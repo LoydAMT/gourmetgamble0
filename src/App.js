@@ -27,10 +27,12 @@ function App() {
         <div style={styles.leftColumn}>
           <h1 style={styles.mainHeading}>
             Parlay Your Ingredients and<br />Stake Your Meals
+            
           </h1>
-          <p style={styles.subHeading}>
-            Parlay Your Ingredients and Stake Your Meals on Winning Recipes
-          </p>
+          <p style={{ ...styles.subHeading, textAlign: 'center' }}>
+                 Parlay Your Ingredients and Stake Your Meals on Winning Recipes                                     
+              <button style={styles.CheckRecipe}>Check Recipes</button>
+           </p>
           <input 
             style={styles.searchBar} 
             type="text" 
@@ -77,6 +79,16 @@ function App() {
   );
 }
 const styles = {
+  CheckRecipe: {
+    backgroundColor: '#ffa62f',
+    border: 'none',
+    borderRadius: '25px',
+    padding: '10px 20px',
+    fontSize: '18px',
+    color: '#143501',
+    cursor: 'pointer',
+    marginleft: 'auto',
+  },
   container: {
     background: 'linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%)',
     minHeight: '100vh',
@@ -88,12 +100,13 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: '40px',
-    gap: '20px',
+    gap: '100px',
   },
   navItem: {
     fontSize: '18px',
     color: '#143501',
     cursor: 'pointer',
+    gap: '50px',
   },
   signInButton: {
     backgroundColor: '#ffa62f',
@@ -120,6 +133,8 @@ const styles = {
     fontSize: '18px',
     color: '#828282',
     marginBottom: '20px',
+    display: 'flex',
+    justifyContent: 'space-between',
   },
   searchBar: {
     width: '100%',

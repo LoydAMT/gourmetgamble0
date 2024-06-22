@@ -1,7 +1,18 @@
-import logo from './logo.svg';
+import React, { useRef } from 'react';
+
 import './App.css';
 
 function App() {
+  const ingredientCardsRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (direction === 'left') {
+      ingredientCardsRef.current.scrollBy({ left: -150, behavior: 'smooth' });
+    } else {
+      ingredientCardsRef.current.scrollBy({ left: 150, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div style={styles.container}>
       <nav style={styles.nav}>
@@ -11,7 +22,7 @@ function App() {
         <div style={styles.navItem}>Contact</div>
         <button style={styles.signInButton}>Sign in/Sign Up</button>
       </nav>
-      
+
       <main style={styles.mainContent}>
         <div style={styles.leftColumn}>
           <h1 style={styles.mainHeading}>
@@ -25,15 +36,27 @@ function App() {
             type="text" 
             placeholder="Search Ingredient Here"
           />
-          <div style={styles.ingredientCards}>
-            <button style={styles.scrollButton}>{'<'}</button>
-            {['fsdffdfdsf', 'fsdffdfdsf', 'fsdffdfdsf'].map((text, index) => (
-              <div key={index} style={styles.card}>
-                <img src={`https://via.placeholder.com/100?text=Ingredient${index+1}`} alt="Ingredient" style={styles.cardImage} />
-                <p>{text}</p>
-              </div>
-            ))}
-            <button style={styles.scrollButton}>{'>'}</button>
+          <div style={styles.ingredientCardsContainer}>
+            <button 
+              style={{ ...styles.scrollButton, ...styles.leftScrollButton }}
+              onClick={() => scroll('left')}
+            >
+              {'<'}
+            </button>
+            <div style={styles.ingredientCards} ref={ingredientCardsRef}>
+              {['fsdffdfdsf', 'fsdffdfdsf', 'fsdffdfdsf', 'fsdffdfdsf', 'fsdffdfdsf'].map((text, index) => (
+                <div key={index} style={styles.card}>
+                  <img src={`https://via.placeholder.com/100?text=Ingredient${index+1}`} alt="Ingredient" style={styles.cardImage} />
+                  <p>{text}</p>
+                </div>
+              ))}
+            </div>
+            <button 
+              style={{ ...styles.scrollButton, ...styles.rightScrollButton }}
+              onClick={() => scroll('right')}
+            >
+              {'>'}
+            </button>
           </div>
         </div>
         <div style={styles.rightColumn}>
@@ -53,7 +76,6 @@ function App() {
     </div>
   );
 }
-
 const styles = {
   container: {
     background: 'linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%)',
@@ -63,9 +85,10 @@ const styles = {
   },
   nav: {
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: '40px',
+    gap: '20px',
   },
   navItem: {
     fontSize: '18px',
@@ -107,10 +130,18 @@ const styles = {
     backgroundColor: 'rgba(127, 250, 116, 0.87)',
     marginBottom: '20px',
   },
+  ingredientCardsContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    position: 'relative',
+    paddingLeft: '40px'
+  },
   ingredientCards: {
     display: 'flex',
     overflowX: 'auto',
     gap: '20px',
+    paddingBottom: '20px',
+    scrollBehavior: 'smooth',
   },
   card: {
     backgroundColor: '#f0bc77',
@@ -133,6 +164,15 @@ const styles = {
     height: '40px',
     fontSize: '24px',
     cursor: 'pointer',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+  },
+  leftScrollButton: {
+    left: '20px',
+  },
+  rightScrollButton: {
+    right: '-20px',
   },
   rightColumn: {
     width: '45%',
@@ -169,9 +209,6 @@ const styles = {
     fontSize: '24px',
   },
   discoverButton: {
-    position: 'absolute',
-    bottom: '20px',
-    right: '20px',
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     border: 'none',
     borderRadius: '20px',
@@ -194,6 +231,7 @@ const styles = {
     borderRadius: '10px',
   },
 };
+
 
 
 export default App;

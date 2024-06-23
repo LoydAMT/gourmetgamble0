@@ -1,9 +1,9 @@
+// src/App.js
 import React, { useState, useEffect, useRef } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import AddRecipeModal from './AddRecipeModal';
 import './App.css';
-
 const styles = {
   container: {
     background: 'linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%)',
@@ -183,6 +183,7 @@ const styles = {
     padding: 0,
   },
 };
+
 function App() {
   const ingredientCardsRef = useRef(null);
   const [ingredients, setIngredients] = useState([]);
@@ -278,26 +279,22 @@ function App() {
           </div>
         </div>
       </main>
-      <section style={styles.recipeList}>
+
+      <div style={styles.recipeList}>
         {recipes.map((recipe) => (
           <div key={recipe.id} style={styles.recipeCard}>
-            <img src={recipe.photo} alt={recipe.name} style={styles.recipePhoto} />
-            <h3>{recipe.name}</h3>
-            <p><strong>Origin:</strong> {recipe.origin}</p>
-            <p><strong>Submitted by:</strong> {recipe.nameOfUser}</p>
+            <h2>{recipe.nameOfDish}</h2>
+            <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} style={styles.recipePhoto} />
             <ul style={styles.ingredientList}>
-              {Array.isArray(recipe.ingredients) 
-                ? recipe.ingredients.map((ingredient, index) => (
-                    <li key={index}>{ingredient}</li>
-                  ))
-                : (typeof recipe.ingredients === 'string' && recipe.ingredients.split(',').map((ingredient, index) => (
-                    <li key={index}>{ingredient.trim()}</li>
-                  )))}
+              {recipe.ingredients.map((ingredient, index) => (
+                <li key={index}>{ingredient}</li>
+              ))}
             </ul>
           </div>
         ))}
-      </section>
-      {showModal && <AddRecipeModal onClose={() => setShowModal(false)} onAddRecipe={handleAddRecipe} />}
+      </div>
+      
+      <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />
     </div>
   );
 }

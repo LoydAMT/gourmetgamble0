@@ -14,13 +14,15 @@ const styles = {
   },
   nav: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
+    marginLeft: '15%',
+    marginRight: '15%',
     alignItems: 'center',
     marginBottom: '40px',
     gap: '20px',
   },
   navItem: {
-    fontSize: '18px',
+    fontSize: '22px',
     color: '#143501',
     cursor: 'pointer',
   },
@@ -29,9 +31,16 @@ const styles = {
     border: 'none',
     borderRadius: '25px',
     padding: '10px 20px',
-    fontSize: '18px',
+    fontSize: '22px',
     color: '#143501',
     cursor: 'pointer',
+  },
+  favoriteButtonContainer: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginBottom: '40px',
+    gap: '20px',
+    flex: 1,
   },
   favoriteButton: {
     backgroundColor: '#ffa62f',
@@ -239,12 +248,12 @@ function App() {
       <nav style={styles.nav}>
         <div style={styles.navItem}>Home</div>
         <div style={styles.navItem}>Recipe</div>
+        <div style={styles.navItem}>Pantry</div>
         <div style={styles.navItem}>Community</div>
-        <div style={styles.navItem}>Contact</div>
+        <div style={styles.navItem}>Chat</div>
         <button style={styles.signInButton}>Sign in/Sign Up</button>
-        <button style={styles.favoriteButton}>Favorites</button>
       </nav>
-
+      
       <main style={styles.mainContent}>
         <div style={styles.leftColumn}>
           <h1 style={styles.mainHeading}>

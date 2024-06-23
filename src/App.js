@@ -9,7 +9,6 @@ const styles = {
   container: {
     background: 'linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%)',
     minHeight: '100vh',
-    padding: '20px',
     fontFamily: 'Inter, sans-serif',
   },
   nav: {
@@ -18,7 +17,8 @@ const styles = {
     marginLeft: '15%',
     marginRight: '15%',
     alignItems: 'center',
-    marginBottom: '40px',
+    marginBottom: '30px',
+    padding: '20px',
     gap: '20px',
   },
   navItem: {
@@ -35,26 +35,9 @@ const styles = {
     color: '#143501',
     cursor: 'pointer',
   },
-  favoriteButtonContainer: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginBottom: '40px',
-    gap: '20px',
-    flex: 1,
-  },
-  favoriteButton: {
-    backgroundColor: '#ffa62f',
-    border: 'none',
-    borderRadius: '25px',
-    padding: '10px 20px',
-    fontSize: '18px',
-    color: '#143501',
-    cursor: 'pointer',
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
   mainContent: {
     display: 'flex',
+    padding: '20px',
     justifyContent: 'space-between',
   },
   leftColumn: {
@@ -203,9 +186,22 @@ const styles = {
     listStyle: 'none',
     padding: 0,
   },
-  contactCard:{
-
+  contactCard: {
+    display: 'flex',
+    background: 'linear-gradient(to right, #FBBC05 0%, #F3E5BC 54%, #FBBC05 100%)',
+    marginBottom: 'auto',
+    height: '30px',
+    justifyContent: 'space-between',
+    width: '100%',
   },
+
+  footerItem: {
+    margin: '5px 150px',
+    textDecoration: 'none',
+    color: '#143501',
+    fontSize: '18px',
+  },
+
 };
 
 function App() {
@@ -320,9 +316,10 @@ function App() {
       </div>
 
       <div style={styles.contactCard}>
-      <p>
-        Contact us at: khentlloyd.cases@cit.edu
-      </p>
+          <a href="#" style={styles.footerItem}>Privacy Policy</a>
+          <a href="#" style={styles.footerItem}>About Us</a>
+          <a href="#" style={styles.footerItem}>Feedback</a>
+          <a href="#" style={styles.footerItem}>Contact us</a>
       </div>
 
       <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />

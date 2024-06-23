@@ -27,7 +27,7 @@ const styles = {
   },
   inputRecipe: {
     marginBottom: '20px',
-    padding: '8px',
+    padding: '0px',
     width: '100%',
     fontSize: '16px',
     height: '100px', // Height for textarea to support multiple lines
@@ -35,7 +35,7 @@ const styles = {
   },
   input: {
     marginBottom: '10px',
-    padding: '8px',
+    padding: '0px',
     width: '100%',
     fontSize: '16px',
   },

@@ -248,10 +248,10 @@ function App() {
       <main style={styles.mainContent}>
         <div style={styles.leftColumn}>
           <h1 style={styles.mainHeading}>
-            Parlay Your Ingredients and<br />Stake Your Meals
+            Parlay Your Ingredients and<br />Stake Your Meals.
           </h1>
           <p style={styles.subHeading}>
-            Parlay Your Ingredients and Stake Your Meals on Winning Recipes
+            Parlay Your Ingredients and Stake Your Meals on Winning Recipes.
           </p>
           <input 
             style={styles.searchBar} 

@@ -312,10 +312,10 @@ function App() {
 
       <div style={styles.contactCard}>
       <p>
-        Contact us at:
+        Contact us at: khentlloyd.cases@cit.edu
       </p>
       </div>
-      
+
       <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />
     </div>
   );

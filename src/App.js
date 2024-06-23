@@ -4,6 +4,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import AddRecipeModal from './AddRecipeModal';
 import './App.css';
+
 const styles = {
   container: {
     background: 'linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%)',
@@ -62,7 +63,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     position: 'relative',
-    paddingLeft: '40px', // Adjusted padding to move everything to the right by 40 pixels
+    paddingLeft: '20px', // Adjusted padding to move everything to the right by 40 pixels
   },
   ingredientCards: {
     display: 'flex',
@@ -74,15 +75,15 @@ const styles = {
   card: {
     backgroundColor: '#f0bc77',
     borderRadius: '20px',
-    padding: '20px',
+    padding: '5px', // Reduced from 20px
     textAlign: 'center',
-    minWidth: '150px',
+    minWidth: '10px', // Reduced from 150px
   },
   cardImage: {
-    width: '100px',
-    height: '100px',
+    width: '150px', // Reduced from 100px
+    height: '150px', // Reduced from 100px
     borderRadius: '50%',
-    marginBottom: '10px',
+    marginBottom: '0px',
   },
   scrollButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
@@ -252,7 +253,7 @@ function App() {
             <div style={styles.ingredientCards} ref={ingredientCardsRef}>
               {ingredients.map((ingredient, index) => (
                 <div key={index} style={styles.card}>
-                  <img src={`https://via.placeholder.com/100?text=${ingredient.name}`} alt="Ingredient" style={styles.cardImage} />
+                  <img src={ingredient.imageURL} alt={ingredient.name} style={styles.cardImage} />
                   <p>{ingredient.name}</p>
                 </div>
               ))}

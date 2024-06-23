@@ -33,6 +33,17 @@ const styles = {
     color: '#143501',
     cursor: 'pointer',
   },
+  favoriteButton: {
+    backgroundColor: '#ffa62f',
+    border: 'none',
+    borderRadius: '25px',
+    padding: '10px 20px',
+    fontSize: '18px',
+    color: '#143501',
+    cursor: 'pointer',
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
   mainContent: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -183,6 +194,9 @@ const styles = {
     listStyle: 'none',
     padding: 0,
   },
+  contactCard:{
+
+  },
 };
 
 function App() {
@@ -228,6 +242,7 @@ function App() {
         <div style={styles.navItem}>Community</div>
         <div style={styles.navItem}>Contact</div>
         <button style={styles.signInButton}>Sign in/Sign Up</button>
+        <button style={styles.favoriteButton}>Favorites</button>
       </nav>
 
       <main style={styles.mainContent}>
@@ -293,6 +308,12 @@ function App() {
             </ul>
           </div>
         ))}
+      </div>
+
+      <div style={styles.contactCard}>
+      <p>
+        Contact us at:
+      </p>
       </div>
       
       <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />

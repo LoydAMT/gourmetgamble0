@@ -20,20 +20,36 @@ const styles = {
     backgroundColor: '#fff',
     padding: '20px',
     borderRadius: '8px',
-    width: '300px',
+    width: '400px', // Increased width for symmetry
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'center', // Center align the contents for symmetry
+  },
+  inputRecipe: {
+    marginBottom: '20px',
+    padding: '8px',
+    width: '100%',
+    fontSize: '16px',
+    height: '100px', // Height for textarea to support multiple lines
+    resize: 'vertical', // Allow vertical resizing
   },
   input: {
     marginBottom: '10px',
     padding: '8px',
+    width: '100%',
     fontSize: '16px',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   button: {
     padding: '10px',
     backgroundColor: '#ff9800',
     border: 'none',
     cursor: 'pointer',
+    width: '48%', // Make buttons symmetrical
   },
 };
 
@@ -43,6 +59,8 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   const [nameOfUser, setNameOfUser] = useState('');
   const [photo, setPhoto] = useState('');
   const [ingredients, setIngredients] = useState('');
+  const [video, setVideo] = useState('');
+  const [recipe, setRecipe] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,6 +70,8 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
         origin,
         nameOfUser,
         photo,
+        video,
+        recipe,
         ingredients: ingredients.split(','),
       };
       const docRef = await addDoc(collection(db, 'recipes'), newRecipe);
@@ -61,6 +81,8 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
       setOrigin('');
       setNameOfUser('');
       setPhoto('');
+      setVideo('');
+      setRecipe('');
       setIngredients('');
     } catch (error) {
       console.error('Error adding document: ', error);
@@ -73,7 +95,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
     <div style={styles.modalBackground}>
       <div style={styles.modalContainer}>
         <h2>Add Recipe</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <input
             style={styles.input}
             type="text"
@@ -108,14 +130,30 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
           <input
             style={styles.input}
             type="text"
+            placeholder="VidTutorial"
+            value={video}
+            onChange={(e) => setVideo(e.target.value)}
+          />
+          <textarea
+            style={styles.inputRecipe}
+            placeholder="Recipe Guide"
+            value={recipe}
+            onChange={(e) => setRecipe(e.target.value)}
+            rows="5"
+          />
+          <input
+            style={styles.input}
+            type="text"
             placeholder="Ingredients (comma separated)"
             value={ingredients}
             onChange={(e) => setIngredients(e.target.value)}
             required
           />
-          <button style={styles.button} type="submit">Add Recipe</button>
+          <div style={styles.buttonContainer}>
+            <button style={styles.button} type="submit">Add Recipe</button>
+            <button style={styles.button} onClick={() => setShowModal(false)}>Cancel</button>
+          </div>
         </form>
-        <button style={styles.button} onClick={() => setShowModal(false)}>Cancel</button>
       </div>
     </div>
   );

@@ -1,94 +1,10 @@
-import React, { useRef } from 'react';
-
+import React, { useState, useEffect, useRef } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './firebaseConfig';
+import AddRecipeModal from './AddRecipeModal';
 import './App.css';
 
-function App() {
-  const ingredientCardsRef = useRef(null);
-
-  const scroll = (direction) => {
-    if (direction === 'left') {
-      ingredientCardsRef.current.scrollBy({ left: -150, behavior: 'smooth' });
-    } else {
-      ingredientCardsRef.current.scrollBy({ left: 150, behavior: 'smooth' });
-    }
-  };
-
-  return (
-    <div style={styles.container}>
-      <nav style={styles.nav}>
-        <div style={styles.navItem}>Home</div>
-        <div style={styles.navItem}>Recipe</div>
-        <div style={styles.navItem}>Community</div>
-        <div style={styles.navItem}>Contact</div>
-        <button style={styles.signInButton}>Sign in/Sign Up</button>
-      </nav>
-
-      <main style={styles.mainContent}>
-        <div style={styles.leftColumn}>
-          <h1 style={styles.mainHeading}>
-            Parlay Your Ingredients and<br />Stake Your Meals
-            
-          </h1>
-          <p style={{ ...styles.subHeading, textAlign: 'center' }}>
-                 Parlay Your Ingredients and Stake Your Meals on Winning Recipes                                     
-              <button style={styles.CheckRecipe}>Check Recipes</button>
-           </p>
-          <input 
-            style={styles.searchBar} 
-            type="text" 
-            placeholder="Search Ingredient Here"
-          />
-          <div style={styles.ingredientCardsContainer}>
-            <button 
-              style={{ ...styles.scrollButton, ...styles.leftScrollButton }}
-              onClick={() => scroll('left')}
-            >
-              {'<'}
-            </button>
-            <div style={styles.ingredientCards} ref={ingredientCardsRef}>
-              {['fsdffdfdsf', 'fsdffdfdsf', 'fsdffdfdsf', 'fsdffdfdsf', 'fsdffdfdsf'].map((text, index) => (
-                <div key={index} style={styles.card}>
-                  <img src={`https://via.placeholder.com/100?text=Ingredient${index+1}`} alt="Ingredient" style={styles.cardImage} />
-                  <p>{text}</p>
-                </div>
-              ))}
-            </div>
-            <button 
-              style={{ ...styles.scrollButton, ...styles.rightScrollButton }}
-              onClick={() => scroll('right')}
-            >
-              {'>'}
-            </button>
-          </div>
-        </div>
-        <div style={styles.rightColumn}>
-          <div style={styles.mainImage}>
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/93dbb781c0deb85382084d502707c0bc26e5e707b4a196271d30a9e2163dd7d2?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Taco Platter" style={styles.mainImageContent} />
-            <div style={styles.discoverMoreContainer}>
-              <div style={styles.starIcon}>★</div>
-              <button style={styles.discoverButton}>Discover More</button>
-            </div>
-          </div>
-          <div style={styles.ratingsSection}>
-            <h2 style={styles.ratingsHeading}>999+ Ratings</h2>
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/93dbb781c0deb85382084d502707c0bc26e5e707b4a196271d30a9e2163dd7d2?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Food" style={styles.ratingsImage} />
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-}
 const styles = {
-  CheckRecipe: {
-    backgroundColor: '#ffa62f',
-    border: 'none',
-    borderRadius: '25px',
-    padding: '10px 20px',
-    fontSize: '18px',
-    color: '#143501',
-    cursor: 'pointer',
-    marginleft: 'auto',
-  },
   container: {
     background: 'linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%)',
     minHeight: '100vh',
@@ -100,13 +16,12 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: '40px',
-    gap: '100px',
+    gap: '20px',
   },
   navItem: {
     fontSize: '18px',
     color: '#143501',
     cursor: 'pointer',
-    gap: '50px',
   },
   signInButton: {
     backgroundColor: '#ffa62f',
@@ -133,8 +48,6 @@ const styles = {
     fontSize: '18px',
     color: '#828282',
     marginBottom: '20px',
-    display: 'flex',
-    justifyContent: 'space-between',
   },
   searchBar: {
     width: '100%',
@@ -149,7 +62,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     position: 'relative',
-    paddingLeft: '40px'
+    paddingLeft: '40px', // Adjusted padding to move everything to the right by 40 pixels
   },
   ingredientCards: {
     display: 'flex',
@@ -184,10 +97,10 @@ const styles = {
     transform: 'translateY(-50%)',
   },
   leftScrollButton: {
-    left: '20px',
+    left: '0px', // Ensures it's on screen
   },
   rightScrollButton: {
-    right: '-20px',
+    right: '-50px',
   },
   rightColumn: {
     width: '45%',
@@ -245,8 +158,148 @@ const styles = {
     width: '100%',
     borderRadius: '10px',
   },
+  recipeList: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    padding: '20px',
+  },
+  recipeCard: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    margin: '20px',
+    padding: '20px',
+    width: '250px',
+    textAlign: 'center',
+  },
+  recipePhoto: {
+    width: '100%',
+    borderRadius: '8px',
+    marginBottom: '10px',
+  },
+  ingredientList: {
+    listStyle: 'none',
+    padding: 0,
+  },
 };
+function App() {
+  const ingredientCardsRef = useRef(null);
+  const [ingredients, setIngredients] = useState([]);
+  const [recipes, setRecipes] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      const querySnapshot = await getDocs(collection(db, 'ingredients'));
+      const ingredientsList = querySnapshot.docs.map((doc) => doc.data());
+      setIngredients(ingredientsList);
+    };
 
+    const fetchRecipes = async () => {
+      const querySnapshot = await getDocs(collection(db, 'recipes'));
+      const recipesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setRecipes(recipesData);
+    };
+
+    fetchIngredients();
+    fetchRecipes();
+  }, []);
+
+  const scroll = (direction) => {
+    if (direction === 'left') {
+      ingredientCardsRef.current.scrollBy({ left: -150, behavior: 'smooth' });
+    } else {
+      ingredientCardsRef.current.scrollBy({ left: 150, behavior: 'smooth' });
+    }
+  };
+
+  const handleAddRecipe = (newRecipe) => {
+    setRecipes((prevRecipes) => [...prevRecipes, newRecipe]);
+  };
+
+  return (
+    <div style={styles.container}>
+      <nav style={styles.nav}>
+        <div style={styles.navItem}>Home</div>
+        <div style={styles.navItem}>Recipe</div>
+        <div style={styles.navItem}>Community</div>
+        <div style={styles.navItem}>Contact</div>
+        <button style={styles.signInButton}>Sign in/Sign Up</button>
+      </nav>
+
+      <main style={styles.mainContent}>
+        <div style={styles.leftColumn}>
+          <h1 style={styles.mainHeading}>
+            Parlay Your Ingredients and<br />Stake Your Meals
+          </h1>
+          <p style={styles.subHeading}>
+            Parlay Your Ingredients and Stake Your Meals on Winning Recipes
+          </p>
+          <input 
+            style={styles.searchBar} 
+            type="text" 
+            placeholder="Search Ingredient Here"
+          />
+          <div style={styles.ingredientCardsContainer}>
+            <button 
+              style={{ ...styles.scrollButton, ...styles.leftScrollButton }}
+              onClick={() => scroll('left')}
+            >
+              {'<'}
+            </button>
+            <div style={styles.ingredientCards} ref={ingredientCardsRef}>
+              {ingredients.map((ingredient, index) => (
+                <div key={index} style={styles.card}>
+                  <img src={`https://via.placeholder.com/100?text=${ingredient.name}`} alt="Ingredient" style={styles.cardImage} />
+                  <p>{ingredient.name}</p>
+                </div>
+              ))}
+            </div>
+            <button 
+              style={{ ...styles.scrollButton, ...styles.rightScrollButton }}
+              onClick={() => scroll('right')}
+            >
+              {'>'}
+            </button>
+          </div>
+        </div>
+        <div style={styles.rightColumn}>
+          <div style={styles.mainImage}>
+            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/93dbb781c0deb85382084d502707c0bc26e5e707b4a196271d30a9e2163dd7d2?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Taco Platter" style={styles.mainImageContent} />
+            <div style={styles.discoverMoreContainer}>
+              <div style={styles.starIcon}>★</div>
+              <button style={styles.discoverButton} onClick={() => setShowModal(true)}>Discover More</button>
+            </div>
+          </div>
+          <div style={styles.ratingsSection}>
+            <h2 style={styles.ratingsHeading}>999+ Ratings</h2>
+            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/93dbb781c0deb85382084d502707c0bc26e5e707b4a196271d30a9e2163dd7d2?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Food" style={styles.ratingsImage} />
+          </div>
+        </div>
+      </main>
+      <section style={styles.recipeList}>
+        {recipes.map((recipe) => (
+          <div key={recipe.id} style={styles.recipeCard}>
+            <img src={recipe.photo} alt={recipe.name} style={styles.recipePhoto} />
+            <h3>{recipe.name}</h3>
+            <p><strong>Origin:</strong> {recipe.origin}</p>
+            <p><strong>Submitted by:</strong> {recipe.nameOfUser}</p>
+            <ul style={styles.ingredientList}>
+              {Array.isArray(recipe.ingredients) 
+                ? recipe.ingredients.map((ingredient, index) => (
+                    <li key={index}>{ingredient}</li>
+                  ))
+                : (typeof recipe.ingredients === 'string' && recipe.ingredients.split(',').map((ingredient, index) => (
+                    <li key={index}>{ingredient.trim()}</li>
+                  )))}
+            </ul>
+          </div>
+        ))}
+      </section>
+      {showModal && <AddRecipeModal onClose={() => setShowModal(false)} onAddRecipe={handleAddRecipe} />}
+    </div>
+  );
+}
 
 export default App;

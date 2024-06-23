@@ -1,4 +1,4 @@
-// src/App.js
+// src/App.js kehnt
 import React, { useState, useEffect, useRef } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';

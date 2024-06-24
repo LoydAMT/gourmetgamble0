@@ -205,18 +205,21 @@ const styles = {
     color: '#143501',
     fontSize: '18px',
   },
-
   filteredRecipes: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     marginTop: '20px',
   },
   filteredRecipeCard: {
     backgroundColor: '#fff',
     borderRadius: '8px',
     boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-    margin: '20px',
+    margin: '10px',
     padding: '20px',
     width: '250px',
     textAlign: 'center',
+    boxSizing: 'border-box',
   },
   filteredRecipePhoto: {
     width: '100%',
@@ -230,7 +233,6 @@ const styles = {
 
 
 };
-
 function App() {
   const ingredientCardsRef = useRef(null);
   const [ingredients, setIngredients] = useState([]);
@@ -290,7 +292,7 @@ function App() {
     selectedIngredients.every((ingredient) =>
       recipe.ingredients.includes(ingredient)
     )
-  );
+  ).slice(0, 3);
 
   return (
     <div style={styles.container}>

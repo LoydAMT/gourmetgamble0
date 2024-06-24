@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import AddRecipeModal from './AddRecipeModal';
+import PrivacyPolicyModal from './PrivacyPolicyModal';
 import './App.css';
 
 const styles = {
@@ -200,10 +201,15 @@ const styles = {
   },
 
   footerItem: {
-    margin: '5px 150px',
-    textDecoration: 'none',
+    display: 'flex',
+    margin: '0px 150px',
+    height: '30px',
+    marginBottom: 'auto',
     color: '#143501',
     fontSize: '18px',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    borderColor: 'transparent',
   },
   filteredRecipes: {
     display: 'flex',
@@ -240,6 +246,7 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false); // Add state for privacy modal
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -398,13 +405,16 @@ function App() {
       </div>
 
       <div style={styles.contactCard}>
-          <a href="#" style={styles.footerItem}>Privacy Policy</a>
-          <a href="#" style={styles.footerItem}>About Us</a>
-          <a href="#" style={styles.footerItem}>Feedback</a>
-          <a href="#" style={styles.footerItem}>Contact us</a>
+      <button style={styles.footerItem} onClick={() => setShowPrivacyModal(true)}>
+            Privacy Policy
+          </button>
+          <button style={styles.footerItem}>About Us</button>
+          <button style={styles.footerItem}>Feedback</button>
+          <button style={styles.footerItem}>Contact us</button>
       </div>
 
       <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />
+      <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} /> {/* Add the PrivacyPolicyModal component */}
     </div>
   );
 }

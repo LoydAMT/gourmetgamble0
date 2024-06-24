@@ -25,6 +25,17 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center', // Center align the contents for symmetry
   },
+
+  policyContainer: {
+    backgroundColor: '#fff',
+    padding: '20px',
+    borderRadius: '8px',
+    width: '', // Increased width for symmetry
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center', // Center align the contents for symmetry
+  },
+
   inputRecipe: {
     marginBottom: '20px',
     padding: '0px',

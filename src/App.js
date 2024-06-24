@@ -189,17 +189,21 @@ const styles = {
   contactCard: {
     display: 'flex',
     background: 'linear-gradient(to right, #FBBC05 0%, #F3E5BC 54%, #FBBC05 100%)',
-    marginBottom: 'auto',
     height: '30px',
     justifyContent: 'space-between',
     width: '100%',
   },
 
   footerItem: {
-    margin: '5px 150px',
-    textDecoration: 'none',
+    display: 'flex',
+    margin: '0px 150px',
+    height: '30px',
+    marginBottom: 'auto',
     color: '#143501',
     fontSize: '18px',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    borderColor: 'transparent',
   },
 
 };
@@ -317,10 +321,10 @@ function App() {
       </div>
 
       <div style={styles.contactCard}>
-          <a href="#" style={styles.footerItem}>Privacy Policy</a>
-          <a href="#" style={styles.footerItem}>About Us</a>
-          <a href="#" style={styles.footerItem}>Feedback</a>
-          <a href="#" style={styles.footerItem}>Contact us</a>
+          <button style={styles.footerItem}>Privacy Policy</button>
+          <button style={styles.footerItem}>About Us</button>
+          <button style={styles.footerItem}>Feedback</button>
+          <button style={styles.footerItem}>Contact us</button>
       </div>
 
       <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />

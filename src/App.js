@@ -81,15 +81,15 @@ const styles = {
     borderRadius: '20px',
     padding: '5px', // Reduced from 20px
     textAlign: 'center',
-    minWidth: '10px', // Reduced from 150px
+    minWidth: '100px', // Reduced from 150px
     cursor: 'pointer',
   },
   selectedCard: {
     backgroundColor: '#4A90E2', // Blue color for selected ingredient
   },
   cardImage: {
-    width: '150px', // Reduced from 100px
-    height: '150px', // Reduced from 100px
+    width: '100px', // Reduced from 100px
+    height: '100px', // Reduced from 100px
     borderRadius: '50%',
     marginBottom: '0px',
   },

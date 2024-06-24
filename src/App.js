@@ -1,4 +1,4 @@
-// src/App.js kehnt
+// src/App.js
 import React, { useState, useEffect, useRef } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
@@ -81,6 +81,10 @@ const styles = {
     padding: '5px', // Reduced from 20px
     textAlign: 'center',
     minWidth: '10px', // Reduced from 150px
+    cursor: 'pointer',
+  },
+  selectedCard: {
+    backgroundColor: '#4A90E2', // Blue color for selected ingredient
   },
   cardImage: {
     width: '150px', // Reduced from 100px
@@ -189,31 +193,51 @@ const styles = {
   contactCard: {
     display: 'flex',
     background: 'linear-gradient(to right, #FBBC05 0%, #F3E5BC 54%, #FBBC05 100%)',
+    marginBottom: 'auto',
     height: '30px',
     justifyContent: 'space-between',
     width: '100%',
   },
 
   footerItem: {
-    display: 'flex',
-    margin: '0px 150px',
-    height: '30px',
-    marginBottom: 'auto',
+    margin: '5px 150px',
+    textDecoration: 'none',
     color: '#143501',
     fontSize: '18px',
-    backgroundColor: 'transparent',
-    cursor: 'pointer',
-    borderColor: 'transparent',
   },
 
-};
+  filteredRecipes: {
+    marginTop: '20px',
+  },
+  filteredRecipeCard: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    margin: '20px',
+    padding: '20px',
+    width: '250px',
+    textAlign: 'center',
+  },
+  filteredRecipePhoto: {
+    width: '100%',
+    borderRadius: '8px',
+    marginBottom: '10px',
+  },
+  filteredIngredientList: {
+    listStyle: 'none',
+    padding: 0,
+  },
 
+
+};
 
 function App() {
   const ingredientCardsRef = useRef(null);
   const [ingredients, setIngredients] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -244,6 +268,30 @@ function App() {
     setRecipes((prevRecipes) => [...prevRecipes, newRecipe]);
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const toggleIngredient = (ingredient) => {
+    setSelectedIngredients((prevSelectedIngredients) => {
+      if (prevSelectedIngredients.includes(ingredient)) {
+        return prevSelectedIngredients.filter((item) => item !== ingredient);
+      } else {
+        return [...prevSelectedIngredients, ingredient];
+      }
+    });
+  };
+
+  const filteredIngredients = ingredients.filter((ingredient) =>
+    ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredRecipes = recipes.filter((recipe) =>
+    selectedIngredients.every((ingredient) =>
+      recipe.ingredients.includes(ingredient)
+    )
+  );
+
   return (
     <div style={styles.container}>
       <nav style={styles.nav}>
@@ -254,7 +302,7 @@ function App() {
         <div style={styles.navItem}>Chat</div>
         <button style={styles.signInButton}>Sign in/Sign Up</button>
       </nav>
-      
+
       <main style={styles.mainContent}>
         <div style={styles.leftColumn}>
           <h1 style={styles.mainHeading}>
@@ -267,6 +315,8 @@ function App() {
             style={styles.searchBar} 
             type="text" 
             placeholder="Search Ingredient Here"
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
           <div style={styles.ingredientCardsContainer}>
             <button 
@@ -276,9 +326,20 @@ function App() {
               {'<'}
             </button>
             <div style={styles.ingredientCards} ref={ingredientCardsRef}>
-              {ingredients.map((ingredient, index) => (
-                <div key={index} style={styles.card}>
-                  <img src={ingredient.imageURL} alt={ingredient.name} style={styles.cardImage} />
+              {filteredIngredients.map((ingredient, index) => (
+                <div
+                  key={index}
+                  style={{
+                    ...styles.card,
+                    ...(selectedIngredients.includes(ingredient.name) ? styles.selectedCard : {})
+                  }}
+                  onClick={() => toggleIngredient(ingredient.name)}
+                >
+                  <img
+                    src={ingredient.imageURL}
+                    alt={ingredient.name}
+                    style={styles.cardImage}
+                  />
                   <p>{ingredient.name}</p>
                 </div>
               ))}
@@ -289,6 +350,20 @@ function App() {
             >
               {'>'}
             </button>
+          </div>
+          
+          <div style={styles.filteredRecipes}>
+            {filteredRecipes.map((recipe) => (
+              <div key={recipe.id} style={styles.filteredRecipeCard}>
+                <h2>{recipe.nameOfDish}</h2>
+                <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} style={styles.filteredRecipePhoto} />
+                <ul style={styles.filteredIngredientList}>
+                  {recipe.ingredients.map((ingredient, index) => (
+                    <li key={index}>{ingredient}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
         <div style={styles.rightColumn}>
@@ -321,10 +396,10 @@ function App() {
       </div>
 
       <div style={styles.contactCard}>
-          <button style={styles.footerItem}>Privacy Policy</button>
-          <button style={styles.footerItem}>About Us</button>
-          <button style={styles.footerItem}>Feedback</button>
-          <button style={styles.footerItem}>Contact us</button>
+          <a href="#" style={styles.footerItem}>Privacy Policy</a>
+          <a href="#" style={styles.footerItem}>About Us</a>
+          <a href="#" style={styles.footerItem}>Feedback</a>
+          <a href="#" style={styles.footerItem}>Contact us</a>
       </div>
 
       <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />

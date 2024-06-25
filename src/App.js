@@ -4,14 +4,9 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import AddRecipeModal from './AddRecipeModal';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
-<<<<<<< HEAD
-import AboutUsModal from './AboutUsModal';
-import ContactUsModal from './ContactUsModal';
-=======
 import AuthModal from './AuthModal'; // Import the AuthModal component
 import AboutUsModal from './AboutUsModal';
 import ContactUsModal from './ContactUsModal';
->>>>>>> origin/master
 import './App.css';
 
 
@@ -256,16 +251,10 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
-<<<<<<< HEAD
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false); // Add state for privacy modal
-  const [showAboutUsModal, setShowAboutUsModal] = useState(false); // Add state for AboutUs modal
-  const [showContactUsModal, setShowContactUsModal] = useState(false); // Add state for AboutUs modal
-=======
   const [showAboutUsModal, setShowAboutUsModal] = useState(false); // Add state for AboutUs modal
   const [showContactUsModal, setShowContactUsModal] = useState(false); // Add state for AboutUs modal
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false); // Add state for AuthModal
->>>>>>> origin/master
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -432,24 +421,6 @@ function App() {
       </div>
 
       <div style={styles.contactCard}>
-<<<<<<< HEAD
-      <button style={styles.footerItem} onClick={() => setShowPrivacyModal(true)}>
-            Privacy Policy
-          </button>
-          <button style={styles.footerItem} onClick={() => setShowAboutUsModal(true)}>
-            About Us
-          </button>
-          <button style={styles.footerItem}>Feedback</button>
-          <button style={styles.footerItem} onClick={() => setShowContactUsModal(true)}>
-            Contact us
-          </button>
-      </div>
-
-      <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />
-      <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} /> {/* Add the PrivacyPolicyModal component */}
-      <AboutUsModal showModal={showAboutUsModal} setShowModal={setShowAboutUsModal} />
-      <ContactUsModal showModal={showContactUsModal} setShowModal={setShowContactUsModal} />
-=======
 <button style={styles.footerItem} onClick={() => setShowPrivacyModal(true)}>
             Privacy Policy
           </button>
@@ -467,7 +438,6 @@ function App() {
       <AuthModal showModal={showAuthModal} setShowModal={setShowAuthModal} /> {/* Add the AuthModal component */}
       <AboutUsModal showModal={showAboutUsModal} setShowModal={setShowAboutUsModal} />
       <ContactUsModal showModal={showContactUsModal} setShowModal={setShowContactUsModal} />
->>>>>>> origin/master
     </div>
   );
 }

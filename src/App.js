@@ -4,7 +4,9 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import AddRecipeModal from './AddRecipeModal';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
+import AuthModal from './AuthModal'; // Import the AuthModal component
 import './App.css';
+
 
 const styles = {
   container: {
@@ -239,6 +241,7 @@ const styles = {
 
 
 };
+
 function App() {
   const ingredientCardsRef = useRef(null);
   const [ingredients, setIngredients] = useState([]);
@@ -246,19 +249,28 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false); // Add state for privacy modal
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false); // Add state for AuthModal
 
   useEffect(() => {
     const fetchIngredients = async () => {
-      const querySnapshot = await getDocs(collection(db, 'ingredients'));
-      const ingredientsList = querySnapshot.docs.map((doc) => doc.data());
-      setIngredients(ingredientsList);
+      try {
+        const querySnapshot = await getDocs(collection(db, 'ingredients'));
+        const ingredientsList = querySnapshot.docs.map((doc) => doc.data());
+        setIngredients(ingredientsList);
+      } catch (error) {
+        console.error("Error fetching ingredients:", error);
+      }
     };
 
     const fetchRecipes = async () => {
-      const querySnapshot = await getDocs(collection(db, 'recipes'));
-      const recipesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setRecipes(recipesData);
+      try {
+        const querySnapshot = await getDocs(collection(db, 'recipes'));
+        const recipesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setRecipes(recipesData);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      }
     };
 
     fetchIngredients();
@@ -309,7 +321,7 @@ function App() {
         <div style={styles.navItem}>Pantry</div>
         <div style={styles.navItem}>Community</div>
         <div style={styles.navItem}>Chat</div>
-        <button style={styles.signInButton}>Sign in/Sign Up</button>
+        <button style={styles.signInButton} onClick={() => setShowAuthModal(true)}>Sign in/Sign Up</button> {/* Added onClick handler */}
       </nav>
 
       <main style={styles.mainContent}>
@@ -405,16 +417,17 @@ function App() {
       </div>
 
       <div style={styles.contactCard}>
-      <button style={styles.footerItem} onClick={() => setShowPrivacyModal(true)}>
-            Privacy Policy
-          </button>
-          <button style={styles.footerItem}>About Us</button>
-          <button style={styles.footerItem}>Feedback</button>
-          <button style={styles.footerItem}>Contact us</button>
+        <button style={styles.footerItem} onClick={() => setShowPrivacyModal(true)}>
+          Privacy Policy
+        </button>
+        <button style={styles.footerItem}>About Us</button>
+        <button style={styles.footerItem}>Feedback</button>
+        <button style={styles.footerItem}>Contact us</button>
       </div>
 
       <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />
-      <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} /> {/* Add the PrivacyPolicyModal component */}
+      <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} />
+      <AuthModal showModal={showAuthModal} setShowModal={setShowAuthModal} /> {/* Add the AuthModal component */}
     </div>
   );
 }

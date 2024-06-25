@@ -4,6 +4,8 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import AddRecipeModal from './AddRecipeModal';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
+import AboutUsModal from './AboutUsModal';
+import ContactUsModal from './ContactUsModal';
 import './App.css';
 
 const styles = {
@@ -247,6 +249,8 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false); // Add state for privacy modal
+  const [showAboutUsModal, setShowAboutUsModal] = useState(false); // Add state for AboutUs modal
+  const [showContactUsModal, setShowContactUsModal] = useState(false); // Add state for AboutUs modal
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -408,13 +412,19 @@ function App() {
       <button style={styles.footerItem} onClick={() => setShowPrivacyModal(true)}>
             Privacy Policy
           </button>
-          <button style={styles.footerItem}>About Us</button>
+          <button style={styles.footerItem} onClick={() => setShowAboutUsModal(true)}>
+            About Us
+          </button>
           <button style={styles.footerItem}>Feedback</button>
-          <button style={styles.footerItem}>Contact us</button>
+          <button style={styles.footerItem} onClick={() => setShowContactUsModal(true)}>
+            Contact us
+          </button>
       </div>
 
       <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />
       <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} /> {/* Add the PrivacyPolicyModal component */}
+      <AboutUsModal showModal={showAboutUsModal} setShowModal={setShowAboutUsModal} />
+      <ContactUsModal showModal={showContactUsModal} setShowModal={setShowContactUsModal} />
     </div>
   );
 }

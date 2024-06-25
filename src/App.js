@@ -241,7 +241,6 @@ const styles = {
 
 
 };
-
 function App() {
   const ingredientCardsRef = useRef(null);
   const [ingredients, setIngredients] = useState([]);

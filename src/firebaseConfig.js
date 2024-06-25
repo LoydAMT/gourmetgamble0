@@ -1,7 +1,7 @@
 // firebaseConfig.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -19,7 +19,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Authentication functions with error handling
+const provider = new GoogleAuthProvider();
+
 const registerUser = async (email, password) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -40,4 +41,14 @@ const loginUser = async (email, password) => {
     }
 };
 
-export { app, db, auth, registerUser, loginUser };
+const signInWithGoogle = async () => {
+    try {
+        const userCredential = await signInWithPopup(auth, provider);
+        return userCredential.user;
+    } catch (error) {
+        console.error("Error logging in with Google:", error);
+        throw error;
+    }
+};
+
+export { app, db, auth, registerUser, loginUser, signInWithGoogle };

@@ -206,7 +206,7 @@ const styles = {
 
   footerItem: {
     display: 'flex',
-    margin: '0px 150px',
+    margin: '0px 130px',
     height: '30px',
     marginBottom: 'auto',
     color: '#143501',

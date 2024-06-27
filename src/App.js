@@ -321,7 +321,6 @@ function App() {
       <nav style={styles.nav}>
         <div style={styles.navItem}>Home</div>
         <div style={styles.navItem}>Recipe</div>
-        <div style={styles.navItem}>Pantry</div>
         <div style={styles.navItem}>Community</div>
         <div style={styles.navItem}>Chat</div>
         <button style={styles.signInButton} onClick={() => setShowAuthModal(true)}>Sign in/Sign Up</button> {/* Added onClick handler */}

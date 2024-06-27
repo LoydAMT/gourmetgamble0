@@ -15,6 +15,7 @@ const styles = {
     background: 'linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%)',
     minHeight: '100vh',
     fontFamily: 'Inter, sans-serif',
+    position: 'relative', // Make container the relative positioning context
   },
   nav: {
     display: 'flex',
@@ -38,6 +39,16 @@ const styles = {
     padding: '10px 20px',
     fontSize: '22px',
     color: '#143501',
+    cursor: 'pointer',
+  },
+  userContainer: {
+    position: 'absolute',
+    top: '20px', // Adjust as needed
+    right: '50px', // Adjust as needed
+  },
+  userImage: {
+    width: '50px', // Adjust as needed
+    height: '50px', // Adjust as needed
     cursor: 'pointer',
   },
   mainContent: {
@@ -325,6 +336,13 @@ function App() {
         <div style={styles.navItem}>Chat</div>
         <button style={styles.signInButton} onClick={() => setShowAuthModal(true)}>Sign in/Sign Up</button> {/* Added onClick handler */}
       </nav>
+      <div style={styles.userContainer}>
+        <img
+          style={styles.userImage}
+          src="https://cdn-icons-png.flaticon.com/512/1144/1144760.png"
+          alt="User"
+        />
+      </div>
 
       <main style={styles.mainContent}>
         <div style={styles.leftColumn}>

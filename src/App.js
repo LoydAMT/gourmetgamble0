@@ -163,6 +163,8 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     fontSize: '24px',
+    cursor: 'pointer',
+    borderColor: 'transparent',
   },
   discoverButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -415,7 +417,7 @@ function App() {
           <div style={styles.mainImage}>
             <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/93dbb781c0deb85382084d502707c0bc26e5e707b4a196271d30a9e2163dd7d2?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Taco Platter" style={styles.mainImageContent} />
             <div style={styles.discoverMoreContainer}>
-              <div style={styles.starIcon}>★</div>
+              <button style={styles.starIcon}>★</button>
               <button style={styles.discoverButton} onClick={() => setShowModal(true)}>Discover More</button>
             </div>
           </div>

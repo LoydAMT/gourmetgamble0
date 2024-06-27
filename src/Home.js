@@ -6,258 +6,256 @@ import PrivacyPolicyModal from './PrivacyPolicyModal';
 import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
 import ContactUsModal from './ContactUsModal';
+import IngredientList from './IngredientList'; 
 import './App.css';
 
 const styles = {
-    container: {
-      background: 'linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%)',
-      minHeight: '100vh',
-      fontFamily: 'Inter, sans-serif',
-      position: 'relative', // Make container the relative positioning context
-    },
-    nav: {
-      display: 'flex',
-      justifyContent: 'space-evenly',
-      marginLeft: '15%',
-      marginRight: '15%',
-      alignItems: 'center',
-      marginBottom: '30px',
-      padding: '20px',
-      gap: '20px',
-    },
-    navItem: {
-      fontSize: '22px',
-      color: '#143501',
-      cursor: 'pointer',
-      backgroundColor: 'transparent',
-      borderColor: 'transparent',
-    },
-    signInButton: {
-      backgroundColor: '#ffa62f',
-      border: 'none',
-      borderRadius: '25px',
-      padding: '10px 20px',
-      fontSize: '22px',
-      color: '#143501',
-      cursor: 'pointer',
-    },
-    userContainer: {
-      position: 'absolute',
-      top: '20px', // Adjust as needed
-      right: '50px', // Adjust as needed
-      backgroundColor: 'transparent',
-      borderColor: 'transparent',
-    },
-    userImage: {
-      width: '50px', // Adjust as needed
-      height: '50px', // Adjust as needed
-      cursor: 'pointer',
-    },
-    mainContent: {
-      display: 'flex',
-      padding: '20px',
-      justifyContent: 'space-between',
-    },
-    leftColumn: {
-      width: '50%',
-    },
-    mainHeading: {
-      fontSize: '48px',
-      color: '#143501',
-      marginBottom: '20px',
-    },
-    subHeading: {
-      fontSize: '18px',
-      color: '#828282',
-      marginBottom: '20px',
-    },
-    searchBar: {
-      width: '100%',
-      padding: '15px',
-      fontSize: '18px',
-      borderRadius: '30px',
-      border: 'none',
-      backgroundColor: 'rgba(127, 250, 116, 0.87)',
-      marginBottom: '20px',
-    },
-    ingredientCardsContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      position: 'relative',
-      paddingLeft: '20px', // Adjusted padding to move everything to the right by 40 pixels
-    },
-    ingredientCards: {
-      display: 'flex',
-      overflowX: 'auto',
-      gap: '20px',
-      paddingBottom: '20px',
-      scrollBehavior: 'smooth',
-    },
-    card: {
-      backgroundColor: '#f0bc77',
-      borderRadius: '20px',
-      padding: '5px', // Reduced from 20px
-      textAlign: 'center',
-      minWidth: '100px', // Reduced from 150px
-      cursor: 'pointer',
-    },
-    selectedCard: {
-      backgroundColor: '#4A90E2', // Blue color for selected ingredient
-    },
-    cardImage: {
-      width: '100px', // Reduced from 100px
-      height: '100px', // Reduced from 100px
-      borderRadius: '50%',
-      marginBottom: '0px',
-    },
-    scrollButton: {
-      backgroundColor: 'rgba(255, 255, 255, 0.5)',
-      border: 'none',
-      borderRadius: '50%',
-      width: '40px',
-      height: '40px',
-      fontSize: '24px',
-      cursor: 'pointer',
-      position: 'absolute',
-      top: '50%',
-      transform: 'translateY(-50%)',
-    },
-    leftScrollButton: {
-      left: '0px', // Ensures it's on screen
-    },
-    rightScrollButton: {
-      right: '-50px',
-    },
-    rightColumn: {
-      width: '45%',
-    },
-    mainImage: {
-      height: '300px',
-      backgroundColor: '#ccc',
-      borderRadius: '20px',
-      marginBottom: '20px',
-      position: 'relative',
-    },
-    mainImageContent: {
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-    },
-    discoverMoreContainer: {
-      position: 'absolute',
-      top: '20px',
-      right: '20px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px',
-    },
-    starIcon: {
-      backgroundColor: '#143501',
-      color: '#fcff6d',
-      borderRadius: '50%',
-      width: '40px',
-      height: '40px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      fontSize: '24px',
-      cursor: 'pointer',
-      borderColor: 'transparent',
-    },
-    discoverButton: {
-      backgroundColor: 'rgba(255, 255, 255, 0.7)',
-      border: 'none',
-      borderRadius: '20px',
-      padding: '10px 20px',
-      fontSize: '16px',
-      cursor: 'pointer',
-    },
-    ratingsSection: {
-      backgroundColor: '#143501',
-      borderRadius: '20px',
-      padding: '20px',
-      color: 'white',
-    },
-    ratingsHeading: {
-      fontSize: '36px',
-      marginBottom: '20px',
-    },
-    ratingsImage: {
-      width: '100%',
-      borderRadius: '10px',
-    },
-    recipeList: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      padding: '20px',
-    },
-    recipeCard: {
-      backgroundColor: '#fff',
-      borderRadius: '8px',
-      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-      margin: '20px',
-      padding: '20px',
-      width: '250px',
-      textAlign: 'center',
-    },
-    recipePhoto: {
-      width: '100%',
-      borderRadius: '8px',
-      marginBottom: '10px',
-    },
-    ingredientList: {
-      listStyle: 'none',
-      padding: 0,
-    },
-    contactCard: {
-      display: 'flex',
-      background: 'linear-gradient(to right, #FBBC05 0%, #F3E5BC 54%, #FBBC05 100%)',
-      marginBottom: 'auto',
-      height: '30px',
-      justifyContent: 'space-between',
-      width: '100%',
-    },
-  
-    footerItem: {
-      display: 'flex',
-      margin: '0px 130px',
-      height: '30px',
-      marginBottom: 'auto',
-      color: '#143501',
-      fontSize: '18px',
-      backgroundColor: 'transparent',
-      cursor: 'pointer',
-      borderColor: 'transparent',
-    },
-    filteredRecipes: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      marginTop: '20px',
-    },
-    filteredRecipeCard: {
-      backgroundColor: '#fff',
-      borderRadius: '8px',
-      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-      margin: '10px',
-      padding: '20px',
-      width: '250px',
-      textAlign: 'center',
-      boxSizing: 'border-box',
-    },
-    filteredRecipePhoto: {
-      width: '100%',
-      borderRadius: '8px',
-      marginBottom: '10px',
-    },
-    filteredIngredientList: {
-      listStyle: 'none',
-      padding: 0,
-    },
-  
-  
-  };
+  container: {
+    background: 'linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%)',
+    minHeight: '100vh',
+    fontFamily: 'Inter, sans-serif',
+    position: 'relative',
+  },
+  nav: {
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    marginLeft: '15%',
+    marginRight: '15%',
+    alignItems: 'center',
+    marginBottom: '30px',
+    padding: '20px',
+    gap: '20px',
+  },
+  navItem: {
+    fontSize: '22px',
+    color: '#143501',
+    cursor: 'pointer',
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
+  },
+  signInButton: {
+    backgroundColor: '#ffa62f',
+    border: 'none',
+    borderRadius: '25px',
+    padding: '10px 20px',
+    fontSize: '22px',
+    color: '#143501',
+    cursor: 'pointer',
+  },
+  userContainer: {
+    position: 'absolute',
+    top: '20px',
+    right: '50px',
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
+  },
+  userImage: {
+    width: '50px',
+    height: '50px',
+    cursor: 'pointer',
+  },
+  mainContent: {
+    display: 'flex',
+    padding: '20px',
+    justifyContent: 'space-between',
+  },
+  leftColumn: {
+    width: '50%',
+  },
+  mainHeading: {
+    fontSize: '48px',
+    color: '#143501',
+    marginBottom: '20px',
+  },
+  subHeading: {
+    fontSize: '18px',
+    color: '#828282',
+    marginBottom: '20px',
+  },
+  searchBar: {
+    width: '100%',
+    padding: '15px',
+    fontSize: '18px',
+    borderRadius: '30px',
+    border: 'none',
+    backgroundColor: 'rgba(127, 250, 116, 0.87)',
+    marginBottom: '20px',
+  },
+  ingredientCardsContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    position: 'relative',
+    paddingLeft: '20px',
+  },
+  ingredientCards: {
+    display: 'flex',
+    overflowX: 'auto',
+    gap: '20px',
+    paddingBottom: '20px',
+    scrollBehavior: 'smooth',
+  },
+  card: {
+    backgroundColor: '#f0bc77',
+    borderRadius: '20px',
+    padding: '5px',
+    textAlign: 'center',
+    minWidth: '100px',
+    cursor: 'pointer',
+  },
+  selectedCard: {
+    backgroundColor: '#4A90E2',
+  },
+  cardImage: {
+    width: '100px',
+    height: '100px',
+    borderRadius: '50%',
+    marginBottom: '0px',
+  },
+  scrollButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    border: 'none',
+    borderRadius: '50%',
+    width: '40px',
+    height: '40px',
+    fontSize: '24px',
+    cursor: 'pointer',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+  },
+  leftScrollButton: {
+    left: '0px',
+  },
+  rightScrollButton: {
+    right: '-50px',
+  },
+  rightColumn: {
+    width: '45%',
+  },
+  mainImage: {
+    height: '300px',
+    backgroundColor: '#ccc',
+    borderRadius: '20px',
+    marginBottom: '20px',
+    position: 'relative',
+  },
+  mainImageContent: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  discoverMoreContainer: {
+    position: 'absolute',
+    top: '20px',
+    right: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  starIcon: {
+    backgroundColor: '#143501',
+    color: '#fcff6d',
+    borderRadius: '50%',
+    width: '40px',
+    height: '40px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '24px',
+    cursor: 'pointer',
+    borderColor: 'transparent',
+  },
+  discoverButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    border: 'none',
+    borderRadius: '20px',
+    padding: '10px 20px',
+    fontSize: '16px',
+    cursor: 'pointer',
+  },
+  ratingsSection: {
+    backgroundColor: '#143501',
+    borderRadius: '20px',
+    padding: '20px',
+    color: 'white',
+  },
+  ratingsHeading: {
+    fontSize: '36px',
+    marginBottom: '20px',
+  },
+  ratingsImage: {
+    width: '100%',
+    borderRadius: '10px',
+  },
+  recipeList: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    padding: '20px',
+  },
+  recipeCard: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    margin: '20px',
+    padding: '20px',
+    width: '250px',
+    textAlign: 'center',
+  },
+  recipePhoto: {
+    width: '100%',
+    borderRadius: '8px',
+    marginBottom: '10px',
+  },
+  ingredientList: {
+    listStyle: 'none',
+    padding: 0,
+  },
+  contactCard: {
+    display: 'flex',
+    background: 'linear-gradient(to right, #FBBC05 0%, #F3E5BC 54%, #FBBC05 100%)',
+    marginBottom: 'auto',
+    height: '30px',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  footerItem: {
+    display: 'flex',
+    margin: '0px 130px',
+    height: '30px',
+    marginBottom: 'auto',
+    color: '#143501',
+    fontSize: '18px',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    borderColor: 'transparent',
+  },
+  filteredRecipes: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginTop: '20px',
+  },
+  filteredRecipeCard: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    margin: '10px',
+    padding: '20px',
+    width: '250px',
+    textAlign: 'center',
+    boxSizing: 'border-box',
+  },
+  filteredRecipePhoto: {
+    width: '100%',
+    borderRadius: '8px',
+    marginBottom: '10px',
+  },
+  filteredIngredientList: {
+    listStyle: 'none',
+    padding: 0,
+  },
+};
 
 function Home() {
   const ingredientCardsRef = useRef(null);
@@ -330,7 +328,7 @@ function Home() {
     selectedIngredients.every((ingredient) =>
       recipe.ingredients.includes(ingredient)
     )
-  ).slice(0, 3);
+  );
 
   return (
     <div style={styles.container}>
@@ -384,15 +382,11 @@ function Home() {
           </div>
           
           <div style={styles.filteredRecipes}>
-            {filteredRecipes.map((recipe) => (
+            {filteredRecipes.slice(0, 3).map((recipe) => (
               <div key={recipe.id} style={styles.filteredRecipeCard}>
                 <h2>{recipe.nameOfDish}</h2>
                 <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} style={styles.filteredRecipePhoto} />
-                <ul style={styles.filteredIngredientList}>
-                  {recipe.ingredients.map((ingredient, index) => (
-                    <li key={index}>{ingredient}</li>
-                  ))}
-                </ul>
+                <IngredientList ingredients={recipe.ingredients} />
               </div>
             ))}
           </div>
@@ -417,11 +411,7 @@ function Home() {
           <div key={recipe.id} style={styles.recipeCard}>
             <h2>{recipe.nameOfDish}</h2>
             <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} style={styles.recipePhoto} />
-            <ul style={styles.ingredientList}>
-              {recipe.ingredients.map((ingredient, index) => (
-                <li key={index}>{ingredient}</li>
-              ))}
-            </ul>
+            <IngredientList ingredients={recipe.ingredients} />
           </div>
         ))}
       </div>

@@ -28,7 +28,7 @@ const styles = {
   input: {
     marginBottom: '10px',
     padding: '10px',
-    width: '100%',
+    width: '96%',
     fontSize: '16px',
   },
   select: {
@@ -56,6 +56,7 @@ const styles = {
     cursor: 'pointer',
     width: '100%',
     color: '#fff',
+    marginBottom: '10px',
     marginTop: '10px',
   },
   successMessage: {

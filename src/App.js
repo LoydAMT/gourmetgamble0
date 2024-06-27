@@ -31,6 +31,8 @@ const styles = {
     fontSize: '22px',
     color: '#143501',
     cursor: 'pointer',
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
   },
   signInButton: {
     backgroundColor: '#ffa62f',
@@ -45,6 +47,8 @@ const styles = {
     position: 'absolute',
     top: '20px', // Adjust as needed
     right: '50px', // Adjust as needed
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
   },
   userImage: {
     width: '50px', // Adjust as needed
@@ -330,19 +334,19 @@ function App() {
   return (
     <div style={styles.container}>
       <nav style={styles.nav}>
-        <div style={styles.navItem}>Home</div>
-        <div style={styles.navItem}>Recipe</div>
-        <div style={styles.navItem}>Community</div>
-        <div style={styles.navItem}>Chat</div>
+        <button style={styles.navItem}>Home</button>
+        <button style={styles.navItem}>Recipe</button>
+        <button style={styles.navItem}>Community</button>
+        <button style={styles.navItem}>Chat</button>
         <button style={styles.signInButton} onClick={() => setShowAuthModal(true)}>Sign in/Sign Up</button> {/* Added onClick handler */}
       </nav>
-      <div style={styles.userContainer}>
+      <button style={styles.userContainer}>
         <img
           style={styles.userImage}
           src="https://cdn-icons-png.flaticon.com/512/1144/1144760.png"
           alt="User"
         />
-      </div>
+      </button>
 
       <main style={styles.mainContent}>
         <div style={styles.leftColumn}>

@@ -89,12 +89,19 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [availableIngredients, setAvailableIngredients] = useState([]);
+  const [newIngredientName, setNewIngredientName] = useState('');
+  const [newIngredientImageURL, setNewIngredientImageURL] = useState('');
+  const [showNewIngredientForm, setShowNewIngredientForm] = useState(false);
 
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'ingredients'));
-        const ingredientsList = querySnapshot.docs.map(doc => doc.data().name);
+        const ingredientsList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          name: doc.data().name,
+          imageURL: doc.data().imageURL,
+        }));
         setAvailableIngredients(ingredientsList);
       } catch (error) {
         console.error('Error fetching ingredients: ', error);
@@ -105,15 +112,50 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   }, []);
 
   const filteredIngredients = availableIngredients.filter((ingredient) =>
-    ingredient.toLowerCase().includes(searchQuery.toLowerCase())
+    ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleIngredientChange = (ingredient) => {
+  const handleIngredientChange = (ingredientName) => {
     setSelectedIngredients((prevSelected) =>
-      prevSelected.includes(ingredient)
-        ? prevSelected.filter((item) => item !== ingredient)
-        : [...prevSelected, ingredient]
+      prevSelected.includes(ingredientName)
+        ? prevSelected.filter((item) => item !== ingredientName)
+        : [...prevSelected, ingredientName]
     );
+  };
+
+  const addNewIngredient = async () => {
+    if (newIngredientName.trim() === '') {
+      alert('Please enter the name for the new ingredient.');
+      return;
+    }
+
+    if (!isValidImageUrl(newIngredientImageURL.trim())) {
+      alert('Please enter a valid image URL for the new ingredient.');
+      return;
+    }
+
+    try {
+      const docRef = await addDoc(collection(db, 'ingredients'), {
+        name: newIngredientName.trim(),
+        imageURL: newIngredientImageURL.trim(),
+      });
+      const newIngredientId = docRef.id;
+      setAvailableIngredients((prevIngredients) => [
+        ...prevIngredients,
+        { id: newIngredientId, name: newIngredientName.trim(), imageURL: newIngredientImageURL.trim() },
+      ]);
+      setSelectedIngredients((prevSelected) => [...prevSelected, newIngredientName.trim()]);
+      setNewIngredientName('');
+      setNewIngredientImageURL('');
+      setShowNewIngredientForm(false);
+    } catch (error) {
+      console.error('Error adding new ingredient: ', error);
+      alert('Failed to add new ingredient. Please try again.');
+    }
+  };
+
+  const isValidImageUrl = (url) => {
+    return url.match(/\.(jpeg|jpg|gif|png)$/) != null;
   };
 
   const handleSubmit = async (e) => {
@@ -211,16 +253,38 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
           />
           <div style={styles.ingredientList}>
             {filteredIngredients.map((ingredient) => (
-              <div key={ingredient} style={styles.ingredientItem}>
+              <div key={ingredient.id} style={styles.ingredientItem}>
                 <input
                   type="checkbox"
-                  checked={selectedIngredients.includes(ingredient)}
-                  onChange={() => handleIngredientChange(ingredient)}
+                  checked={selectedIngredients.includes(ingredient.name)}
+                  onChange={() => handleIngredientChange(ingredient.name)}
                 />
-                <label>{ingredient}</label>
+                <label>{ingredient.name}</label>
               </div>
             ))}
+            {showNewIngredientForm && (
+              <div style={styles.ingredientItem}>
+                <input
+                  type="text"
+                  placeholder="New Ingredient Name"
+                  value={newIngredientName}
+                  onChange={(e) => setNewIngredientName(e.target.value)}
+                />
+                <input
+                  type="url"
+                  placeholder="Image URL"
+                  value={newIngredientImageURL}
+                  onChange={(e) => setNewIngredientImageURL(e.target.value)}
+                />
+                <button type="button" onClick={addNewIngredient}>
+                  Add
+                </button>
+              </div>
+            )}
           </div>
+          <button type="button" onClick={() => setShowNewIngredientForm(true)}>
+            Add New Ingredient
+          </button>
           <div style={styles.buttonContainer}>
             <button
               style={{ ...styles.button, ...styles.addButton }}

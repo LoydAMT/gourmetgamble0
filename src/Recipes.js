@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import './App.css';
+
 const styles = {
   container: {
     padding: '20px',
@@ -29,10 +30,6 @@ const styles = {
   recipeTitle: {
     fontSize: '24px',
     margin: '10px 0',
-  },
-  browseByCourse: {
-    fontSize: '20px',
-    marginBottom: '10px',
   },
   searchContainer: {
     marginBottom: '20px',
@@ -78,11 +75,10 @@ const styles = {
   },
 };
 
-function App() {
+function Recipes() {
   const [recipes, setRecipes] = useState([]);
   const [recipeOfTheDay, setRecipeOfTheDay] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -138,21 +134,15 @@ function App() {
                 <img src={recipe.photo} alt={recipe.nameOfDish} style={styles.recipeCardImage} />
                 <div style={styles.recipeCardContent}>
                   <h3 style={styles.recipeCardTitle}>{recipe.nameOfDish}</h3>
-                  <p style={styles.recipeCardOrigin}>{recipe.nameOfUser}</p>
+                  <p style={styles.recipeCardOrigin}>Uploaded by: {recipe.nameOfUser}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
       ))}
-      <AddRecipeModal
-        showModal={showAddRecipeModal}
-        setShowModal={setShowAddRecipeModal}
-        onAddRecipe={(newRecipe) => setRecipes([...recipes, newRecipe])}
-      />
     </div>
   );
 }
-
 
 export default Recipes;

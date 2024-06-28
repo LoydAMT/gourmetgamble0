@@ -18,6 +18,8 @@ const styles = {
     boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
     marginBottom: '20px',
     padding: '20px',
+    maxWidth: '400px',
+    margin: '0 auto 20px auto',
   },
   recipeImage: {
     width: '100%',

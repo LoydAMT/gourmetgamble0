@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import Home from './Home';
+import Recipes from './Recipes';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
 import ContactUsModal from './ContactUsModal';
+import AddRecipeModal from './AddRecipeModal';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './firebaseConfig';
 import './App.css';
 
 const styles = {
@@ -73,51 +77,84 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAboutUsModal, setShowAboutUsModal] = useState(false);
   const [showContactUsModal, setShowContactUsModal] = useState(false);
+  const [recipes, setRecipes] = useState([]);
+  const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      const querySnapshot = await getDocs(collection(db, 'recipes'));
+      const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setRecipes(recipesData);
+    };
+
+    fetchRecipes();
+  }, []);
+
+  const handleAddRecipe = (newRecipe) => {
+    setRecipes([...recipes, newRecipe]);
+  };
 
   return (
     <Router>
-      <div>
-        <nav style={styles.nav}>
-          <button style={styles.navItem} onClick={() => window.location.href = '/'}>
-            Home
-          </button>
-          <button style={styles.navItem}>Recipe</button>
-          <button style={styles.navItem}>Community</button>
-          <button style={styles.navItem}>Chat</button>
-          <button style={styles.signInButton} onClick={() => setShowAuthModal(true)}>Sign in/Sign Up</button>
-        </nav>
-        <button style={styles.userContainer}>
-          <img
-            style={styles.userImage}
-            src="https://cdn-icons-png.flaticon.com/512/1144/1144760.png"
-            alt="User"
-          />
-        </button>
-
-        <Routes>
-          <Route path="/" element={<Home />} />
-          {/* Add other routes here */}
-        </Routes>
-
-        <div style={styles.contactCard}>
-          <button style={styles.footerItem} onClick={() => setShowPrivacyModal(true)}>
-            Privacy Policy
-          </button>
-          <button style={styles.footerItem} onClick={() => setShowAboutUsModal(true)}>
-            About Us
-          </button>
-          <button style={styles.footerItem}>Feedback</button>
-          <button style={styles.footerItem} onClick={() => setShowContactUsModal(true)}>
-            Contact us
-          </button>
-        </div>
-
-        <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} />
-        <AuthModal showModal={showAuthModal} setShowModal={setShowAuthModal} />
-        <AboutUsModal showModal={showAboutUsModal} setShowModal={setShowAboutUsModal} />
-        <ContactUsModal showModal={showContactUsModal} setShowModal={setShowContactUsModal} />
-      </div>
+      <AppContent
+        showPrivacyModal={showPrivacyModal}
+        setShowPrivacyModal={setShowPrivacyModal}
+        showAuthModal={showAuthModal}
+        setShowAuthModal={setShowAuthModal}
+        showAboutUsModal={showAboutUsModal}
+        setShowAboutUsModal={setShowAboutUsModal}
+        showContactUsModal={showContactUsModal}
+        setShowContactUsModal={setShowContactUsModal}
+        recipes={recipes}
+        handleAddRecipe={handleAddRecipe}
+        showAddRecipeModal={showAddRecipeModal}
+        setShowAddRecipeModal={setShowAddRecipeModal}
+      />
     </Router>
+  );
+}
+
+function AppContent({
+  showPrivacyModal, setShowPrivacyModal,
+  showAuthModal, setShowAuthModal,
+  showAboutUsModal, setShowAboutUsModal,
+  showContactUsModal, setShowContactUsModal,
+  recipes, handleAddRecipe, showAddRecipeModal, setShowAddRecipeModal
+}) {
+  const navigate = useNavigate();
+
+  return (
+    <div>
+      <nav style={styles.nav}>
+        <button style={styles.navItem} onClick={() => navigate('/')}>
+          Home
+        </button>
+        <button style={styles.navItem} onClick={() => navigate('/recipes')}>
+          Recipes
+        </button>
+        <button style={styles.navItem}>Community</button>
+        <button style={styles.navItem}>Chat</button>
+        <button style={styles.signInButton} onClick={() => setShowAuthModal(true)}>
+          Sign in/Sign Up
+        </button>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/recipes" element={<Recipes recipes={recipes} />} />
+      </Routes>
+
+      <AddRecipeModal
+        showModal={showAddRecipeModal}
+        setShowModal={setShowAddRecipeModal}
+        onAddRecipe={handleAddRecipe}
+      />
+
+      <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} />
+      <AuthModal showModal={showAuthModal} setShowModal={setShowAuthModal} />
+      <AboutUsModal showModal={showAboutUsModal} setShowModal={setShowAboutUsModal} />
+      <ContactUsModal showModal={showContactUsModal} setShowModal={setShowContactUsModal} />
+    </div>
   );
 }
 

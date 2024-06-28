@@ -204,9 +204,11 @@ const styles = {
     textAlign: 'center',
   },
   recipePhoto: {
-    width: '100%',
+    width: '250px', // Set a fixed width
+    height: '250px', // Set a fixed height
     borderRadius: '8px',
     marginBottom: '10px',
+    objectFit: 'cover', // Ensure the image covers the area without distortion
   },
   ingredientList: {
     listStyle: 'none',
@@ -248,9 +250,11 @@ const styles = {
     boxSizing: 'border-box',
   },
   filteredRecipePhoto: {
-    width: '100%',
+    width: '200px', // Set a fixed width
+    height: '200px', // Set a fixed height
     borderRadius: '8px',
     marginBottom: '10px',
+    objectFit: 'cover', // Ensure the image covers the area without distortion
   },
   filteredIngredientList: {
     listStyle: 'none',

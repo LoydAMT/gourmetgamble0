@@ -254,7 +254,7 @@ const styles = {
   },
   filteredIngredientList: {
     listStyle: 'none',
-    padding: 0,
+    padding: '2px',
   },
 };
 

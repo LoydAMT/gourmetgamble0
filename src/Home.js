@@ -8,6 +8,7 @@ import AboutUsModal from './AboutUsModal';
 import ContactUsModal from './ContactUsModal';
 import IngredientList from './IngredientList'; 
 import './App.css';
+import './App.css';
 
 const styles = {
   container: {

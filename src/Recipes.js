@@ -19,15 +19,18 @@ const styles = {
     marginBottom: '20px',
     padding: '20px',
     maxWidth: '400px',
+    maxHeight: '500px',
     margin: '0 auto 20px auto',
   },
   recipeImage: {
-    width: '100%',
-    height: '200px',
+    width: '400px',
+    height: '350px',
     objectFit: 'cover',
+    borderRadius: '10px',
   },
   recipeContent: {
     textAlign: 'center',
+    marginTop: '10px',
   },
   recipeTitle: {
     fontSize: '24px',
@@ -35,9 +38,10 @@ const styles = {
   },
   searchContainer: {
     marginBottom: '20px',
+    textAlign: 'center',
   },
   searchInput: {
-    width: '100%',
+    width: '80%',
     padding: '10px',
     fontSize: '16px',
     borderRadius: '5px',
@@ -49,7 +53,6 @@ const styles = {
   },
   recipeGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
     gap: '20px',
   },
   recipeCard: {
@@ -77,6 +80,36 @@ const styles = {
   },
 };
 
+// Media queries for responsiveness
+const responsiveStyles = `
+  @media (min-width: 600px) {
+    .recipeGrid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    .searchInput {
+      width: 60%;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .recipeGrid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    .searchInput {
+      width: 50%;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .recipeGrid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    .searchInput {
+      width: 40%;
+    }
+  }
+`;
+
 function Recipes() {
   const [recipes, setRecipes] = useState([]);
   const [recipeOfTheDay, setRecipeOfTheDay] = useState(null);
@@ -86,6 +119,7 @@ function Recipes() {
     const fetchRecipes = async () => {
       const querySnapshot = await getDocs(collection(db, 'recipes'));
       const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      console.log('Fetched Recipes:', recipesData); // Log fetched recipes
       setRecipes(recipesData);
       setRecipeOfTheDay(recipesData[Math.floor(Math.random() * recipesData.length)]);
     };
@@ -109,9 +143,16 @@ function Recipes() {
 
   return (
     <div style={styles.container}>
+      <style>{responsiveStyles}</style>
       {recipeOfTheDay && (
         <div style={styles.recipeOfTheDay}>
-          <img src={recipeOfTheDay.photo} alt={recipeOfTheDay.nameOfDish} style={styles.recipeImage} />
+          <div style={{ width: '100%', position: 'relative' }}>
+            <img
+              src={recipeOfTheDay.photo || 'placeholder-image-url.jpg'}
+              alt={recipeOfTheDay.nameOfDish}
+              style={styles.recipeImage}
+            />
+          </div>
           <div style={styles.recipeContent}>
             <h2 style={styles.recipeTitle}>{recipeOfTheDay.nameOfDish}</h2>
             <p>Recipe of the Day</p>
@@ -130,10 +171,14 @@ function Recipes() {
       {Object.keys(groupedRecipes).map((origin) => (
         <div key={origin}>
           <h3 style={styles.categoryTitle}>{origin}</h3>
-          <div style={styles.recipeGrid}>
+          <div className="recipeGrid" style={styles.recipeGrid}>
             {groupedRecipes[origin].map((recipe) => (
               <div key={recipe.id} style={styles.recipeCard}>
-                <img src={recipe.photo} alt={recipe.nameOfDish} style={styles.recipeCardImage} />
+                <img
+                  src={recipe.photo || 'placeholder-image-url.jpg'}
+                  alt={recipe.nameOfDish}
+                  style={styles.recipeCardImage}
+                />
                 <div style={styles.recipeCardContent}>
                   <h3 style={styles.recipeCardTitle}>{recipe.nameOfDish}</h3>
                   <p style={styles.recipeCardOrigin}>Uploaded by: {recipe.nameOfUser}</p>

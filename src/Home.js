@@ -5,9 +5,11 @@ import AddRecipeModal from './AddRecipeModal';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
-import ContactUsModal from './ContactUsModal';
+import ContactUsModal from './ContactUsModal';  
+import { Carousel } from 'react-responsive-carousel';
+import RecipeSlideshow from './RecipeSlideshow'; // Assuming the component is in the same directory or imported correctly
+import 'react-responsive-carousel/lib/styles/carousel.min.css'; 
 import IngredientList from './IngredientList'; 
-import './App.css';
 import './App.css';
 
 const styles = {
@@ -387,7 +389,7 @@ function Home() {
           </div>
           
           <div style={styles.filteredRecipes}>
-            {filteredRecipes.slice(0, 5).map((recipe) => (
+            {filteredRecipes.slice(0, 3).map((recipe) => (
               <div key={recipe.id} style={styles.filteredRecipeCard}>
                 <h2>{recipe.nameOfDish}</h2>
                 <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} style={styles.filteredRecipePhoto} />
@@ -404,9 +406,8 @@ function Home() {
               <button style={styles.discoverButton} onClick={() => setShowModal(true)}>Discover More</button>
             </div>
           </div>
-          <div style={styles.ratingsSection}>
-            <h2 style={styles.ratingsHeading}>999+ Ratings</h2>
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/93dbb781c0deb85382084d502707c0bc26e5e707b4a196271d30a9e2163dd7d2?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Food" style={styles.ratingsImage} />
+           <div>
+            <RecipeSlideshow />
           </div>
         </div>
       </main>

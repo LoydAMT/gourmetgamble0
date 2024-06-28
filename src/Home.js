@@ -387,7 +387,7 @@ function Home() {
           </div>
           
           <div style={styles.filteredRecipes}>
-            {filteredRecipes.slice(0, 3).map((recipe) => (
+            {filteredRecipes.slice(0, 5).map((recipe) => (
               <div key={recipe.id} style={styles.filteredRecipeCard}>
                 <h2>{recipe.nameOfDish}</h2>
                 <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} style={styles.filteredRecipePhoto} />

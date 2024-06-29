@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from './firebaseConfig';
 
 const SimilarDishCard = ({ imageSrc, title }) => (
   <div className="similar-dish-card">
@@ -14,12 +16,25 @@ const SocialButton = ({ src, alt }) => (
 );
 
 const DishDetails = ({ recipe }) => {
-  const similarDishes = [
-    { imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/e43d8858ed54ee72a143732334694a524229bed8dae953e7e900060c846f2e15?apiKey=58b165f68bc74f159c175e4d9cf0f581&", title: "SIMILAR DISH 1" },
-    { imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/e43d8858ed54ee72a143732334694a524229bed8dae953e7e900060c846f2e15?apiKey=58b165f68bc74f159c175e4d9cf0f581&", title: "SIMILAR DISH 2" },
-    { imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/e43d8858ed54ee72a143732334694a524229bed8dae953e7e900060c846f2e15?apiKey=58b165f68bc74f159c175e4d9cf0f581&", title: "SIMILAR DISH 3" },
-    { imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/e43d8858ed54ee72a143732334694a524229bed8dae953e7e900060c846f2e15?apiKey=58b165f68bc74f159c175e4d9cf0f581&", title: "SIMILAR DISH 4" },
-  ];
+  const [similarDishes, setSimilarDishes] = useState([]);
+
+  useEffect(() => {
+    const fetchSimilarDishes = async () => {
+      const querySnapshot = await getDocs(collection(db, 'recipes'));
+      const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const similar = recipesData.filter(r => {
+        const sharedIngredients = r.ingredients.filter(ingredient => recipe.ingredients.includes(ingredient));
+        return sharedIngredients.length >= 5;
+      });
+
+      setSimilarDishes(similar);
+    };
+
+    if (recipe) {
+      fetchSimilarDishes();
+    }
+  }, [recipe]);
 
   return (
     <main className="dish-details">
@@ -55,7 +70,7 @@ const DishDetails = ({ recipe }) => {
         <h2 className="similar-dishes-title">SIMILAR DISHES</h2>
         <div className="similar-dishes-grid">
           {similarDishes.map((dish, index) => (
-            <SimilarDishCard key={index} imageSrc={dish.imageSrc} title={dish.title} />
+            <SimilarDishCard key={index} imageSrc={dish.photo || 'https://via.placeholder.com/150'} title={dish.nameOfDish} />
           ))}
         </div>
       </section>

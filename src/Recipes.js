@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
-import DishDisplay from './DishDisplay';
+import DishDetails from './DishDetails';
 import './App.css';
 
 const styles = {
@@ -227,7 +227,7 @@ function Recipes() {
           },
         }}
       >
-        {selectedRecipe && <DishDisplay recipe={selectedRecipe} />}
+        {selectedRecipe && <DishDetails recipe={selectedRecipe} />}
         <button onClick={closeModal}>Close</button>
       </Modal>
     </div>

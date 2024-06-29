@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import Modal from 'react-modal';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
+import DishDisplay from './DishDisplay';
 import './App.css';
 
 const styles = {
@@ -114,12 +116,13 @@ function Recipes() {
   const [recipes, setRecipes] = useState([]);
   const [recipeOfTheDay, setRecipeOfTheDay] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchRecipes = async () => {
       const querySnapshot = await getDocs(collection(db, 'recipes'));
       const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      console.log('Fetched Recipes:', recipesData); // Log fetched recipes
       setRecipes(recipesData);
       setRecipeOfTheDay(recipesData[Math.floor(Math.random() * recipesData.length)]);
     };
@@ -140,6 +143,16 @@ function Recipes() {
     acc[recipe.origin].push(recipe);
     return acc;
   }, {});
+
+  const openModal = (recipe) => {
+    setSelectedRecipe(recipe);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedRecipe(null);
+  };
 
   return (
     <div style={styles.container}>
@@ -173,7 +186,11 @@ function Recipes() {
           <h3 style={styles.categoryTitle}>{origin}</h3>
           <div className="recipeGrid" style={styles.recipeGrid}>
             {groupedRecipes[origin].map((recipe) => (
-              <div key={recipe.id} style={styles.recipeCard}>
+              <div
+                key={recipe.id}
+                style={styles.recipeCard}
+                onClick={() => openModal(recipe)}
+              >
                 <img
                   src={recipe.photo || 'placeholder-image-url.jpg'}
                   alt={recipe.nameOfDish}
@@ -188,6 +205,31 @@ function Recipes() {
           </div>
         </div>
       ))}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Recipe Details"
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          },
+          content: {
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            marginRight: '-50%',
+            transform: 'translate(-50%, -50%)',
+            maxWidth: '90%',
+            maxHeight: '90%',
+            padding: '20px',
+            borderRadius: '10px',
+          },
+        }}
+      >
+        {selectedRecipe && <DishDisplay recipe={selectedRecipe} />}
+        <button onClick={closeModal}>Close</button>
+      </Modal>
     </div>
   );
 }

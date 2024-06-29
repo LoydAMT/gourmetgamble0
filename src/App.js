@@ -9,9 +9,8 @@ import ContactUsModal from './ContactUsModal';
 import AddRecipeModal from './AddRecipeModal';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
+import DishDisplay from './DishDisplay';
 import './App.css';
-
-
 
 function App() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -83,6 +82,7 @@ function AppContent({
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/recipes" element={<Recipes recipes={recipes} />} />
+        <Route path="/dish-display" element={<DishDisplay />} />
       </Routes>
 
       <AddRecipeModal

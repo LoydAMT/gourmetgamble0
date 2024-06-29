@@ -51,7 +51,8 @@ const styles = {
   },
   filteredRecipePhoto: {
     width: '100%',
-    height: '800px',
+    height: '643px',
+    borderRadius: '15px',
   },
 };
 

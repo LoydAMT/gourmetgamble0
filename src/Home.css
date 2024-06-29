@@ -189,9 +189,10 @@ nav {
 .main-image {
   height: 300px;
   background-color: #ccc;
-  border-radius: 20px;
+  border-radius: 25px;
   margin-bottom: 20px;
   position: relative;
+  overflow: hidden;
 }
 
 @media (max-width: 768px) {
@@ -203,6 +204,7 @@ nav {
 
 .main-image-content {
   width: 100%;
+  border-radius: 25px;
   height: 100%;
   object-fit: cover;
 }
@@ -210,6 +212,7 @@ nav {
 .discover-more-container {
   position: absolute;
   top: 20px;
+  border-radius: 50px; /* Curved edges */
   right: 20px;
   display: flex;
   align-items: center;

@@ -145,7 +145,7 @@ function Home() {
         <div className="right-column">
           <div className="main-image">
             <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/93dbb781c0deb85382084d502707c0bc26e5e707b4a196271d30a9e2163dd7d2?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Taco Platter" className="main-image-content" />
-            <div className="discover-more-container">
+            <div className="discover-more-container" >
               <button className="star-icon">★</button>
               <button className="discover-button" onClick={() => setShowModal(true)}>Discover More</button>
             </div>

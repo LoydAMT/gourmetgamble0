@@ -10,6 +10,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   const [photo, setPhoto] = useState('');
   const [video, setVideo] = useState('');
   const [recipe, setRecipe] = useState('');  // Added the recipe state back
+  const [description, setDescription] = useState('');
   const [recipeSteps, setRecipeSteps] = useState([{ value: '' }]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -107,6 +108,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
         photo,
         video,
         recipe,
+        description,
         ingredients: selectedIngredients,
         steps: recipeSteps.map(step => step.value),
       };
@@ -139,6 +141,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <input className="input" type="text" placeholder="Name of dish" value={nameOfDish} onChange={(e) => setNameOfDish(e.target.value)} required />
+          <textarea className="inputRecipe" placeholder="Dish Description" value={description} onChange={(e) => setDescription(e.target.value)} />
           <input className="input" type="text" placeholder="Origin" value={origin} onChange={(e) => setOrigin(e.target.value)} required />
           <input className="input" type="text" placeholder="Your name" value={nameOfUser} onChange={(e) => setNameOfUser(e.target.value)} required />
           <input className="input" type="url" placeholder="Photo URL" value={photo} onChange={(e) => setPhoto(e.target.value)} />

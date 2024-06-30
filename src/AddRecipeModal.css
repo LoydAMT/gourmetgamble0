@@ -37,6 +37,7 @@
     font-size: 16px;
     height: 50px;
     resize: vertical;
+    font-family: sans-serif, inter, arial;
 }
 
 .inputSteps {

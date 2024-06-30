@@ -127,6 +127,8 @@ nav {
 .ingredient-cards-container {
   display: flex;
   align-items: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
   position: relative;
   padding-left: 20px;
 }
@@ -152,6 +154,11 @@ nav {
   text-align: center;
   min-width: 100px;
   cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.card:hover{
+  transform: scale(1.05)
 }
 
 .selected-card {

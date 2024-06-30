@@ -117,22 +117,22 @@
   .dish-name {
     color: #000;
     text-align: justify;
-    margin-top: 51px; 
     font: 700 clamp(24px, 4vw + 1rem, 36px) / 150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
-    margin-bottom: 15px;
+    padding-top: 25px;
+    margin-top: 0px;
   }
 
   .dish-author {
     color: #000;
     text-align: justify;
     max-width: 100%;
+    margin-top: 0px;
     font: 700 24px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
   }
 
 
   .action-buttons {
     display: flex;
-    margin-top: 41px;
     gap: 19px;
   }
   @media (max-width: 991px) {
@@ -148,7 +148,7 @@
     text-align: center;
     justify-content: center;
     flex-grow: 1;
-    padding: 15px 13px;
+    padding: 5px 5px;
     font: 700 24px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
   }
   @media (max-width: 991px) {
@@ -170,8 +170,9 @@
   }
   .description-title {
     color: #000;
-    text-align: center;
+    text-align: justify;
     margin-top: 42px;
+    margin-bottom: 10px;
     font: 700 24px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
   }
   @media (max-width: 991px) {
@@ -183,12 +184,13 @@
   .dish-description {
     color: #000;
     align-self: start;
-    margin: 23px 0 0 33px;
-    font: 700 15px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
+    margin: 0 0 0 33px;
+    max-width: 93%;
+    font: 500 15px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
   }
   @media (max-width: 991px) {
     .dish-description {
-      margin-left: 10px;
+      margin-left: 20px;
     }
   }
   .similar-dishes-title {

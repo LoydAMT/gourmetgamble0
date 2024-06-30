@@ -46,7 +46,6 @@ const styles = {
   slideshowContainer: {
     width: '100%', // Adjust as needed
     maxWidth: '2000px', // Set a maximum width
-   
     margin: '0 auto', // Center align horizontally
   },
   filteredRecipePhoto: {
@@ -54,6 +53,7 @@ const styles = {
     height: '643px',
     borderRadius: '15px',
   },
+
 };
 
 export default RecipeSlideshow;

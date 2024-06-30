@@ -304,6 +304,11 @@ nav {
   width: 215px;
   text-align: center;
   box-sizing: border-box;
+  transition: transform 0.3s ease;
+}
+
+.filtered-recipe-card:hover{
+  transform: scale(1.075);
 }
 
 .filtered-recipe-photo {

@@ -121,6 +121,7 @@ function Recipes() {
       >
         {selectedRecipe && <DishDetails recipe={selectedRecipe} />}
       </Modal>
+
     </div>
   );
 }

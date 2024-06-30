@@ -18,7 +18,17 @@ const SocialButton = ({ src, alt }) => (
   <img src={src} alt={alt} className="social-icon" />
 );
 
-const DishDetails = ({ recipe }) => {
+function extractYouTubeID(url) {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return match[2];
+  } else {
+    return null;
+  }
+}
+
+const DishDetails = ({ closeModal, recipe }) => {
   const [similarDishes, setSimilarDishes] = useState([]);
   const [mainDisplay, setMainDisplay] = useState('photo');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -47,6 +57,9 @@ const DishDetails = ({ recipe }) => {
     setIsPlaying(displayType === 'video');
   };
 
+  const videoID = recipe.video ? extractYouTubeID(recipe.video) : null;
+  const videoThumbnailURL = videoID ? `https://img.youtube.com/vi/${videoID}/0.jpg` : "https://via.placeholder.com/150";
+
   return (
     <main className="dish-details">
       <RecipeModal showModal={showRecipeModal} setShowModal={setShowRecipeModal} recipe={recipe} />
@@ -68,13 +81,13 @@ const DishDetails = ({ recipe }) => {
             </div>
             {recipe.video && (
               <div className="thumbnail" onClick={() => handleDisplayChange('video')}>
-                <img src="https://tse1.mm.bing.net/th?id=OIP.dzugAXMlgEoZcJgtR2Er_gHaHa&pid=Api&P=0&h=180" alt="Video thumbnail" className="thumbnail-image" />
+                <img src={videoThumbnailURL} alt="Video thumbnail" className="thumbnail-image" />
               </div>
             )}
           </div>
         </div>
         <div className="dish-info">
-          <button className="close-button" onClick={() => window.location.reload()}>×</button>
+          <button className="close-button" onClick={closeModal}>×</button>
           <h1 className="dish-name">{recipe.nameOfDish}</h1>
           <p className="dish-author">Author:<br /> {recipe.nameOfUser}</p>
           <div className="action-buttons">

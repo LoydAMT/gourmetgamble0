@@ -1,6 +1,6 @@
 // src/AuthModal.js
 import React, { useState } from 'react';
-import { registerUser, loginUser, db } from './firebaseConfig';
+import { registerUser, loginUser, signInWithGoogle, db } from './firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import './App.css';
 
@@ -28,7 +28,7 @@ const styles = {
   input: {
     marginBottom: '10px',
     padding: '10px',
-    width: '100%',
+    width: '96%',
     fontSize: '16px',
   },
   select: {
@@ -48,6 +48,16 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
     width: '48%',
+  },
+  googleButton: {
+    padding: '10px',
+    backgroundColor: '#4285F4',
+    border: 'none',
+    cursor: 'pointer',
+    width: '100%',
+    color: '#fff',
+    marginBottom: '10px',
+    marginTop: '10px',
   },
   successMessage: {
     color: 'green',
@@ -78,7 +88,7 @@ const AuthModal = ({ showModal, setShowModal }) => {
           email,
           culinaryExperience,
         });
-        setSuccessMessage('Successfully saved!');
+        setSuccessMessage('Successfully registered!');
         setTimeout(() => {
           setShowModal(false);
           setSuccessMessage('');
@@ -99,14 +109,36 @@ const AuthModal = ({ showModal, setShowModal }) => {
   const handleSignIn = async () => {
     try {
       await loginUser(email, password);
-      setShowModal(false);
-      setEmail('');
-      setPassword('');
-      setName('');
-      setCulinaryExperience('');
+      setSuccessMessage('Successfully logged in!');
+      setTimeout(() => {
+        setShowModal(false);
+        setSuccessMessage('');
+        setEmail('');
+        setPassword('');
+        setName('');
+        setCulinaryExperience('');
+      }, 2000);
     } catch (error) {
       console.error("Error in login:", error);
       setErrorMessage('Error in login: ' + error.message);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const user = await signInWithGoogle();
+      if (user) {
+        setSuccessMessage('Successfully logged in with Google!');
+        setTimeout(() => {
+          setShowModal(false);
+          setSuccessMessage('');
+        }, 2000);
+      } else {
+        setErrorMessage('Failed to log in with Google. Please try again.');
+      }
+    } catch (error) {
+      console.error("Error logging in with Google:", error);
+      setErrorMessage('Error logging in with Google: ' + error.message);
     }
   };
 
@@ -167,6 +199,7 @@ const AuthModal = ({ showModal, setShowModal }) => {
             </>
           )}
         </div>
+        <button style={styles.googleButton} type="button" onClick={handleGoogleSignIn}>Sign in with Google</button>
         <button style={styles.button} onClick={() => setShowModal(false)}>Cancel</button>
         {successMessage && <div style={styles.successMessage}>{successMessage}</div>}
         {errorMessage && <div style={styles.errorMessage}>{errorMessage}</div>}

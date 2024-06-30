@@ -3,6 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import ReactPlayer from 'react-player';
 import './DishDetails.css';
+import RecipeModal from './RecipeModal';
 
 const SimilarDishCard = ({ imageSrc, title }) => (
   <div className="similar-dish-card">
@@ -21,6 +22,7 @@ const DishDetails = ({ recipe }) => {
   const [similarDishes, setSimilarDishes] = useState([]);
   const [mainDisplay, setMainDisplay] = useState('photo');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showRecipeModal, setShowRecipeModal] = useState(false);
 
   useEffect(() => {
     const fetchSimilarDishes = async () => {
@@ -47,6 +49,7 @@ const DishDetails = ({ recipe }) => {
 
   return (
     <main className="dish-details">
+      <RecipeModal showModal={showRecipeModal} setShowModal={setShowRecipeModal} recipe={recipe} />
       <section className="content-wrapper">
         <div className="dish-image-container">
           <div className="main-image-container">
@@ -75,7 +78,7 @@ const DishDetails = ({ recipe }) => {
           <h1 className="dish-name">{recipe.nameOfDish}</h1>
           <p className="dish-author">BY {recipe.nameOfUser}</p>
           <div className="action-buttons">
-            <button className="recipe-button" onClick={() => handleDisplayChange('video')}>OPEN RECIPE BUTTON</button>
+            <button className="recipe-button" onClick={() => setShowRecipeModal(true)}>OPEN RECIPE BUTTON</button>
             <div className="social-buttons">
               <SocialButton src="https://cdn.builder.io/api/v1/image/assets/TEMP/7a9066052bd6b7055bb6a1d42d410f27c58bf20b47d0c4ca3691f14d8f400d90?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Social media icon 1" />
               <SocialButton src="https://cdn.builder.io/api/v1/image/assets/TEMP/06ab42ee6002883ffd32c9c2e019c6e852d9bac72702bfb5a99342e9cc36ff2c?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Social media icon 2" />
@@ -95,6 +98,6 @@ const DishDetails = ({ recipe }) => {
       </section>
     </main>
   );
-}
+};
 
 export default DishDetails;

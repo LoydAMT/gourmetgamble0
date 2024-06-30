@@ -292,4 +292,32 @@
     object-fit: cover;
     object-position: center;
   }
+  .full-recipe {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #fff5e6;
+  }
+  .recipe-title {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  .recipe-author {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  .recipe-steps {
+    font-size: 16px;
+  }
+  .recipe-steps h2 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  .recipe-steps ul {
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+  .recipe-steps p {
+    margin-top: 10px;
+  }
   

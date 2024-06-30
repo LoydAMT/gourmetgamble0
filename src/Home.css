@@ -2,7 +2,9 @@
 
 /* General container styles */
 .container {
-  background: linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%);
+  background: 
+  url("https://cdn.builder.io/api/v1/image/assets/TEMP/8149b43b93b354f5568ce1456eb20b37421c64e60744b5dd7adc1aa307d934a7?apiKey=24c6f7eaf9b146b8a51450bff9375ddd&width=1200") center/auto,
+  linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%);
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
   position: relative;
@@ -21,8 +23,9 @@ nav {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 40px;
   padding: 10px 20px;
-  background-color: transparent;
+  background: linear-gradient(90deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%);
   flex-wrap: wrap;
 }
 

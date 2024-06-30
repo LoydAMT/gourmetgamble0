@@ -114,8 +114,8 @@ function Recipes() {
             transform: 'translate(-50%, -50%)',
             maxWidth: '90%',
             maxHeight: '90%',
-            padding: '20px',
-            borderRadius: '10px',
+            padding: '0px',
+            borderRadius: '20px',
           },
         }}
       >

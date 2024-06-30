@@ -1,7 +1,10 @@
-.recipes-container {
+  .recipes-container {
     padding: 20px;
-    background-color: #fff5e6;
+    background: 
+      url("https://cdn.builder.io/api/v1/image/assets/TEMP/8149b43b93b354f5568ce1456eb20b37421c64e60744b5dd7adc1aa307d934a7?apiKey=24c6f7eaf9b146b8a51450bff9375ddd&width=1200") center/auto,
+      linear-gradient(270deg, #FCFF6D 0%, #F9EC8D 42%, #F6D8B0 100%);
   }
+
   
   .recipe-of-the-day {
     display: flex;

@@ -1,14 +1,17 @@
   .dish-details {
-  background-color: #fff;
   display: flex;
   flex-direction: column;
-  padding: 50px;
+  padding: 70px;
+  background: linear-gradient(270deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%);
+  border-radius: 20px;
   }
+
   @media (max-width: 991px) {
     .dish-details {
       padding-right: 20px;
     }
   }
+
   .content-wrapper {
     display: flex;
     width: 1000px;

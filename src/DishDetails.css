@@ -22,9 +22,9 @@
     margin-left: 5%;
     position: relative;
     height: 500px; /* You might want to set a specific height if necessary */
-}
+  }
 
-.main-image-container {
+  .main-image-container {
     width: 100%; /* Full width of the parent */
     height: 100%; /* Adjust the height as needed, or keep it responsive */
     padding: 0; /* No padding for precise fitting */
@@ -34,9 +34,11 @@
     position: relative; /* Adjust positioning if necessary */
     top: 0;
     left: 0;
-}
+  }
 
-.main-image-wrapper {
+  .main-image-wrapper {
+    border: solid 1px #000;
+    border-radius: 20px;
     position: absolute;
     width: 100%; /* Full width of the parent container */
     height: 100%; /* Full height of the parent container */
@@ -44,16 +46,16 @@
     justify-content: center;
     align-items: center;
     overflow: hidden; /* Ensures no overflow of the inner content */
-}
+  }
 
-.main-dish-image {
+  .main-dish-image {
     width: 100%;
     height: 100%;
     object-fit: cover; /* Ensures the image covers the area, may crop */
     object-position: center; /* Centers the image within the element */
-}
+  }
 
-.thumbnail-container {
+  .thumbnail-container {
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -61,7 +63,7 @@
   width: 100%; /* Ensures it occupies the full width of its parent container */
   margin-top: 20px; /* Increase if more space is needed between the main image and thumbnails */
   flex-wrap: wrap; /* Wraps thumbnails to the next line if they don't fit */
-}
+  }
 
   
   .thumbnail {
@@ -82,7 +84,7 @@
     flex-direction: column;
     line-height: normal;
     width: 43%;
-    margin-left: 20px;
+    margin-left: 30px;
   }
   @media (max-width: 991px) {
     .dish-info {
@@ -114,23 +116,20 @@
 
   .dish-name {
     color: #000;
-    text-align: center;
+    text-align: justify;
     margin-top: 51px; 
-    font: 700 clamp(24px, 4vw + 1rem, 32px) / 150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
+    font: 700 clamp(24px, 4vw + 1rem, 36px) / 150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
+    margin-bottom: 15px;
   }
 
   .dish-author {
     color: #000;
-    text-align: center;
-    margin-top: 45px;
+    text-align: justify;
+    max-width: 100%;
     font: 700 24px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
   }
-  @media (max-width: 991px) {
-    .dish-author {
-      max-width: 100%;
-      margin-top: 40px;
-    }
-  }
+
+
   .action-buttons {
     display: flex;
     margin-top: 41px;
@@ -221,13 +220,10 @@
     }
   }
   .similar-dish-card {
-    border-radius: 20px;
-    background-color: #d9d9d9;
     display: flex;
     flex-grow: 1;
     align-items: center;
     font-size: 24px;
-    color: #000;
     font-weight: 700;
     text-align: center;
     line-height: 150%;
@@ -240,19 +236,28 @@
       margin-top: 40px;
     }
   }
+
   .image-wrapper {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px;
+    opacity: 0.75;
+    border: 1px solid #000;
     display: flex;
     flex-direction: column;
-    font-family: Inter, sans-serif;
     position: relative;
-    stroke-width: 1px;
-    stroke: #000;
     overflow: hidden;
-    border: 1px solid #000;
-    aspect-ratio: 1.53;
     justify-content: center;
     padding: 57px 13px;
+    aspect-ratio: 1.53;
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
+
+.image-wrapper:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
   .dish-image {
     position: absolute;
     inset: 0;

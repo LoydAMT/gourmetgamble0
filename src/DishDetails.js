@@ -76,9 +76,9 @@ const DishDetails = ({ recipe }) => {
         <div className="dish-info">
           <button className="close-button" onClick={() => window.location.reload()}>×</button>
           <h1 className="dish-name">{recipe.nameOfDish}</h1>
-          <p className="dish-author">BY {recipe.nameOfUser}</p>
+          <p className="dish-author">Author:<br /> {recipe.nameOfUser}</p>
           <div className="action-buttons">
-            <button className="recipe-button" onClick={() => setShowRecipeModal(true)}>OPEN RECIPE BUTTON</button>
+            <button className="recipe-button" onClick={() => setShowRecipeModal(true)}>OPEN RECIPE</button>
             <div className="social-buttons">
               <SocialButton src="https://cdn.builder.io/api/v1/image/assets/TEMP/7a9066052bd6b7055bb6a1d42d410f27c58bf20b47d0c4ca3691f14d8f400d90?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Social media icon 1" />
               <SocialButton src="https://cdn.builder.io/api/v1/image/assets/TEMP/06ab42ee6002883ffd32c9c2e019c6e852d9bac72702bfb5a99342e9cc36ff2c?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Social media icon 2" />

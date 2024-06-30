@@ -22,7 +22,7 @@ const RecipeModal = ({ showModal, setShowModal, recipe }) => {
       <div className="modal-content">
         <button className="close-button" onClick={() => setShowModal(false)}>×</button>
         <h1 className="recipe-title">{recipe.nameOfDish}</h1>
-        <p className="recipe-author">BY {recipe.nameOfUser}</p>
+        <p className="recipe-author">Author: {recipe.nameOfUser}</p>
         <div className="recipe-ingredients">
           <h2>Ingredients</h2>
           <ul>

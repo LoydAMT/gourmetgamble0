@@ -3,114 +3,7 @@ import Modal from 'react-modal';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import DishDetails from './DishDetails';
-import './App.css';
-
-const styles = {
-  container: {
-    padding: '20px',
-    backgroundColor: '#fff5e6',
-  },
-  recipeOfTheDay: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: '10px',
-    overflow: 'hidden',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    marginBottom: '20px',
-    padding: '20px',
-    maxWidth: '400px',
-    maxHeight: '500px',
-    margin: '0 auto 20px auto',
-  },
-  recipeImage: {
-    width: '400px',
-    height: '350px',
-    objectFit: 'cover',
-    borderRadius: '10px',
-  },
-  recipeContent: {
-    textAlign: 'center',
-    marginTop: '10px',
-  },
-  recipeTitle: {
-    fontSize: '24px',
-    margin: '10px 0',
-  },
-  searchContainer: {
-    marginBottom: '20px',
-    textAlign: 'center',
-  },
-  searchInput: {
-    width: '80%',
-    padding: '10px',
-    fontSize: '16px',
-    borderRadius: '5px',
-    border: '1px solid #ddd',
-  },
-  categoryTitle: {
-    fontSize: '22px',
-    margin: '20px 0 10px 0',
-  },
-  recipeGrid: {
-    display: 'grid',
-    gap: '20px',
-  },
-  recipeCard: {
-    backgroundColor: '#fff',
-    borderRadius: '10px',
-    overflow: 'hidden',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-  },
-  recipeCardImage: {
-    width: '100%',
-    height: '150px',
-    objectFit: 'cover',
-  },
-  recipeCardContent: {
-    padding: '10px',
-    textAlign: 'center',
-  },
-  recipeCardTitle: {
-    fontSize: '18px',
-    margin: '10px 0',
-  },
-  recipeCardOrigin: {
-    fontSize: '14px',
-    color: '#666',
-  },
-};
-
-// Media queries for responsiveness
-const responsiveStyles = `
-  @media (min-width: 600px) {
-    .recipeGrid {
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
-    .searchInput {
-      width: 60%;
-    }
-  }
-
-  @media (min-width: 768px) {
-    .recipeGrid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
-    .searchInput {
-      width: 50%;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .recipeGrid {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    }
-    .searchInput {
-      width: 40%;
-    }
-  }
-`;
+import './Recipes.css';  // Make sure to import your new CSS file
 
 function Recipes() {
   const [recipes, setRecipes] = useState([]);
@@ -155,26 +48,25 @@ function Recipes() {
   };
 
   return (
-    <div style={styles.container}>
-      <style>{responsiveStyles}</style>
+    <div className="recipes-container">
       {recipeOfTheDay && (
-        <div style={styles.recipeOfTheDay}>
+        <div className="recipe-of-the-day">
           <div style={{ width: '100%', position: 'relative' }}>
             <img
               src={recipeOfTheDay.photo || 'placeholder-image-url.jpg'}
               alt={recipeOfTheDay.nameOfDish}
-              style={styles.recipeImage}
+              className="recipe-image"
             />
           </div>
-          <div style={styles.recipeContent}>
-            <h2 style={styles.recipeTitle}>{recipeOfTheDay.nameOfDish}</h2>
+          <div className="recipe-content">
+            <h2 className="recipe-title">{recipeOfTheDay.nameOfDish}</h2>
             <p>Recipe of the Day</p>
           </div>
         </div>
       )}
-      <div style={styles.searchContainer}>
+      <div className="search-container">
         <input
-          style={styles.searchInput}
+          className="search-input"
           type="text"
           placeholder="Search by name, origin, or uploader"
           value={searchTerm}
@@ -183,22 +75,22 @@ function Recipes() {
       </div>
       {Object.keys(groupedRecipes).map((origin) => (
         <div key={origin}>
-          <h3 style={styles.categoryTitle}>{origin}</h3>
-          <div className="recipeGrid" style={styles.recipeGrid}>
+          <h3 className="category-title">{origin}</h3>
+          <div className="recipe-grid">
             {groupedRecipes[origin].map((recipe) => (
               <div
                 key={recipe.id}
-                style={styles.recipeCard}
+                className="recipe-card"
                 onClick={() => openModal(recipe)}
               >
                 <img
                   src={recipe.photo || 'placeholder-image-url.jpg'}
                   alt={recipe.nameOfDish}
-                  style={styles.recipeCardImage}
+                  className="recipe-card-image"
                 />
-                <div style={styles.recipeCardContent}>
-                  <h3 style={styles.recipeCardTitle}>{recipe.nameOfDish}</h3>
-                  <p style={styles.recipeCardOrigin}>Uploaded by: {recipe.nameOfUser}</p>
+                <div className="recipe-card-content">
+                  <h3 className="recipe-card-title">{recipe.nameOfDish}</h3>
+                  <p className="recipe-card-origin">Uploaded by: {recipe.nameOfUser}</p>
                 </div>
               </div>
             ))}

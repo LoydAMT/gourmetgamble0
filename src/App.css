@@ -89,14 +89,6 @@ nav {
   cursor: pointer;
 }
 
-.contact-card {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 10px;
-  background: linear-gradient(to right, #FBBC05 0%, #F3E5BC 54%, #FBBC05 100%);
-}
-
 /* Footer styles */
 footer {
   display: flex;

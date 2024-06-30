@@ -228,7 +228,6 @@ function Recipes() {
         }}
       >
         {selectedRecipe && <DishDetails recipe={selectedRecipe} />}
-        <button onClick={closeModal}>Close</button>
       </Modal>
     </div>
   );

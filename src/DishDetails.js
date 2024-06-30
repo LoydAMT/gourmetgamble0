@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
+import ReactPlayer from 'react-player';
 
 const SimilarDishCard = ({ imageSrc, title }) => (
   <div className="similar-dish-card">
@@ -17,6 +18,7 @@ const SocialButton = ({ src, alt }) => (
 
 const DishDetails = ({ recipe }) => {
   const [similarDishes, setSimilarDishes] = useState([]);
+  const [mainDisplay, setMainDisplay] = useState('photo');
 
   useEffect(() => {
     const fetchSimilarDishes = async () => {
@@ -36,19 +38,33 @@ const DishDetails = ({ recipe }) => {
     }
   }, [recipe]);
 
+  const handleDisplayChange = (displayType) => {
+    setMainDisplay(displayType);
+  };
+
   return (
     <main className="dish-details">
       <section className="content-wrapper">
         <div className="dish-image-container">
-          <div className="dish-image-wrapper">
-            <img src={recipe.photo || "https://cdn.builder.io/api/v1/image/assets/TEMP/127b33c7ba18abb8d4427281ea2c8bbf1bf09faa1ec7b220e00de7f8bd4ef22b?apiKey=58b165f68bc74f159c175e4d9cf0f581&"} alt="Dish" className="icon" />
-            <div className="main-image-container">
-              <div className="main-image-wrapper">
-                <img src={recipe.photo || "https://cdn.builder.io/api/v1/image/assets/TEMP/7c51fdb6d3b23b04b3e30c857b45962c4f982aa64375de0e23178dd9f52385af?apiKey=58b165f68bc74f159c175e4d9cf0f581&"} alt="Main dish" className="main-dish-image" />
-                DISH PHOTO 1
-              </div>
+          <div className="main-image-container">
+            <div className="main-image-wrapper">
+              {mainDisplay === 'photo' && (
+                <img src={recipe.photo || "https://via.placeholder.com/150"} alt="Main dish" className="main-dish-image" />
+              )}
+              {mainDisplay === 'video' && recipe.video && (
+                <ReactPlayer url={recipe.video} controls width="100%" />
+              )}
             </div>
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/50bb264c8adee88dfca34106e9077eea9e1b8ac77b9f9fa1f2ed1a3ff661d1d4?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="" className="icon" />
+          </div>
+          <div className="thumbnail-container">
+            <div className="thumbnail" onClick={() => handleDisplayChange('photo')}>
+              <img src={recipe.photo || "https://via.placeholder.com/150"} alt="Dish thumbnail" className="thumbnail-image" />
+            </div>
+            {recipe.video && (
+              <div className="thumbnail" onClick={() => handleDisplayChange('video')}>
+                <ReactPlayer url={recipe.video} light width="100%" height="100%" />
+              </div>
+            )}
           </div>
         </div>
         <div className="dish-info">
@@ -56,7 +72,7 @@ const DishDetails = ({ recipe }) => {
           <h1 className="dish-name">{recipe.nameOfDish}</h1>
           <p className="dish-author">BY {recipe.nameOfUser}</p>
           <div className="action-buttons">
-            <button className="recipe-button">OPEN RECIPE BUTTON</button>
+            <button className="recipe-button" onClick={() => handleDisplayChange('video')}>OPEN RECIPE BUTTON</button>
             <div className="social-buttons">
               <SocialButton src="https://cdn.builder.io/api/v1/image/assets/TEMP/7a9066052bd6b7055bb6a1d42d410f27c58bf20b47d0c4ca3691f14d8f400d90?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Social media icon 1" />
               <SocialButton src="https://cdn.builder.io/api/v1/image/assets/TEMP/06ab42ee6002883ffd32c9c2e019c6e852d9bac72702bfb5a99342e9cc36ff2c?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Social media icon 2" />
@@ -109,36 +125,6 @@ const DishDetails = ({ recipe }) => {
             width: 100%;
           }
         }
-        .dish-image-wrapper {
-          display: flex;
-          margin-top: 107px;
-          flex-grow: 1;
-          align-items: center;
-          gap: 7px;
-          font-size: 64px;
-          color: #000;
-          font-weight: 700;
-          text-align: center;
-          line-height: 150%;
-        }
-        @media (max-width: 991px) {
-          .dish-image-wrapper {
-            margin-top: 40px;
-            flex-wrap: wrap;
-            font-size: 40px;
-          }
-        }
-        .icon {
-          aspect-ratio: 1;
-          object-fit: auto;
-          object-position: center;
-          width: 45px;
-          background-color: #d9d9d9;
-          border-radius: 50%;
-          align-self: stretch;
-          height: 45px;
-          margin: auto 0;
-        }
         .main-image-container {
           border-radius: 20px;
           box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
@@ -184,6 +170,24 @@ const DishDetails = ({ recipe }) => {
           width: 100%;
           object-fit: cover;
           object-position: center;
+        }
+        .thumbnail-container {
+          display: flex;
+          gap: 10px;
+          margin-top: 10px;
+        }
+        .thumbnail {
+          cursor: pointer;
+          width: 80px;
+          height: 80px;
+          border: 1px solid #000;
+          border-radius: 5px;
+          overflow: hidden;
+        }
+        .thumbnail-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
         .dish-info {
           display: flex;

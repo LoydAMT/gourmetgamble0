@@ -9,7 +9,8 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   const [nameOfUser, setNameOfUser] = useState('');
   const [photo, setPhoto] = useState('');
   const [video, setVideo] = useState('');
-  const [recipe, setRecipe] = useState('');
+  const [recipe, setRecipe] = useState('');  // Added the recipe state back
+  const [recipeSteps, setRecipeSteps] = useState([{ value: '' }]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -84,6 +85,16 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
     return url.match(/\.(jpeg|jpg|gif|png)$/) != null;
   };
 
+  const handleStepChange = (value, index) => {
+    const newSteps = [...recipeSteps];
+    newSteps[index].value = value;
+    setRecipeSteps(newSteps);
+  };
+
+  const addStep = () => {
+    setRecipeSteps([...recipeSteps, { value: '' }]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -97,6 +108,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
         video,
         recipe,
         ingredients: selectedIngredients,
+        steps: recipeSteps.map(step => step.value),
       };
       const docRef = await addDoc(collection(db, 'recipes'), newRecipe);
       onAddRecipe({ id: docRef.id, ...newRecipe });
@@ -107,6 +119,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
       setPhoto('');
       setVideo('');
       setRecipe('');
+      setRecipeSteps([{ value: '' }]);
       setSelectedIngredients([]);
       setSearchQuery('');
     } catch (error) {
@@ -131,6 +144,18 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
           <input className="input" type="url" placeholder="Photo URL" value={photo} onChange={(e) => setPhoto(e.target.value)} />
           <input className="input" type="url" placeholder="Video Tutorial URL" value={video} onChange={(e) => setVideo(e.target.value)} />
           <textarea className="inputRecipe" placeholder="Recipe Guide" value={recipe} onChange={(e) => setRecipe(e.target.value)} />
+          {recipeSteps.map((step, index) => (
+            <textarea
+              key={index}
+              className="inputSteps"
+              placeholder={`Input Step ${index + 1}`}
+              value={step.value}
+              onChange={(e) => handleStepChange(e.target.value, index)}
+            />
+          ))}
+          <button type="button" className="button addButton" onClick={addStep}>
+            Add Step
+          </button>
           <input className="searchInput" type="text" placeholder="Search Ingredients" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           <div className="ingredientList">
             {filteredIngredients.map((ingredient) => (

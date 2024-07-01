@@ -5,6 +5,7 @@ import Recipes from './Recipes';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
+import Community from './Community';
 import ContactUsModal from './ContactUsModal';
 import AddRecipeModal from './AddRecipeModal';
 import { collection, getDocs } from 'firebase/firestore';
@@ -71,8 +72,9 @@ function AppContent({
         <button className="nav-item" onClick={() => navigate('/recipes')}>
           Recipes
         </button>
-        <button className="nav-item">Community</button>
-        <button className="nav-item">Chat</button>
+        <button className="nav-item" onClick={() => navigate('/community')}>
+          Community
+        </button>
         <button className="sign-in-button" onClick={() => setShowAuthModal(true)}>
           Sign in/Sign Up
         </button>
@@ -81,7 +83,7 @@ function AppContent({
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/recipes" element={<Recipes recipes={recipes} />} />
-      
+        <Route path="/community" element={<Community />} />
       </Routes>
 
       <AddRecipeModal

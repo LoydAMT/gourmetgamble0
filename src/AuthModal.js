@@ -1,6 +1,5 @@
-// src/AuthModal.js
 import React, { useState } from 'react';
-import { registerUser, loginUser, signInWithGoogle, db } from './firebaseConfig';
+import { registerUser, loginUser, signInWithGoogle, db, getUserProfile } from './firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import './App.css';
 
@@ -80,28 +79,24 @@ const AuthModal = ({ showModal, setShowModal }) => {
 
   const handleSignUp = async () => {
     try {
-      const user = await registerUser(email, password);
-      if (user && user.uid) {
-        await addDoc(collection(db, 'users'), {
-          uid: user.uid,
-          name,
-          email,
-          culinaryExperience,
-        });
-        setSuccessMessage('Successfully registered!');
-        setTimeout(() => {
-          setShowModal(false);
-          setSuccessMessage('');
-          setEmail('');
-          setPassword('');
-          setName('');
-          setCulinaryExperience('');
-        }, 2000);
-      } else {
-        setErrorMessage('Failed to register user. Please try again.');
-      }
+      const userCredential = await registerUser(email, password);
+      const user = userCredential.user;
+      await addDoc(collection(db, 'users'), {
+        uid: user.uid,
+        name,
+        email: user.email,
+        culinaryExperience,
+      });
+      setSuccessMessage('Successfully registered!');
+      setTimeout(() => {
+        setShowModal(false);
+        setSuccessMessage('');
+        setEmail('');
+        setPassword('');
+        setName('');
+        setCulinaryExperience('');
+      }, 2000);
     } catch (error) {
-      console.error("Error in registration:", error);
       setErrorMessage('Error in registration: ' + error.message);
     }
   };
@@ -119,25 +114,31 @@ const AuthModal = ({ showModal, setShowModal }) => {
         setCulinaryExperience('');
       }, 2000);
     } catch (error) {
-      console.error("Error in login:", error);
       setErrorMessage('Error in login: ' + error.message);
     }
   };
 
   const handleGoogleSignIn = async () => {
     try {
-      const user = await signInWithGoogle();
-      if (user) {
-        setSuccessMessage('Successfully logged in with Google!');
-        setTimeout(() => {
-          setShowModal(false);
-          setSuccessMessage('');
-        }, 2000);
-      } else {
-        setErrorMessage('Failed to log in with Google. Please try again.');
+      const result = await signInWithGoogle();
+      const user = result.user;
+
+      // Check if the user already exists in the database
+      const userProfile = await getUserProfile(user.uid);
+      if (!userProfile) {
+        await addDoc(collection(db, 'users'), {
+          uid: user.uid,
+          name: user.displayName || user.email,
+          email: user.email,
+        });
       }
+
+      setSuccessMessage('Successfully logged in with Google!');
+      setTimeout(() => {
+        setShowModal(false);
+        setSuccessMessage('');
+      }, 2000);
     } catch (error) {
-      console.error("Error logging in with Google:", error);
       setErrorMessage('Error logging in with Google: ' + error.message);
     }
   };

@@ -1,6 +1,6 @@
 // firebaseConfig.js
-import { initializeApp } from "firebase/app";
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 // Your web app's Firebase configuration
@@ -13,42 +13,27 @@ const firebaseConfig = {
     appId: "1:573275647223:web:117be7110a1ffe3e4d37f2",
     measurementId: "G-Y43QVYFP9J"
 };
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const provider = new GoogleAuthProvider();
-
-const registerUser = async (email, password) => {
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        return userCredential.user;
-    } catch (error) {
-        console.error("Error registering user:", error);
-        throw error;
-    }
+const registerUser = (email, password) => {
+  return createUserWithEmailAndPassword(auth, email, password);
 };
 
-const loginUser = async (email, password) => {
-    try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        return userCredential.user;
-    } catch (error) {
-        console.error("Error logging in user:", error);
-        throw error;
-    }
+const loginUser = (email, password) => {
+  return signInWithEmailAndPassword(auth, email, password);
 };
 
-const signInWithGoogle = async () => {
-    try {
-        const userCredential = await signInWithPopup(auth, provider);
-        return userCredential.user;
-    } catch (error) {
-        console.error("Error logging in with Google:", error);
-        throw error;
-    }
+const signInWithGoogle = () => {
+  const provider = new GoogleAuthProvider();
+  return signInWithPopup(auth, provider);
 };
 
-export { app, db, auth, registerUser, loginUser, signInWithGoogle };
+const getUserProfile = async (uid) => {
+  const q = query(collection(db, 'users'), where('uid', '==', uid));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.length ? querySnapshot.docs[0].data() : null;
+};
+
+export { db, auth, registerUser, loginUser, signInWithGoogle, getUserProfile };

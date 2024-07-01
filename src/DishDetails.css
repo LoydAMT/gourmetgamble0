@@ -11,12 +11,12 @@
 
 /* Add fade-in effect when the component mounts */
 .dish-details.fade-in {
-  animation: fadeIn 0.5s forwards;
+  animation: fadeIn 1s forwards;
 }
 
 /* Add fade-out effect when the component unmounts */
 .dish-details.fade-out {
-  animation: fadeOut 0.5s forwards;
+  animation: fadeOut 1s forwards;
 }
 
 .dish-details {

@@ -38,20 +38,27 @@ const DishDetails = ({ closeModal, recipe }) => {
     const fetchSimilarDishes = async () => {
       const querySnapshot = await getDocs(collection(db, 'recipes'));
       const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
+  
+      console.log('Fetched recipes data:', recipesData);
+  
+      // Filter recipes with 5 or more shared ingredients
       const similar = recipesData.filter(r => {
         const sharedIngredients = r.ingredients.filter(ingredient => recipe.ingredients.includes(ingredient));
         return sharedIngredients.length >= 5;
       });
-
-      setSimilarDishes(similar);
+      
+      console.log('Similar dishes before filtering by name:', similar);
+  
+      // Exclude recipes with the same name as the current recipe
+      const filteredSimilar = similar.filter(r => r.nameOfDish !== recipe.nameOfDish);
+      console.log('Filtered similar dishes:', filteredSimilar);
+      setSimilarDishes(filteredSimilar);
     };
-
     if (recipe) {
       fetchSimilarDishes();
     }
-  }, [recipe]);
-
+  }, [recipe]);  
+  
   const handleDisplayChange = (displayType) => {
     setMainDisplay(displayType);
     setIsPlaying(displayType === 'video');

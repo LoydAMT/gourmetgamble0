@@ -26,7 +26,14 @@ const RecipeSlideshow = () => {
 
   return (
     <div style={styles.slideshowContainer}>
-      <Carousel showThumbs={false} infiniteLoop useKeyboardArrows autoPlay>
+      <Carousel 
+        showThumbs={false} 
+        infiniteLoop 
+        useKeyboardArrows 
+        autoPlay 
+        interval={3000} // 3 seconds between transitions
+        transitionTime={1000} // 1 second transition time
+      >
         {recipes.map((recipe, index) => (
           <div key={index}>
             <img
@@ -53,7 +60,6 @@ const styles = {
     height: '643px',
     borderRadius: '15px',
   },
-
 };
 
 export default RecipeSlideshow;

@@ -75,6 +75,7 @@ function AppContent({
         <button className="nav-item" onClick={() => navigate('/community')}>
           Community
         </button>
+       
         <button className="sign-in-button" onClick={() => setShowAuthModal(true)}>
           Sign in/Sign Up
         </button>

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import ReactPlayer from 'react-player';
 import './DishDetails.css';
 import RecipeModal from './RecipeModal';
 
-const SimilarDishCard = ({ imageSrc, title }) => (
-  <div className="similar-dish-card">
+const SimilarDishCard = ({ imageSrc, title, onClick }) => (
+  <div className="similar-dish-card" onClick={onClick}>
     <div className="image-wrapper">
       <img src={imageSrc} alt={title} className="dish-image" />
       {title}
@@ -28,29 +28,56 @@ function extractYouTubeID(url) {
   }
 }
 
-const DishDetails = ({ closeModal, recipe }) => {
+const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
   const [similarDishes, setSimilarDishes] = useState([]);
   const [mainDisplay, setMainDisplay] = useState('photo');
   const [isPlaying, setIsPlaying] = useState(false);
   const [showRecipeModal, setShowRecipeModal] = useState(false);
+  const dishDetailsRef = useRef(null);
 
   useEffect(() => {
+    if (dishDetailsRef.current) {
+      dishDetailsRef.current.classList.add('fade-in');
+      dishDetailsRef.current.classList.remove('fade-out');
+    }
+
     const fetchSimilarDishes = async () => {
       const querySnapshot = await getDocs(collection(db, 'recipes'));
       const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
+      // Filter recipes with 5 or more shared ingredients
       const similar = recipesData.filter(r => {
         const sharedIngredients = r.ingredients.filter(ingredient => recipe.ingredients.includes(ingredient));
         return sharedIngredients.length >= 5;
       });
 
-      setSimilarDishes(similar);
+      // Exclude recipes with the same name as the current recipe
+      const filteredSimilar = similar.filter(r => r.nameOfDish !== recipe.nameOfDish);
+      setSimilarDishes(filteredSimilar);
     };
 
     if (recipe) {
       fetchSimilarDishes();
     }
+
+    return () => {
+      if (dishDetailsRef.current) {
+        dishDetailsRef.current.classList.remove('fade-in');
+        dishDetailsRef.current.classList.add('fade-out');
+      }
+    };
   }, [recipe]);
+
+  const handleSimilarDishClick = (id) => {
+    if (dishDetailsRef.current) {
+      dishDetailsRef.current.classList.add('fade-out');
+      dishDetailsRef.current.classList.remove('fade-in');
+    }
+
+    setTimeout(() => {
+      onSimilarDishClick(id);
+    }, 200); // Adjust the timeout to match the CSS animation duration
+  };
 
   const handleDisplayChange = (displayType) => {
     setMainDisplay(displayType);
@@ -61,7 +88,7 @@ const DishDetails = ({ closeModal, recipe }) => {
   const videoThumbnailURL = videoID ? `https://img.youtube.com/vi/${videoID}/0.jpg` : "https://via.placeholder.com/150";
 
   return (
-    <main className="dish-details">
+    <main className="dish-details fade-in" ref={dishDetailsRef}>
       <RecipeModal showModal={showRecipeModal} setShowModal={setShowRecipeModal} recipe={recipe} />
       <section className="content-wrapper">
         <div className="dish-image-container">
@@ -87,7 +114,7 @@ const DishDetails = ({ closeModal, recipe }) => {
           </div>
         </div>
         <div className="dish-info">
-          <button className="close-button" onClick={() => window.location.reload()}>×</button>
+          <button className="close-button" onClick={closeModal}>×</button>
           <h1 className="dish-name">{recipe.nameOfDish}</h1>
           <p className="dish-author">Author:<br /> {recipe.nameOfUser}</p>
           <div className="action-buttons">
@@ -105,7 +132,12 @@ const DishDetails = ({ closeModal, recipe }) => {
         <h2 className="similar-dishes-title">SIMILAR DISHES</h2>
         <div className="similar-dishes-grid">
           {similarDishes.map((dish, index) => (
-            <SimilarDishCard key={index} imageSrc={dish.photo || 'https://via.placeholder.com/150'} title={dish.nameOfDish} />
+            <SimilarDishCard 
+              key={index} 
+              imageSrc={dish.photo || 'https://via.placeholder.com/150'} 
+              title={dish.nameOfDish} 
+              onClick={() => handleSimilarDishClick(dish.id)}
+            />
           ))}
         </div>
       </section>

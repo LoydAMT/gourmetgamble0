@@ -48,13 +48,23 @@ nav {
   flex-wrap: wrap;
 }
 
+.nav-item:hover{
+  background-color: goldenrod;
+  border-radius: 20px;
+}
+
 .nav-item, .sign-in-button {
   font-size: 18px;
   color: #143501;
   cursor: pointer;
   margin: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-right: 10px;
+  padding-left: 10px;
   background-color: transparent;
   border: none;
+  transition: ease-in-out 0.3s
 }
 
 .sign-in-button {
@@ -92,24 +102,29 @@ nav {
 /* Footer styles */
 footer {
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   background-color: #333;
   padding: 1rem;
   margin-top: auto;
+  background: linear-gradient(90deg, #FBBC05 0%, #F3E5BC 54%, #FBBC05 100%);
 }
 
 .footer-item {
-  color: white;
+  color: #143501;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0.5rem 1rem;
   font-size: 1rem;
   margin: 0 0.5rem;
+  font-weight: 600;
+  transition: ease-in-out 0.3s;
 }
 
 .footer-item:hover {
-  background-color: #575757;
+  background-color: goldenrod;
+  border-radius: 20px;
+  
 }
 
 /* Ensure footer items are smaller on small screens */

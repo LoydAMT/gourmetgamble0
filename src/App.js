@@ -72,7 +72,6 @@ function AppContent({
           Recipes
         </button>
         <button className="nav-item">Community</button>
-        <button className="nav-item">Chat</button>
         <button className="sign-in-button" onClick={() => setShowAuthModal(true)}>
           Sign in/Sign Up
         </button>

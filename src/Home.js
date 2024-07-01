@@ -7,7 +7,8 @@ import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
 import ContactUsModal from './ContactUsModal';
 import { Carousel } from 'react-responsive-carousel';
-import RecipeSlideshow from './RecipeSlideshow'; // Assuming the component is in the same directory or imported correctly
+import RecipeSlideshow from './RecipeSlideshow';
+import ChatBot from './ChatBot';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import IngredientList from './IngredientList';
 import './Home.css';
@@ -16,13 +17,14 @@ function Home() {
   const ingredientCardsRef = useRef(null);
   const [ingredients, setIngredients] = useState([]);
   const [recipes, setRecipes] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false); // Ensure this state is correctly initialized
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [showAboutUsModal, setShowAboutUsModal] = useState(false);
   const [showContactUsModal, setShowContactUsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showChatBot, setShowChatBot] = useState(false);
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -145,7 +147,7 @@ function Home() {
         <div className="right-column">
           <div className="main-image">
             <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/93dbb781c0deb85382084d502707c0bc26e5e707b4a196271d30a9e2163dd7d2?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Taco Platter" className="main-image-content" />
-            <div className="discover-more-container" >
+            <div className="discover-more-container">
               <button className="star-icon">★</button>
               <button className="discover-button" onClick={() => setShowModal(true)}>Discover More</button>
             </div>
@@ -168,7 +170,15 @@ function Home() {
       <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} />
       <AuthModal showModal={showAuthModal} setShowModal={setShowAuthModal} />
       <AboutUsModal showModal={showAboutUsModal} setShowModal={setShowAboutUsModal} />
-      <ContactUsModal showModal={showContactUsModal} setShowModal={setShowContactUsModal} />
+      <ContactUsModal showModal={showContactUsModal} setShowModal={setShowContactUsModal} />    
+      {/* ChatBot Floating Button */}
+      <button
+        className="chatbot-button"
+        onClick={() => setShowChatBot(!showChatBot)}
+      >
+        💬
+      </button>
+      {showChatBot && <ChatBot />}
     </div>
   );
 }

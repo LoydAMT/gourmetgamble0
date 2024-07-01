@@ -50,19 +50,19 @@ function Recipes() {
   return (
     <div className="recipes-container">
       {recipeOfTheDay && (
-        <div className="recipe-of-the-day">
+        <div className="recipe-of-the-day" onClick={() => openModal(recipeOfTheDay)}>
         <img
-          src={recipeOfTheDay.photo || 'placeholder-image-url.jpg'}
-          alt={recipeOfTheDay.nameOfDish}
-          className="recipe-image"
+        src={recipeOfTheDay.photo || 'placeholder-image-url.jpg'}
+        alt={recipeOfTheDay.nameOfDish}
+        className="recipe-image"
         />
         <div className="content-block recipe-content">
-          <h2 className="recipe-title">{recipeOfTheDay.nameOfDish}</h2>
-          <p>Recipe of the Day</p>
+        <h2 className="recipe-title">{recipeOfTheDay.nameOfDish}</h2>
+        <p>Recipe of the Day</p>
         </div>
-      </div>
-      
-      )}
+    </div>
+    )}
+
       <div className="search-container">
         <input
           className="search-input"

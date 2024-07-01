@@ -11,6 +11,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import './App.css';
 
+
 function App() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);

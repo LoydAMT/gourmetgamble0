@@ -51,18 +51,17 @@ function Recipes() {
     <div className="recipes-container">
       {recipeOfTheDay && (
         <div className="recipe-of-the-day">
-          <div style={{ width: '100%', position: 'relative' }}>
-            <img
-              src={recipeOfTheDay.photo || 'placeholder-image-url.jpg'}
-              alt={recipeOfTheDay.nameOfDish}
-              className="recipe-image"
-            />
-          </div>
-          <div className="recipe-content">
-            <h2 className="recipe-title">{recipeOfTheDay.nameOfDish}</h2>
-            <p>Recipe of the Day</p>
-          </div>
+        <img
+          src={recipeOfTheDay.photo || 'placeholder-image-url.jpg'}
+          alt={recipeOfTheDay.nameOfDish}
+          className="recipe-image"
+        />
+        <div className="content-block recipe-content">
+          <h2 className="recipe-title">{recipeOfTheDay.nameOfDish}</h2>
+          <p>Recipe of the Day</p>
         </div>
+      </div>
+      
       )}
       <div className="search-container">
         <input

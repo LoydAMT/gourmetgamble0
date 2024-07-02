@@ -58,9 +58,10 @@
   font-size: 18px;
 }
 
-
 .search-container {
-  margin-bottom: 20px;
+  width: 90%;
+  max-width: 1250px;
+  margin: 20px auto;
   text-align: center;
 }
 
@@ -72,6 +73,12 @@
   border: 1px solid #ddd;
 }
 
+.origin-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .category-title {
   font-size: 22px;
   margin: 20px 0 10px 0;
@@ -79,6 +86,7 @@
 
 .recipe-grid {
   display: flex;
+  flex-wrap: wrap;
   gap: 30px;
 }
 
@@ -91,13 +99,11 @@
   transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.5s ease;
 }
 
-
 .recipe-card:hover {
   transform: scale(1.05);
   opacity: 1;
   background-color: rgba(255, 165, 0, 0.9);
 }
-
 
 .recipe-card-image {
   width: 100%;

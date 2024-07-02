@@ -7,29 +7,20 @@
   font-family: Arial, sans-serif;
 }
 
-.search-bar {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
 .new-post-container {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   margin-bottom: 20px;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .new-post-input {
-  width: 100%;
+  flex: 1;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  margin-bottom: 10px;
+  margin-right: 10px;
 }
 
 .new-post-button {
@@ -58,22 +49,6 @@
   display: flex;
   align-items: center;
   margin-bottom: 10px;
-}
-
-.post-user-name {
-  margin: 0;
-}
-
-.post-timestamp {
-  font-size: 12px;
-  color: #777;
-  margin-top: 2px;
-}
-
-.post-photo {
-  max-width: 100%;
-  height: auto;
-  margin-top: 10px;
 }
 
 .likes-comments-container {
@@ -122,8 +97,8 @@
 
 .profile-picture {
   max-width: 30px;
-  max-height: 30px;
-  border-radius: 50%;
+    max-height: 30px;
+  border-radius: 40%;
   object-fit: cover;
   margin-right: 10px;
 }

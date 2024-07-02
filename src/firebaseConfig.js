@@ -13,6 +13,7 @@ const firebaseConfig = {
     appId: "1:573275647223:web:117be7110a1ffe3e4d37f2",
     measurementId: "G-Y43QVYFP9J"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -43,10 +44,4 @@ const uploadProfilePicture = async (file, uid) => {
   return getDownloadURL(fileRef);
 };
 
-const uploadPostPhoto = async (file) => {
-  const fileRef = ref(storage, `postPhotos/${file.name}`);
-  await uploadBytes(fileRef, file);
-  return getDownloadURL(fileRef);
-};
-
-export { db, auth, registerUser, loginUser, signInWithGoogle, getUserProfile, uploadProfilePicture, uploadPostPhoto };
+export { db, auth, registerUser, loginUser, signInWithGoogle, getUserProfile, uploadProfilePicture };

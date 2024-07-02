@@ -4,8 +4,6 @@ import { db, auth, getUserProfile } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import './Community.css';
 
-const defaultProfilePicture = 'https://www.kindpng.com/picc/m/451-4517876_default-profile-hd-png-download.png';
-
 function Community() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
@@ -24,13 +22,11 @@ function Community() {
           setCurrentUser({
             uid: user.uid,
             name: userProfile.name || user.email,
-            profilePicture: userProfile.profilePicture || defaultProfilePicture,
           });
         } else {
           setCurrentUser({
             uid: user.uid,
             name: user.email,
-            profilePicture: defaultProfilePicture,
           });
         }
       } else {
@@ -51,7 +47,6 @@ function Community() {
         comments: [],
         likes: [],
         userName: currentUser.name,
-        userProfilePicture: currentUser.profilePicture,
       });
       setNewPost('');
     }
@@ -63,7 +58,7 @@ function Community() {
       const postDoc = await getDoc(postRef);
       if (postDoc.exists()) {
         const postData = postDoc.data();
-        const newComment = { content: comment, userName: currentUser.name, userProfilePicture: currentUser.profilePicture };
+        const newComment = { content: comment, userName: currentUser.name };
         await updateDoc(postRef, { comments: [...postData.comments, newComment] });
       } else {
         console.error('Post does not exist!');
@@ -92,36 +87,27 @@ function Community() {
   return (
     <div className="community-container">
       <h1>Community</h1>
-      {currentUser && (
-        <div className="new-post-container">
-          <img src={currentUser.profilePicture} alt="Profile" className="profile-picture" />
-          <input
-            type="text"
-            value={newPost}
-            onChange={(e) => setNewPost(e.target.value)}
-            placeholder="Write a new post..."
-            className="new-post-input"
-          />
-          <button onClick={handleAddPost} className="new-post-button">Add Post</button>
-        </div>
-      )}
+      <div className="new-post-container">
+        <input
+          type="text"
+          value={newPost}
+          onChange={(e) => setNewPost(e.target.value)}
+          placeholder="Write a new post..."
+          className="new-post-input"
+        />
+        <button onClick={handleAddPost} className="new-post-button">Add Post</button>
+      </div>
       <div className="posts-container">
         {posts.map(post => (
           <div key={post.id} className="post-card">
-            <div className="post-header">
-              <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
-              <p><strong>{post.userName}</strong>: {post.content}</p>
-            </div>
+            <p><strong>{post.userName}</strong>: {post.content}</p>
             <div className="likes-comments-container">
               <button onClick={() => handleLike(post.id)} className="like-button">
                 {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
               </button>
               <span>{post.likes ? post.likes.length : 0} Likes</span>
               {post.comments.map((comment, index) => (
-                <div key={index} className="comment">
-                  <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
-                  <p><strong>{comment.userName}</strong>: {comment.content}</p>
-                </div>
+                <p key={index} className="comment"><strong>{comment.userName}</strong>: {comment.content}</p>
               ))}
               <AddComment postId={post.id} onAddComment={handleAddComment} />
             </div>

@@ -7,7 +7,7 @@ import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
 import Community from './Community';
 import Profile from './Profile';
-import ContactUsModal from './ContactUsModal';
+import ContactUsModal from './ContactUsModal'; 
 import AddRecipeModal from './AddRecipeModal';
 import { collection, getDocs } from 'firebase/firestore';
 import { db, auth } from './firebaseConfig';
@@ -137,9 +137,6 @@ function AppContent({
         </button>
         <button className="footer-item" onClick={() => setShowContactUsModal(true)}>
           Contact Us
-        </button>
-        <button className="footer-item" onClick={() => setShowPrivacyModal(true)}>
-          Feedback
         </button>
         <button className="footer-item" onClick={() => setShowPrivacyModal(true)}>
           Privacy Policy

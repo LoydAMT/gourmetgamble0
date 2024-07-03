@@ -1,72 +1,8 @@
 import React, { useState } from 'react';
 import { registerUser, loginUser, signInWithGoogle, db, getUserProfile } from './firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
-import './App.css';
-
-const styles = {
-  modalBackground: {
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '8px',
-    width: '400px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  input: {
-    marginBottom: '10px',
-    padding: '10px',
-    width: '96%',
-    fontSize: '16px',
-  },
-  select: {
-    marginBottom: '10px',
-    padding: '10px',
-    width: '100%',
-    fontSize: '16px',
-  },
-  buttonContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  button: {
-    padding: '10px',
-    backgroundColor: '#ff9800',
-    border: 'none',
-    cursor: 'pointer',
-    width: '48%',
-  },
-  googleButton: {
-    padding: '10px',
-    backgroundColor: '#4285F4',
-    border: 'none',
-    cursor: 'pointer',
-    width: '100%',
-    color: '#fff',
-    marginBottom: '10px',
-    marginTop: '10px',
-  },
-  successMessage: {
-    color: 'green',
-    marginTop: '20px',
-  },
-  errorMessage: {
-    color: 'red',
-    marginTop: '20px',
-  },
-};
+import './AuthModal.css';
+import googleLogo from './google.png'; // Adjust the path as necessary
 
 const AuthModal = ({ showModal, setShowModal }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -146,13 +82,14 @@ const AuthModal = ({ showModal, setShowModal }) => {
   if (!showModal) return null;
 
   return (
-    <div style={styles.modalBackground}>
-      <div style={styles.modalContainer}>
-        <h2>{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
+    <div className="modal-background">
+      <div className="modal-container">
+        <h2 className="LSHeader">{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
+        <p className="LSSubText">{isSignUp ? 'Enter your email to sign up for this app' : 'Login using email or other'}</p>
         {isSignUp && (
           <>
             <input
-              style={styles.input}
+              className="input"
               type="text"
               placeholder="Name"
               value={name}
@@ -160,7 +97,7 @@ const AuthModal = ({ showModal, setShowModal }) => {
               required
             />
             <select
-              style={styles.select}
+              className="select"
               value={culinaryExperience}
               onChange={(e) => setCulinaryExperience(e.target.value)}
               required
@@ -172,7 +109,7 @@ const AuthModal = ({ showModal, setShowModal }) => {
           </>
         )}
         <input
-          style={styles.input}
+          className="input"
           type="email"
           placeholder="Email"
           value={email}
@@ -180,30 +117,34 @@ const AuthModal = ({ showModal, setShowModal }) => {
           required
         />
         <input
-          style={styles.input}
+          className="input"
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <div style={styles.buttonContainer}>
+        <div className="button-container">
           {isSignUp ? (
             <>
-              <button style={styles.button} type="button" onClick={handleSignUp}>Save</button>
-              <button style={styles.button} type="button" onClick={() => setIsSignUp(false)}>Sign In</button>
+              <button className="Sbutton" type="button" onClick={handleSignUp}>Create account</button>
+              <button className="Sbutton" type="button" onClick={() => setIsSignUp(false)}>Back to Sign In</button>
             </>
           ) : (
             <>
-              <button style={styles.button} type="button" onClick={handleSignIn}>Sign In</button>
-              <button style={styles.button} type="button" onClick={() => setIsSignUp(true)}>Sign Up</button>
+              <button className="Sbutton" type="button" onClick={handleSignIn}>Login</button>
+              <button className="Sbutton" type="button" onClick={() => setIsSignUp(true)}>Create Account</button>
             </>
           )}
         </div>
-        <button style={styles.googleButton} type="button" onClick={handleGoogleSignIn}>Sign in with Google</button>
-        <button style={styles.button} onClick={() => setShowModal(false)}>Cancel</button>
-        {successMessage && <div style={styles.successMessage}>{successMessage}</div>}
-        {errorMessage && <div style={styles.errorMessage}>{errorMessage}</div>}
+        <p className="GoogleLoginText">or login with</p>
+        <button className="google-button" type="button" onClick={handleGoogleSignIn}>
+          <img src={googleLogo} alt="Google Logo" className="google-logo" />
+          Google
+        </button>
+        <button className="Sbutton" onClick={() => setShowModal(false)}>Cancel</button>
+        {successMessage && <div className="success-message">{successMessage}</div>}
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
       </div>
     </div>
   );

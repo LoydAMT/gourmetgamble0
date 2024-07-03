@@ -178,7 +178,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
           <input className="input" type="text" placeholder="Your name" value={nameOfUser} onChange={(e) => setNameOfUser(e.target.value)} required />
           <input className="input" type="url" placeholder="Photo URL" value={photo} onChange={(e) => setPhoto(e.target.value)} />
           <input className="input" type="url" placeholder="Video Tutorial URL" value={video} onChange={(e) => setVideo(e.target.value)} />
-          <textarea className="inputRecipe" placeholder="Recipe Guide" value={recipe} onChange={(e) => setRecipe(e.target.value)} />
+          <textarea className="inputRecipe" placeholder="Ingredients Measurements" value={recipe} onChange={(e) => setRecipe(e.target.value)} />
           {recipeSteps.map((step, index) => (
             <textarea
               key={index}

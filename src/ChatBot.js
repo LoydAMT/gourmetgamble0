@@ -31,21 +31,24 @@ const ChatBot = () => {
     // Lowercase text for easier comparison
     const messageText = text.toLowerCase();
 
-    // Handling specific prompts
-    if (messageText.includes("thank you")) {
-      const botMessage = {
-        _id: new Date().getTime(),
-        text: "You're welcome! Glad to help you!",
-        createdAt: new Date(),
-        user: { _id: 2, name: 'Food Bot' }
-      };
-      setMessages(messages => [...messages, botMessage]);
-      return;
-    }
+    // Define an extensive list of food-related keywords
+    const foodKeywords = [
+      'recipe', 'food', 'breakfast', 'lunch', 'dinner', 'fruit', 'vegetable', 'meal', 'cook', 'ingredient', 'dish', 
+      'cuisine', 'healthy', 'snack', 'dessert', 'appetizer', 'main course', 'beverage', 'drink', 'smoothie', 'shake', 
+      'grill', 'bake', 'roast', 'fry', 'boil', 'steam', 'saute', 'braise', 'stew', 'soup', 'salad', 'sauce', 'condiment', 
+      'marinade', 'dip', 'spread', 'pastry', 'bread', 'cake', 'pie', 'tart', 'pudding', 'ice cream', 'sorbet', 'cookie', 
+      'biscuit', 'sandwich', 'burger', 'pizza', 'pasta', 'noodle', 'rice', 'grain', 'cereal', 'oatmeal', 'porridge', 
+      'protein', 'carb', 'fiber', 'vitamin', 'mineral', 'nutrient', 'calorie', 'diet', 'vegan', 'vegetarian', 'gluten-free', 
+      'dairy-free', 'nut-free', 'paleo', 'keto', 'low-carb', 'low-fat', 'low-sugar', 'organic', 'non-gmo', 'farm-to-table', 
+      'locally-sourced', 'seasonal', 'ethnic', 'international', 'fusion', 'gourmet', 'fine dining', 'comfort food', 
+      'fast food', 'street food', 'homemade', 'quick', 'easy', 'simple', 'budget', 'economical', 'leftovers', 'meal prep', 
+      'batch cooking', 'family-friendly', 'kid-friendly', 'party', 'celebration', 'holiday', 'festival', 'tradition', 
+      'regional', 'specialty', 'artisan', 'farm', 'garden', 'fresh', 'frozen', 'canned', 'preserved', 'pickled', 'fermented', 
+      'spices', 'herbs', 'aromatics', 'flavor', 'taste', 'texture', 'presentation', 'plating', 'garnish', 'food styling'
+    ];
 
-    const keywords = ['recipe', 'food', 'breakfast', 'lunch', 'dinner', 'fruit', 'healthy'];
-    if (keywords.some(keyword => messageText.includes(keyword))) {
-      // Send the query to the Groq API for more complex queries
+    if (foodKeywords.some(keyword => messageText.includes(keyword))) {
+      // Send the query to the Groq API for food-related queries
       try {
         const response = await groq.chat.completions.create({
           messages: [

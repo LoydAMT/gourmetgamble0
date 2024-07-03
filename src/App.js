@@ -139,9 +139,6 @@ function AppContent({
           Contact Us
         </button>
         <button className="footer-item" onClick={() => setShowPrivacyModal(true)}>
-          Feedback
-        </button>
-        <button className="footer-item" onClick={() => setShowPrivacyModal(true)}>
           Privacy Policy
         </button>
       </footer>

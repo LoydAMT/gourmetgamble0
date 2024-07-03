@@ -4,7 +4,7 @@ import { db, auth, getUserProfile, uploadPostPhoto } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import './Community.css';
 
-const defaultProfilePicture = 'https://www.kindpng.com/picc/m/451-4517876_default-profile-hd-png-download.png';
+import defaultProfilePicture from './user.png';
 
 function Community() {
   const [posts, setPosts] = useState([]);

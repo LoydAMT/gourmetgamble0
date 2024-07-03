@@ -1,8 +1,7 @@
-//profile.js
 import React, { useState, useEffect } from 'react';
 import { auth, db, getUserProfile, uploadProfilePicture } from './firebaseConfig';
 import { collection, getDocs, query, where, updateDoc, doc } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import './Profile.css';
 
 function Profile() {
@@ -55,11 +54,10 @@ function Profile() {
         console.log('File uploaded successfully. URL:', url);
 
         console.log('Updating Firestore document...');
-        // Query the users collection to find the document with the correct UID
         const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
-          const userDoc = querySnapshot.docs[0]; // Assuming there's only one document per UID
+          const userDoc = querySnapshot.docs[0];
           const userRef = doc(db, 'users', userDoc.id);
           await updateDoc(userRef, { profilePicture: url });
           console.log('Firestore document updated successfully.');
@@ -79,6 +77,10 @@ function Profile() {
     }
   };
 
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
   return (
     <div className="profile-container">
       {currentUser ? (
@@ -90,12 +92,15 @@ function Profile() {
               alt="Profile"
               className="profile-picture"
             />
-            <input type="file" accept="image/*" onChange={handleProfilePictureChange} />
-            {newProfilePicture && (
-              <button onClick={handleSaveProfilePicture} className="save-button">Save</button>
-            )}
+            <div className="profile-upload">
+              <input type="file" accept="image/*" onChange={handleProfilePictureChange} />
+              {newProfilePicture && (
+                <button onClick={handleSaveProfilePicture} className="save-button">Save</button>
+              )}
+            </div>
           </div>
           {error && <p className="error-message">{error}</p>}
+          <button onClick={handleLogout} className="logout-button">Logout</button>
           <h2>Your Recipes</h2>
           <div className="recipes-container">
             {recipes.map(recipe => (
@@ -114,6 +119,3 @@ function Profile() {
 }
 
 export default Profile;
-
-
-

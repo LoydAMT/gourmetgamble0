@@ -9,6 +9,7 @@ function Profile() {
   const [profilePicture, setProfilePicture] = useState('');
   const [newProfilePicture, setNewProfilePicture] = useState(null);
   const [recipes, setRecipes] = useState([]);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -81,6 +82,14 @@ function Profile() {
     await signOut(auth);
   };
 
+  const handleRecipeClick = (recipe) => {
+    setSelectedRecipe(recipe);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedRecipe(null);
+  };
+
   return (
     <div className="profile-container">
       {currentUser ? (
@@ -104,12 +113,29 @@ function Profile() {
           <h2>Your Recipes</h2>
           <div className="recipes-container">
             {recipes.map(recipe => (
-              <div key={recipe.id} className="recipe-card">
+              <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
                 <p>{recipe.nameOfDish}</p>
               </div>
             ))}
           </div>
+          {selectedRecipe && (
+            <div className="modalBackground">
+              <div className="modalContainer">
+                <h2>{selectedRecipe.nameOfDish}</h2>
+                <p><strong>Description:</strong> {selectedRecipe.description}</p>
+                <p><strong>Origin:</strong> {selectedRecipe.origin}</p>
+                <p><strong>Ingredients:</strong> {selectedRecipe.ingredients.join(', ')}</p>
+                <p><strong>Steps:</strong></p>
+                <ul>
+                  {selectedRecipe.steps.map((step, index) => (
+                    <li key={index}>{step}</li>
+                  ))}
+                </ul>
+                <button onClick={handleCloseModal} className="button closeModalButton">Close</button>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <p>Please log in to view your profile.</p>

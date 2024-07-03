@@ -7,7 +7,7 @@ import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
 import Community from './Community';
 import Profile from './Profile';
-import ContactUsModal from './ContactUsModal';
+import ContactUsModal from './ContactUsModal'; 
 import AddRecipeModal from './AddRecipeModal';
 import { collection, getDocs } from 'firebase/firestore';
 import { db, auth } from './firebaseConfig';

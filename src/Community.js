@@ -132,6 +132,10 @@ function Community() {
     setSearchQuery(e.target.value);
   };
 
+  const handleAddImageClick = () => {
+    document.getElementById('post-photo-input').click();
+  };
+
   const filteredPosts = posts.filter(post => 
     (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -139,55 +143,71 @@ function Community() {
 
   return (
     <div className="community-container">
-      <h1>Community</h1>
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={handleSearchChange}
-        placeholder="Search for posts..."
-        className="search-bar"
-      />
-      {currentUser && (
-        <div className="new-post-container">
-          <img src={currentUser.profilePicture} alt="Profile" className="profile-picture" />
-          <input
-            type="text"
-            value={newPost}
-            onChange={(e) => setNewPost(e.target.value)}
-            placeholder="Write a new post..."
-            className="new-post-input"
-          />
-          <input type="file" accept="image/*" onChange={handlePostPhotoChange} />
-          <button onClick={handleAddPost} className="new-post-button">Add Post</button>
-        </div>
-      )}
-      <div className="posts-container">
-        {filteredPosts.map(post => (
-          <div key={post.id} className="post-card">
-            <div className="post-header">
-              <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
-              <div>
-                <p className="post-user-name"><strong>{post.userName}</strong></p>
-                {post.createdAt && <p className="post-timestamp">{new Date(post.createdAt).toLocaleString()}</p>}
+      <div className="post-input-container">
+        <img src={currentUser?.profilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+        <input
+          type="text"
+          value={newPost}
+          onChange={(e) => setNewPost(e.target.value)}
+          placeholder="What's on your mind?"
+          className="new-post-input"
+        />
+        <button onClick={handleAddImageClick} className="add-image-button">
+          <span role="img" aria-label="Add Image">📷</span>
+        </button>
+        <input id="post-photo-input" type="file" accept="image/*" onChange={handlePostPhotoChange} className="file-input" />
+        <button onClick={handleAddPost} className="new-post-button">Post</button>
+      </div>
+
+      <div className="main-content">
+        <div className="posts-container">
+          {filteredPosts.map(post => (
+            <div key={post.id} className="post-card">
+              <div className="post-header">
+                <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+                <div>
+                  <p className="post-user-name"><strong>{post.userName}</strong></p>
+                  {post.createdAt && <p className="post-timestamp">{new Date(post.createdAt).toLocaleString()}</p>}
+                </div>
+              </div>
+              <p>{post.content}</p>
+              {post.photoURL && <img src={post.photoURL} alt="Post" className="post-photo" />}
+              <div className="likes-comments-container">
+                <button onClick={() => handleLike(post.id)} className="like-button">
+                  {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
+                </button>
+                <span>{post.likes ? post.likes.length : 0} Likes</span>
+                {post.comments.map((comment, index) => (
+                  <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
+                    <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+                    <p><strong>{comment.userName}</strong>: {comment.content}</p>
+                  </div>
+                ))}
+                <AddComment postId={post.id} onAddComment={handleAddComment} />
               </div>
             </div>
-            <p>{post.content}</p>
-            {post.photoURL && <img src={post.photoURL} alt="Post" className="post-photo" />}
-            <div className="likes-comments-container">
-              <button onClick={() => handleLike(post.id)} className="like-button">
-                {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
-              </button>
-              <span>{post.likes ? post.likes.length : 0} Likes</span>
-              {post.comments.map((comment, index) => (
-                <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
-                  <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
-                  <p><strong>{comment.userName}</strong>: {comment.content}</p>
-                </div>
-              ))}
-              <AddComment postId={post.id} onAddComment={handleAddComment} />
-            </div>
+          ))}
+        </div>
+
+        <div className="sidebar">
+          <div className="search-bar-container">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search"
+              className="search-bar"
+            />
           </div>
-        ))}
+          <div className="trends-container">
+            <h3>Trends for you</h3>
+            {/* Add your trends content here */}
+          </div>
+          <div className="who-to-follow-container">
+            <h3>Who to follow</h3>
+            {/* Add your follow suggestions here */}
+          </div>
+        </div>
       </div>
     </div>
   );

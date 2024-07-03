@@ -1,47 +1,57 @@
 /* Community.css */
 
 .community-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   font-family: Arial, sans-serif;
 }
 
-.search-bar {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.new-post-container {
+.post-input-container {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-  align-items: flex-start;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
 .new-post-input {
-  width: 100%;
+  flex-grow: 1;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  border-radius: 20px;
+}
+
+.add-image-button {
+  background-color: transparent;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+.file-input {
+  display: none;
 }
 
 .new-post-button {
   padding: 10px 20px;
   background-color: #ffa500;
   border: none;
-  border-radius: 4px;
+  border-radius: 20px;
   color: #fff;
   cursor: pointer;
 }
 
+.main-content {
+  display: flex;
+  justify-content: space-between;
+}
+
 .posts-container {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -49,14 +59,15 @@
 
 .post-card {
   padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
 .post-header {
   display: flex;
   align-items: center;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
@@ -74,6 +85,7 @@
   max-width: 100%;
   height: auto;
   margin-top: 10px;
+  border-radius: 10px;
 }
 
 .likes-comments-container {
@@ -115,15 +127,43 @@
 .comment {
   display: flex;
   align-items: center;
+  gap: 10px;
   margin-left: 20px;
   font-size: 14px;
   margin-top: 5px;
 }
 
 .profile-picture {
-  max-width: 30px;
-  max-height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+}
+
+.sidebar {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+}
+
+.search-bar {
+  width: 90%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+
+.trends-container, .who-to-follow-container {
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }

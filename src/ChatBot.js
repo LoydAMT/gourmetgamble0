@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import Groq from 'groq-sdk';
 import './ChatBot.css';
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
-  const CHATGPT_API_KEY = 'sk-proj-AvE3vAq0ijffp4otfxV4T3BlbkFJdHxfYn9nspawQXue7uls';  // Ensure this key is still valid
+  const groq = new Groq({
+    apiKey: process.env.REACT_APP_GROQ_API_KEY,
+    dangerouslyAllowBrowser: true  // Allow usage in browser environment
+  });
 
-  // Initialize the chat with a welcome message
   useEffect(() => {
     const welcomeMessage = {
       _id: new Date().getTime(),
@@ -24,15 +26,16 @@ const ChatBot = () => {
       createdAt: new Date(),
       user: { _id: 1 }
     };
-    setMessages(messages => [...messages, userMessage]);  
+    setMessages(messages => [...messages, userMessage]);
 
+    // Lowercase text for easier comparison
     const messageText = text.toLowerCase();
-    const keywords = ['recipe', 'food', 'breakfast', 'lunch', 'dinner', 'fruit', 'healthy'];
 
-    if (!keywords.some(keyword => messageText.includes(keyword))) {
+    // Handling specific prompts
+    if (messageText.includes("thank you")) {
       const botMessage = {
-        _id: new Date().getTime() + 1,
-        text: "I'm still learning, please ask me about food and recipes only, like 'How do I bake a cake?'",
+        _id: new Date().getTime(),
+        text: "You're welcome! Glad to help you!",
         createdAt: new Date(),
         user: { _id: 2, name: 'Food Bot' }
       };
@@ -40,37 +43,48 @@ const ChatBot = () => {
       return;
     }
 
-    try {
-      const response = await axios.post('https://api.openai.com/v1/completions', {
-        model: "gpt-3.5-turbo-instruct", 
-        prompt: `get me a recipe for ${messageText}`,
-        max_tokens: 1200,
-        temperature: 0.2,
-        n: 1,
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${CHATGPT_API_KEY}`
-        }
-      });
+    const keywords = ['recipe', 'food', 'breakfast', 'lunch', 'dinner', 'fruit', 'healthy'];
+    if (keywords.some(keyword => messageText.includes(keyword))) {
+      // Send the query to the Groq API for more complex queries
+      try {
+        const response = await groq.chat.completions.create({
+          messages: [
+            {
+              role: "user",
+              content: messageText,
+            },
+          ],
+          model: "gemma-7b-it",
+        });
 
-      const recipe = response.data.choices[0].text.trim();
+        const recipe = response.choices[0]?.message?.content.trim() || 'Sorry, I could not find a recipe for that.';
+        const formattedRecipe = recipe.replace(/\n/g, '<br/>');
+
+        const botMessage = {
+          _id: new Date().getTime(),
+          text: formattedRecipe,
+          createdAt: new Date(),
+          user: { _id: 2, name: 'Food Bot' }
+        };
+        setMessages(messages => [...messages, botMessage]);
+      } catch (error) {
+        console.error('Error fetching the recipe:', error);
+        const errorMessage = {
+          _id: new Date().getTime(),
+          text: `Error: ${error.message}`,
+          createdAt: new Date(),
+          user: { _id: 2, name: 'Food Bot' }
+        };
+        setMessages(messages => [...messages, errorMessage]);
+      }
+    } else {
       const botMessage = {
-        _id: new Date().getTime() + 1,
-        text: recipe,
+        _id: new Date().getTime(),
+        text: "I'm still learning, please ask me about food and recipes only.",
         createdAt: new Date(),
         user: { _id: 2, name: 'Food Bot' }
       };
       setMessages(messages => [...messages, botMessage]);
-    } catch (error) {
-      console.error('Error fetching the recipe:', error);
-      const errorMessage = {
-        _id: new Date().getTime() + 1,
-        text: `Error: ${error.response ? JSON.stringify(error.response.data, null, 2) : JSON.stringify(error.message)}`,
-        createdAt: new Date(),
-        user: { _id: 2, name: 'Food Bot' }
-      };
-      setMessages(messages => [...messages, errorMessage]);
     }
   };
 
@@ -90,9 +104,8 @@ const ChatBot = () => {
       </div>
       <div className="chatbot-messages">
         {messages.map(message => (
-          <div key={message._id} className={`chatbot-message ${message.user._id === 1 ? 'user-message' : 'bot-message'}`}>
-            <p>{message.text}</p>
-          </div>
+          <div key={message._id} className={`chatbot-message ${message.user._id === 1 ? 'user-message' : 'bot-message'}`}
+               dangerouslySetInnerHTML={{ __html: message.text }} />
         ))}
       </div>
       <form className="chatbot-input" onSubmit={handleSubmit}>

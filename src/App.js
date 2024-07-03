@@ -6,10 +6,12 @@ import PrivacyPolicyModal from './PrivacyPolicyModal';
 import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
 import Community from './Community';
+import Profile from './Profile';
 import ContactUsModal from './ContactUsModal';
 import AddRecipeModal from './AddRecipeModal';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from './firebaseConfig';
+import { db, auth } from './firebaseConfig';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import './App.css';
 
 function App() {
@@ -19,6 +21,7 @@ function App() {
   const [showContactUsModal, setShowContactUsModal] = useState(false);
   const [recipes, setRecipes] = useState([]);
   const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -28,10 +31,26 @@ function App() {
     };
 
     fetchRecipes();
+
+    const authUnsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    return () => {
+      authUnsubscribe();
+    };
   }, []);
 
   const handleAddRecipe = (newRecipe) => {
     setRecipes([...recipes, newRecipe]);
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
   };
 
   return (
@@ -49,6 +68,8 @@ function App() {
         handleAddRecipe={handleAddRecipe}
         showAddRecipeModal={showAddRecipeModal}
         setShowAddRecipeModal={setShowAddRecipeModal}
+        currentUser={currentUser}
+        handleLogout={handleLogout}
       />
     </Router>
   );
@@ -59,7 +80,8 @@ function AppContent({
   showAuthModal, setShowAuthModal,
   showAboutUsModal, setShowAboutUsModal,
   showContactUsModal, setShowContactUsModal,
-  recipes, handleAddRecipe, showAddRecipeModal, setShowAddRecipeModal
+  recipes, handleAddRecipe, showAddRecipeModal, setShowAddRecipeModal,
+  currentUser, handleLogout
 }) {
   const navigate = useNavigate();
 
@@ -75,16 +97,27 @@ function AppContent({
         <button className="nav-item" onClick={() => navigate('/community')}>
           Community
         </button>
-       
-        <button className="sign-in-button" onClick={() => setShowAuthModal(true)}>
-          Sign in/Sign Up
-        </button>
+        {currentUser ? (
+          <>
+            <button className="nav-item" onClick={() => navigate('/profile')}>
+              Profile
+            </button>
+            <button className="nav-item" onClick={handleLogout}>
+              Logout
+            </button>
+          </>
+        ) : (
+          <button className="sign-in-button" onClick={() => setShowAuthModal(true)}>
+            Sign in/Sign Up
+          </button>
+        )}
       </nav>
 
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/recipes" element={<Recipes recipes={recipes} />} />
         <Route path="/community" element={<Community />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
 
       <AddRecipeModal

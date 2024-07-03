@@ -114,7 +114,7 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
           </div>
         </div>
         <div className="dish-info">
-          <button className="close-button" onClick={closeModal}>×</button>
+          <button className="close-button" onClick={() => window.location.reload()}>×</button>
           <h1 className="dish-name">{recipe.nameOfDish}</h1>
           <p className="dish-author">Author:<br /> {recipe.nameOfUser}</p>
           <div className="action-buttons">

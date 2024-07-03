@@ -80,7 +80,7 @@ function Recipes() {
         />
       </div>
       {Object.keys(groupedRecipes).map((origin) => (
-        <div key={origin}>
+        <div key={origin} className="origin-container">
           <h3 className="category-title">{origin}</h3>
           <div className="recipe-grid">
             {groupedRecipes[origin].map((recipe) => (

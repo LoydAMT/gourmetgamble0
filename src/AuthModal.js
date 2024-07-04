@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { registerUser, loginUser, signInWithGoogle, db, getUserProfile } from './firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import './AuthModal.css';
-import googleLogo from './google.png'; // Adjust the path as necessary
+import googleLogo from './google.png';
 
 const AuthModal = ({ showModal, setShowModal }) => {
   const [isSignUp, setIsSignUp] = useState(false);

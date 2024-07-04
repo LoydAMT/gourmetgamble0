@@ -12,6 +12,7 @@ function Community() {
   const [newPostPhoto, setNewPostPhoto] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
@@ -172,18 +173,12 @@ function Community() {
     }
   };
 
-  const filteredPosts = posts.filter(post =>
-    (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
-  const [filter, setFilter] = useState('all');
-
-  const handleFilterChange = (newFilter) => {
-    setFilter(newFilter);
-  };
-
   const getFilteredPosts = () => {
+    const filteredPosts = posts.filter(post =>
+      (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
     switch (filter) {
       case 'myPosts':
         return filteredPosts.filter(post => post.userId === currentUser?.uid);
@@ -213,9 +208,9 @@ function Community() {
       </div>
 
       <div className="filter-buttons">
-        <button className={`filter-button ${filter === 'all' ? 'active' : ''}`} onClick={() => handleFilterChange('all')}>All</button>
-        <button className={`filter-button ${filter === 'myPosts' ? 'active' : ''}`} onClick={() => handleFilterChange('myPosts')}>My Posts</button>
-        <button className={`filter-button ${filter === 'interactions' ? 'active' : ''}`} onClick={() => handleFilterChange('interactions')}>Interactions</button>
+        <button className={`filter-button ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All</button>
+        <button className={`filter-button ${filter === 'myPosts' ? 'active' : ''}`} onClick={() => setFilter('myPosts')}>My Posts</button>
+        <button className={`filter-button ${filter === 'interactions' ? 'active' : ''}`} onClick={() => setFilter('interactions')}>Interactions</button>
       </div>
 
       <div className="main-content">
@@ -276,11 +271,13 @@ function Community() {
               className="search-bar"
             />
           </div>
-          <div className="trends-container">
+          <div className="sidebar-section">
             <h3>Trends for you</h3>
+            {/* Add your trends content here */}
           </div>
-          <div className="who-to-follow-container">
+          <div className="sidebar-section">
             <h3>Who to follow</h3>
+            {/* Add your follow suggestions here */}
           </div>
         </div>
       </div>

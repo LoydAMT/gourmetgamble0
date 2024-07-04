@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './AboutUsModal.css'; // Import the CSS file
 import khentPhoto from './MemberPhotos/Khent.jpg';
 import elaishaPhoto from './MemberPhotos/Elaisha.jpg';
@@ -15,7 +15,7 @@ const AboutUsModal = ({ showModal, setShowModal }) => {
             {showModal && (
                 <div className="modal" onClick={closeModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                    <span className="close" onClick={closeModal}>&times;</span>
+                        <span className="close" onClick={closeModal}>&times;</span>
                         <h2>About Us</h2>
                         <p>Welcome to our Parlay community! We are dedicated to bringing together food enthusiasts 
                         from all walks of life. Our mission is to create a platform where you can share, discover, 
@@ -32,10 +32,30 @@ const AboutUsModal = ({ showModal, setShowModal }) => {
                         Our team is committed to providing you with the best user experience possible. We 
                         work hard to ensure that our platform is user-friendly, reliable, and fun to use.</p>
                         <div className="MemberPhotos">
-                            <img src={khentPhoto} alt="Khent" />
-                            <img src={elaishaPhoto} alt="Elaisha" />
-                            <img src={arbienPhoto} alt="Arbien" />
-                            <img src={keithPhoto} alt="Keith" />
+                            <div className="MemberPhoto">
+                                <img src={khentPhoto} alt="Khent" />
+                                <a href="https://www.instagram.com/khentlloyddx/" target="_blank" rel="noopener noreferrer">
+                                    <h4>Khent Lloyd</h4>
+                                </a>
+                            </div>
+                            <div className="MemberPhoto">
+                                <img src={elaishaPhoto} alt="Elaisha" />
+                                <a href="https://www.instagram.com/sxnzelsh/" target="_blank" rel="noopener noreferrer">
+                                    <h4>Elaisha Mae</h4>
+                                </a>
+                            </div>
+                            <div className="MemberPhoto">
+                                <img src={arbienPhoto} alt="Arbien" />
+                                <a href="https://www.instagram.com/neofelis_07/" target="_blank" rel="noopener noreferrer">
+                                    <h4>Arbien (John)</h4>
+                                </a>
+                            </div>
+                            <div className="MemberPhoto">
+                                <img src={keithPhoto} alt="Keith" />
+                                <a href="https://www.instagram.com/eclipse._.k/" target="_blank" rel="noopener noreferrer">
+                                    <h4>Keith Harvey</h4>
+                                </a>
+                            </div>
                         </div>
 
                         <h3>Join Us</h3>

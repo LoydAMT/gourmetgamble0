@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, deleteDoc } from 'firebase/firestore';
 import { db, auth, getUserProfile, uploadPostPhoto } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import './Community.css';
@@ -12,6 +12,7 @@ function Community() {
   const [newPostPhoto, setNewPostPhoto] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
@@ -82,6 +83,7 @@ function Community() {
         likes: [],
         userName: currentUser.name,
         userProfilePicture: currentUser.profilePicture,
+        userId: currentUser.uid,
         createdAt: new Date().toISOString(),
         photoURL,
       };
@@ -101,6 +103,7 @@ function Community() {
           content: comment,
           userName: currentUser.name,
           userProfilePicture: currentUser.profilePicture,
+          userId: currentUser.uid,
           createdAt: new Date().toISOString(),
         };
         await updateDoc(postRef, { comments: [...postData.comments, newComment] });
@@ -118,13 +121,45 @@ function Community() {
         const postData = postDoc.data();
         const likes = postData.likes || [];
         if (likes.includes(currentUser.uid)) {
-          // Remove like
           await updateDoc(postRef, { likes: likes.filter(uid => uid !== currentUser.uid) });
         } else {
-          // Add like
           await updateDoc(postRef, { likes: [...likes, currentUser.uid] });
         }
       }
+    }
+  };
+
+  const handleEditPost = async (postId, newContent) => {
+    if (newContent.trim() && currentUser) {
+      const postRef = doc(db, 'posts', postId);
+      await updateDoc(postRef, { content: newContent });
+    }
+  };
+
+  const handleDeletePost = async (postId) => {
+    const postRef = doc(db, 'posts', postId);
+    await deleteDoc(postRef);
+  };
+
+  const handleEditComment = async (postId, commentIndex, newContent) => {
+    if (newContent.trim() && currentUser) {
+      const postRef = doc(db, 'posts', postId);
+      const postDoc = await getDoc(postRef);
+      if (postDoc.exists()) {
+        const postData = postDoc.data();
+        postData.comments[commentIndex].content = newContent;
+        await updateDoc(postRef, { comments: postData.comments });
+      }
+    }
+  };
+
+  const handleDeleteComment = async (postId, commentIndex) => {
+    const postRef = doc(db, 'posts', postId);
+    const postDoc = await getDoc(postRef);
+    if (postDoc.exists()) {
+      const postData = postDoc.data();
+      postData.comments.splice(commentIndex, 1);
+      await updateDoc(postRef, { comments: postData.comments });
     }
   };
 
@@ -140,6 +175,16 @@ function Community() {
     (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  const displayedPosts = filteredPosts.filter(post => {
+    if (filter === 'myPosts') {
+      return post.userId === currentUser?.uid;
+    } else if (filter === 'interactions') {
+      return post.comments.some(comment => comment.userId === currentUser?.uid) || (post.likes && post.likes.includes(currentUser?.uid));
+    } else {
+      return true;
+    }
+  });
 
   return (
     <div className="community-container">
@@ -159,9 +204,15 @@ function Community() {
         <button onClick={handleAddPost} className="new-post-button">Post</button>
       </div>
 
+      <div className="filter-buttons">
+        <button onClick={() => setFilter('all')} className={`filter-button ${filter === 'all' ? 'active' : ''}`}>All Posts</button>
+        <button onClick={() => setFilter('myPosts')} className={`filter-button ${filter === 'myPosts' ? 'active' : ''}`}>My Posts</button>
+        <button onClick={() => setFilter('interactions')} className={`filter-button ${filter === 'interactions' ? 'active' : ''}`}>My Interactions</button>
+      </div>
+
       <div className="main-content">
         <div className="posts-container">
-          {filteredPosts.map(post => (
+          {displayedPosts.map(post => (
             <div key={post.id} className="post-card">
               <div className="post-header">
                 <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
@@ -169,6 +220,12 @@ function Community() {
                   <p className="post-user-name"><strong>{post.userName}</strong></p>
                   {post.createdAt && <p className="post-timestamp">{new Date(post.createdAt).toLocaleString()}</p>}
                 </div>
+                {post.userId === currentUser?.uid && (
+                  <div className="post-actions">
+                    <button onClick={() => handleEditPost(post.id, prompt('Edit your post:', post.content))}>Edit</button>
+                    <button onClick={() => handleDeletePost(post.id)}>Delete</button>
+                  </div>
+                )}
               </div>
               <p>{post.content}</p>
               {post.photoURL && <img src={post.photoURL} alt="Post" className="post-photo" />}
@@ -181,6 +238,12 @@ function Community() {
                   <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
                     <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
                     <p><strong>{comment.userName}</strong>: {comment.content}</p>
+                    {comment.userId === currentUser?.uid && (
+                      <div className="comment-actions">
+                        <button onClick={() => handleEditComment(post.id, index, prompt('Edit your comment:', comment.content))}>Edit</button>
+                        <button onClick={() => handleDeleteComment(post.id, index)}>Delete</button>
+                      </div>
+                    )}
                   </div>
                 ))}
                 <AddComment postId={post.id} onAddComment={handleAddComment} />

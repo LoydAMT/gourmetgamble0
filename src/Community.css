@@ -45,6 +45,23 @@
   cursor: pointer;
 }
 
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.filter-button.active {
+  background-color: #ffa500;
+  color: #fff;
+}
+
 .main-content {
   display: flex;
   justify-content: space-between;
@@ -139,6 +156,17 @@
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+}
+
+.post-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .sidebar {

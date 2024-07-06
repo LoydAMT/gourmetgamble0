@@ -45,6 +45,25 @@
   cursor: pointer;
 }
 
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.filter-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.filter-button.active {
+  background-color: #ffa500;
+  color: #fff;
+}
+
 .main-content {
   display: flex;
   justify-content: space-between;
@@ -59,9 +78,11 @@
 
 .post-card {
   padding: 15px;
+  max-width: 1080px;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  position: relative;
 }
 
 .post-header {
@@ -131,6 +152,7 @@
   margin-left: 20px;
   font-size: 14px;
   margin-top: 5px;
+  position: relative;
 }
 
 .profile-picture {
@@ -161,9 +183,46 @@
   border-radius: 20px;
 }
 
-.trends-container, .who-to-follow-container {
+.sidebar-section {
   padding: 15px;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.post-options, .comment-options {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.options-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.options-menu {
+  position: absolute;
+  top: 20px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.post-options:hover .options-menu, .comment-options:hover .options-menu {
+  display: flex;
+}
+
+.options-menu button {
+  padding: 5px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
 }

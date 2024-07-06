@@ -13,8 +13,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db, auth, getUserProfile } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import './App.css';
-
-const defaultProfilePicture = 'https://www.kindpng.com/picc/m/451-4517876_default-profile-hd-png-download.png';
+import defaultProfilePicture from './user.png'; // Import the image
 
 function App() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);

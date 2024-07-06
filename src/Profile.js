@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, getUserProfile, uploadProfilePicture } from './firebaseConfig';
-import { collection, getDocs, query, where, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, query, where, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import './Profile.css';
 
@@ -9,6 +9,7 @@ function Profile() {
   const [profilePicture, setProfilePicture] = useState('');
   const [newProfilePicture, setNewProfilePicture] = useState(null);
   const [recipes, setRecipes] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [error, setError] = useState('');
 
@@ -24,10 +25,24 @@ function Profile() {
             profilePicture: userProfile.profilePicture || '',
           });
           setProfilePicture(userProfile.profilePicture || '');
-          const q = query(collection(db, 'recipes'), where('userId', '==', user.uid));
-          const querySnapshot = await getDocs(q);
-          const userRecipes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          
+          // Fetch user recipes
+          const recipeQuery = query(collection(db, 'recipes'), where('userId', '==', user.uid));
+          const recipeQuerySnapshot = await getDocs(recipeQuery);
+          const userRecipes = recipeQuerySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setRecipes(userRecipes);
+          
+          // Fetch user favorites
+          if (userProfile.favorites) {
+            const favoriteRecipes = [];
+            for (const favoriteId of userProfile.favorites) {
+              const favoriteDoc = await getDoc(doc(db, 'recipes', favoriteId));
+              if (favoriteDoc.exists()) {
+                favoriteRecipes.push({ id: favoriteDoc.id, ...favoriteDoc.data() });
+              }
+            }
+            setFavorites(favoriteRecipes);
+          }
         }
       } else {
         setCurrentUser(null);
@@ -50,29 +65,21 @@ function Profile() {
     if (newProfilePicture && currentUser) {
       const file = document.querySelector('input[type="file"]').files[0];
       try {
-        console.log('Uploading file to Firebase Storage...');
         const url = await uploadProfilePicture(file, currentUser.uid);
-        console.log('File uploaded successfully. URL:', url);
-
-        console.log('Updating Firestore document...');
         const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           const userDoc = querySnapshot.docs[0];
           const userRef = doc(db, 'users', userDoc.id);
           await updateDoc(userRef, { profilePicture: url });
-          console.log('Firestore document updated successfully.');
-
           setProfilePicture(url);
           setCurrentUser((prev) => ({ ...prev, profilePicture: url }));
           setNewProfilePicture(null);
           setError('');
         } else {
-          console.error('User document does not exist!');
           setError('User document does not exist. Please ensure your user profile is set up correctly.');
         }
       } catch (error) {
-        console.error('Error uploading profile picture:', error);
         setError('Error uploading profile picture. Please try again.');
       }
     }
@@ -110,6 +117,7 @@ function Profile() {
           </div>
           {error && <p className="error-message">{error}</p>}
           <button onClick={handleLogout} className="logout-button">Logout</button>
+          
           <h2>Your Recipes</h2>
           <div className="recipes-container">
             {recipes.map(recipe => (
@@ -119,6 +127,17 @@ function Profile() {
               </div>
             ))}
           </div>
+
+          <h2>Your Favorites</h2>
+          <div className="recipes-container">
+            {favorites.map(recipe => (
+              <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
+                <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
+                <p>{recipe.nameOfDish}</p>
+              </div>
+            ))}
+          </div>
+
           {selectedRecipe && (
             <div className="modalBackground">
               <div className="modalContainer">

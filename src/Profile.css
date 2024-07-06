@@ -71,6 +71,23 @@
   background-color: #e5533d;
 }
 
+.show-button {
+  background-color: #007bff;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+
+.show-button:hover {
+  background-color: #0056b3;
+}
+
 .recipes-container {
   display: flex;
   flex-wrap: wrap;
@@ -135,4 +152,27 @@
 
 .closeModalButton:hover {
   background-color: #e5533d;
+}
+
+.follow-button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.follow-button:hover {
+  background-color: #0056b3;
+}
+
+.error-bar {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }

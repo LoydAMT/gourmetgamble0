@@ -1,11 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
 import { db, auth, getUserProfile, uploadPostPhoto } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import './Community.css';
 
 import defaultProfilePicture from './user.png';
 
+const shuffleArray = (array) => {
+  let currentIndex = array.length, randomIndex;
+
+  
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+};
 function Community() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
@@ -13,6 +27,9 @@ function Community() {
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
+  const [whoToFollow, setWhoToFollow] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
@@ -36,6 +53,8 @@ function Community() {
             profilePicture: defaultProfilePicture,
           });
         }
+        fetchWhoToFollow(user.uid);
+        fetchFollowing(user.uid);
       } else {
         setCurrentUser(null);
       }
@@ -46,6 +65,65 @@ function Community() {
       authUnsubscribe();
     };
   }, []);
+
+  const fetchWhoToFollow = async (currentUserId) => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'users'));
+      const usersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const filteredUsers = usersData.filter(user => user.uid !== currentUserId);
+      setWhoToFollow(shuffleArray(filteredUsers).slice(0, 5));
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setError('Error fetching users. Please try again later.');
+    }
+  };
+
+  const fetchFollowing = async (currentUserId) => {
+    try {
+      const userQuery = query(collection(db, 'users'), where('uid', '==', currentUserId));
+      const querySnapshot = await getDocs(userQuery);
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
+        setFollowing(userData.following || []);
+      }
+    } catch (error) {
+      console.error('Error fetching following:', error);
+      setError('Error fetching following. Please try again later.');
+    }
+  };
+
+  const handleFollow = async (followedUserId) => {
+    if (!currentUser) {
+      setError('You need to be logged in to follow users.');
+      return;
+    }
+
+    try {
+      const userQuery = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+      const userSnapshot = await getDocs(userQuery);
+      if (!userSnapshot.empty) {
+        const userDoc = userSnapshot.docs[0];
+        const userData = userDoc.data();
+        let updatedFollowing;
+        if (following.includes(followedUserId)) {
+          updatedFollowing = following.filter(id => id !== followedUserId);
+        } else {
+          updatedFollowing = [...following, followedUserId];
+        }
+
+        await updateDoc(doc(db, 'users', userDoc.id), { following: updatedFollowing });
+        setFollowing(updatedFollowing);
+
+        console.log('Follow action successful:', followedUserId);
+      } else {
+        setError('User profile not found.');
+      }
+    } catch (error) {
+      console.error('Error following user:', error);
+      setError('Error following user. Please try again later.');
+    }
+  };
 
   const sortPosts = (posts) => {
     const twoDaysAgo = new Date();
@@ -191,6 +269,7 @@ function Community() {
 
   return (
     <div className="community-container">
+      {error && <div className="error-bar">{error}</div>}
       <div className="post-input-container">
         <img src={currentUser?.profilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
         <input
@@ -277,7 +356,19 @@ function Community() {
           </div>
           <div className="sidebar-section">
             <h3>Who to follow</h3>
-            {/* Add your follow suggestions here */}
+            <ul className="who-to-follow-list">
+              {whoToFollow.map(user => (
+                <li key={user.uid} className="who-to-follow-item">
+                  <img src={user.profilePicture || defaultProfilePicture} alt="Profile" className="who-to-follow-profile-picture" />
+                  <div className="who-to-follow-info">
+                    <p><strong>{user.name}</strong></p>
+                  </div>
+                  <button className="follow-button" onClick={() => handleFollow(user.uid)}>
+                    {following.includes(user.uid) ? 'Unfollow' : 'Follow'}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

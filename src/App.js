@@ -7,13 +7,14 @@ import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
 import Community from './Community';
 import Profile from './Profile';
+import StalkProfile from './StalkProfile';
 import ContactUsModal from './ContactUsModal';
 import AddRecipeModal from './AddRecipeModal';
 import { collection, getDocs } from 'firebase/firestore';
 import { db, auth, getUserProfile } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import './App.css';
-import defaultProfilePicture from './user.png'; // Import the image
+import defaultProfilePicture from './user.png';
 
 function App() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -121,6 +122,7 @@ function AppContent({
         <Route path="/recipes" element={<Recipes recipes={recipes} />} />
         <Route path="/community" element={<Community />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:userId" element={<StalkProfile />} />
       </Routes>
 
       <AddRecipeModal

@@ -1,5 +1,6 @@
 /* Community.css */
 
+/* General styles for the community page */
 .community-container {
   display: flex;
   flex-direction: column;
@@ -7,6 +8,7 @@
   font-family: Arial, sans-serif;
 }
 
+/* Styles for the post input section */
 .post-input-container {
   display: flex;
   align-items: center;
@@ -14,7 +16,7 @@
   padding: 10px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
 .new-post-input {
@@ -45,11 +47,10 @@
   cursor: pointer;
 }
 
+/* Styles for the filter buttons */
 .filter-buttons {
   display: flex;
   gap: 10px;
-  justify-content: center;
-  margin-top: 10px;
 }
 
 .filter-button {
@@ -61,9 +62,10 @@
 
 .filter-button.active {
   background-color: #ffa500;
-  color: #fff;
+  color: white;
 }
 
+/* Main content area styles */
 .main-content {
   display: flex;
   justify-content: space-between;
@@ -76,13 +78,12 @@
   gap: 20px;
 }
 
+/* Styles for individual post cards */
 .post-card {
   padding: 15px;
-  max-width: 1080px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
 .post-header {
@@ -152,7 +153,6 @@
   margin-left: 20px;
   font-size: 14px;
   margin-top: 5px;
-  position: relative;
 }
 
 .profile-picture {
@@ -163,6 +163,7 @@
   margin-right: 10px;
 }
 
+/* Sidebar styles */
 .sidebar {
   width: 300px;
   display: flex;
@@ -187,42 +188,68 @@
   padding: 15px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
-.post-options, .comment-options {
-  position: absolute;
-  right: 10px;
-  top: 10px;
+.who-to-follow-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.who-to-follow-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.who-to-follow-profile-picture {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.who-to-follow-info {
+  flex-grow: 1;
+}
+
+.follow-button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.follow-button:hover {
+  background-color: #0056b3;
+}
+
+.error-bar {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
 
 .options-button {
   background: none;
   border: none;
-  font-size: 24px;
   cursor: pointer;
 }
 
 .options-menu {
-  position: absolute;
-  top: 20px;
-  right: 0;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   display: none;
-  flex-direction: column;
-  gap: 5px;
 }
 
-.post-options:hover .options-menu, .comment-options:hover .options-menu {
-  display: flex;
-}
-
-.options-menu button {
-  padding: 5px 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
+.post-options:hover .options-menu,
+.comment-options:hover .options-menu {
+  display: block;
 }

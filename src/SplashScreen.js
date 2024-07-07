@@ -3,28 +3,30 @@ import './SplashScreen.css';
 import 'animate.css/animate.min.css'; // Ensure animate.css is imported
 import logo from './logo.png'; // Adjust the path as necessary
 
-function SplashScreen({ onComplete }) {
+function SplashScreen({ onComplete, isComplete }) {
   const [showText, setShowText] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    
+    if (isComplete) {
+      onComplete();
+      return;
+    }
+
     const textTimeout = setTimeout(() => {
       setShowText(true);
-      
-    }, 1500); // 1.5 seconds for the logo animation
+    }, 1500); // Delay for the logo animation
 
-    // Start fade out animation after text animation completes
     const exitTimeout = setTimeout(() => {
       setFadeOut(true);
-      setTimeout(onComplete, 1000); // Adjust the duration to match fade-out animation
-    }, 3500); // 1.5 seconds for logo animation + 1.5 seconds for text animation + 0.5 second buffer
+      setTimeout(onComplete, 1000); // Delay to match fade-out animation
+    }, 3500); // Total animation sequence
 
     return () => {
       clearTimeout(textTimeout);
       clearTimeout(exitTimeout);
     };
-  }, [onComplete]);
+  }, [onComplete, isComplete]);
 
   return (
     <div className={`splash-screen ${fadeOut ? 'animate__animated animate__fadeOut' : ''}`}>

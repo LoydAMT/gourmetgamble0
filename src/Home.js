@@ -26,8 +26,7 @@ function Home() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showChatBot, setShowChatBot] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
-  const [fadeInClass, setFadeInClass] = useState('');
+  const [showSplash, setShowSplash] = useState(() => sessionStorage.getItem("splashComplete") !== "true");
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -54,12 +53,7 @@ function Home() {
     fetchRecipes();
   }, []);
 
-  useEffect(() => {
-    if (!showSplash) {
-      // Add zoom-in class after splash screen is hidden
-      setFadeInClass('animate__animated animate__zoomIn');
-    }
-  }, [showSplash]);
+ 
 
   const scroll = (direction) => {
     if (direction === 'left') {
@@ -96,9 +90,9 @@ function Home() {
       recipe.ingredients.includes(ingredient)
     )
   );
-
-  const handleSplashComplete = () => {
+ const handleSplashComplete = () => {
     setShowSplash(false);
+    sessionStorage.setItem("splashComplete", "true");
   };
 
   return (

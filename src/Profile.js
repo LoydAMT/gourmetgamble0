@@ -3,6 +3,7 @@ import { auth, db, getUserProfile, uploadProfilePicture } from './firebaseConfig
 import { collection, getDocs, query, where, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useParams, Link } from 'react-router-dom';
+import AddRecipeModal from './AddRecipeModal';
 import './Profile.css';
 
 function Profile() {
@@ -18,6 +19,8 @@ function Profile() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [showFollowing, setShowFollowing] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
+  const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -30,6 +33,7 @@ function Profile() {
             name: userProfile.name || '',
             email: userProfile.email || '',
             profilePicture: userProfile.profilePicture || '',
+            nickname: userProfile.nickname || '',
           });
           setProfilePicture(userProfile.profilePicture || '');
 
@@ -120,6 +124,27 @@ function Profile() {
     }
   };
 
+  const handleNicknameChange = async (e) => {
+    if (currentUser) {
+      const newNickname = e.target.value;
+      try {
+        const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userRef = doc(db, 'users', userDoc.id);
+          await updateDoc(userRef, { nickname: newNickname });
+          setProfileUser((prev) => ({ ...prev, nickname: newNickname }));
+          setError('');
+        } else {
+          setError('User document does not exist. Please ensure your user profile is set up correctly.');
+        }
+      } catch (error) {
+        setError('Error updating nickname. Please try again.');
+      }
+    }
+  };
+
   const handleLogout = async () => {
     await signOut(auth);
   };
@@ -159,38 +184,36 @@ function Profile() {
       {error && <div className="error-bar">{error}</div>}
       {profileUser ? (
         <>
-          <h1>{profileUser.name}'s Profile</h1>
-          <div className="profile-info">
+          <div className="profile-header">
             <img
-              src={newProfilePicture || profilePicture || 'default-profile.png'}
+              src={profilePicture || 'default-profile.png'}
               alt="Profile"
               className="profile-picture"
             />
-            {!userId && (
-              <div className="profile-upload">
-                <input type="file" accept="image/*" onChange={handleProfilePictureChange} />
-                {newProfilePicture && (
-                  <button onClick={handleSaveProfilePicture} className="save-button">Save</button>
-                )}
+            <div className="profile-details">
+              <div className="nickname">{profileUser.nickname || 'Nickname'}</div>
+              <div className="name">{profileUser.name}</div>
+              <div className="profile-stats">
+                <span>{recipes.length} Uploads</span>
+                <span onClick={() => setShowFollowers(!showFollowers)}>{followers.length} Followers</span>
+                <span onClick={() => setShowFollowing(!showFollowing)}>{following.length} Following</span>
               </div>
-            )}
-          </div>
-          {error && <p className="error-message">{error}</p>}
-          {!userId && (
-            <div>
-              <button onClick={handleLogout} className="logout-button">Logout</button>
-              <button onClick={() => setShowFollowing(!showFollowing)} className="show-button">
-                {showFollowing ? 'Hide Following' : 'Show Following'}
-              </button>
-              <button onClick={() => setShowFollowers(!showFollowers)} className="show-button">
-                {showFollowers ? 'Hide Followers' : 'Show Followers'}
-              </button>
+              {!userId && (
+                <div className="profile-actions">
+                  <button className="edit-profile-button" onClick={() => setShowEditProfileModal(true)}>Edit Profile</button>
+                  <button onClick={handleLogout} className="logout-button">Logout</button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
-          <h2>{userId ? `${profileUser.name}'s` : 'Your'} Recipes</h2>
+          <div className="upload-recipe-button-container">
+            <button className="upload-recipe-button" onClick={() => setShowAddRecipeModal(true)}>Upload Recipe</button>
+          </div>
+
+          <h2>Saved Recipes</h2>
           <div className="recipes-container">
-            {recipes.map(recipe => (
+            {favorites.map(recipe => (
               <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
                 <p>{recipe.nameOfDish}</p>
@@ -198,9 +221,9 @@ function Profile() {
             ))}
           </div>
 
-          <h2>{userId ? `${profileUser.name}'s` : 'Your'} Favorites</h2>
+          <h2>My Recipes</h2>
           <div className="recipes-container">
-            {favorites.map(recipe => (
+            {recipes.map(recipe => (
               <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
                 <p>{recipe.nameOfDish}</p>
@@ -275,10 +298,59 @@ function Profile() {
               </div>
             </div>
           )}
+
+          <AddRecipeModal showModal={showAddRecipeModal} setShowModal={setShowAddRecipeModal} />
+          <EditProfileModal
+            showModal={showEditProfileModal}
+            setShowModal={setShowEditProfileModal}
+            profilePicture={profilePicture}
+            newProfilePicture={newProfilePicture}
+            handleProfilePictureChange={handleProfilePictureChange}
+            handleSaveProfilePicture={handleSaveProfilePicture}
+            handleNicknameChange={handleNicknameChange}
+            profileUser={profileUser}
+          />
         </>
       ) : (
         <p>Please log in to view your profile.</p>
       )}
+    </div>
+  );
+}
+
+function EditProfileModal({
+  showModal,
+  setShowModal,
+  profilePicture,
+  newProfilePicture,
+  handleProfilePictureChange,
+  handleSaveProfilePicture,
+  handleNicknameChange,
+  profileUser,
+}) {
+  if (!showModal) return null;
+
+  return (
+    <div className="modalBackground">
+      <div className="modalContainer">
+        <h2>Edit Profile</h2>
+        <div className="profile-edit">
+          <img
+            src={newProfilePicture || profilePicture || 'default-profile.png'}
+            alt="Profile"
+            className="profile-picture"
+          />
+          <input type="file" accept="image/*" onChange={handleProfilePictureChange} />
+          <input
+            type="text"
+            placeholder="Set Nickname"
+            defaultValue={profileUser.nickname}
+            onBlur={handleNicknameChange}
+          />
+          <button onClick={handleSaveProfilePicture} className="save-button">Save</button>
+          <button onClick={() => setShowModal(false)} className="closeModalButton">Close</button>
+        </div>
+      </div>
     </div>
   );
 }

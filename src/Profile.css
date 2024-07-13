@@ -10,7 +10,7 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.profile-info {
+.profile-header {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
@@ -25,17 +25,32 @@
   border: 2px solid #ffa500;
 }
 
-.profile-upload {
+.profile-details {
   display: flex;
   flex-direction: column;
 }
 
-.profile-upload input[type="file"] {
-  display: block;
-  margin-bottom: 10px;
+.profile-details h1 {
+  margin: 0;
 }
 
-.save-button {
+.profile-stats {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-stats span {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.save-button, .logout-button {
   background-color: #32cd32;
   border: none;
   border-radius: 25px;
@@ -46,17 +61,18 @@
   transition: background-color 0.3s ease;
 }
 
-.save-button:hover {
-  background-color: #28a428;
-}
-
-.error-message {
-  color: red;
-  margin-bottom: 20px;
-}
-
 .logout-button {
   background-color: #ff6347;
+}
+
+.upload-recipe-button-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.upload-recipe-button {
+  background-color: #32cd32;
   border: none;
   border-radius: 25px;
   padding: 10px 20px;
@@ -64,28 +80,10 @@
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s ease;
-  margin-bottom: 20px;
 }
 
-.logout-button:hover {
-  background-color: #e5533d;
-}
-
-.show-button {
-  background-color: #007bff;
-  border: none;
-  border-radius: 25px;
-  padding: 10px 20px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-  margin-bottom: 20px;
-  margin-left: 10px;
-}
-
-.show-button:hover {
-  background-color: #0056b3;
+.upload-recipe-button:hover {
+  background-color: #28a428;
 }
 
 .recipes-container {
@@ -154,20 +152,6 @@
   background-color: #e5533d;
 }
 
-.follow-button {
-  padding: 5px 10px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.follow-button:hover {
-  background-color: #0056b3;
-}
-
 .error-bar {
   background-color: #ff4d4d;
   color: white;
@@ -175,4 +159,20 @@
   text-align: center;
   border-radius: 5px;
   margin-bottom: 10px;
+}
+
+.follow-button {
+  background-color: #007bff;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.follow-button:hover {
+  background-color: #0056b3;
 }

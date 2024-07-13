@@ -235,15 +235,20 @@
 
 .follow-button {
   padding: 5px 10px;
-  background-color: #007bff;
   border: none;
   border-radius: 5px;
   color: white;
   cursor: pointer;
 }
 
-.follow-button:hover {
-  background-color: #0056b3;
+.who-to-follow-item .follow-button {
+  background-color: #FBBC05;
+  color: white;
+}
+
+.who-to-follow-item .follow-button:hover {
+  background-color: #a77d00;
+  color: white;
 }
 
 .error-bar {

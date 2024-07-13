@@ -66,12 +66,16 @@
 }
 
 .search-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
+  width: 98%;
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 30px;
+  border: none;
+  background-color: rgba(127, 250, 116, 0.87);
+  margin-bottom: 20px;
 }
+
+
 
 .origin-container {
   display: flex;

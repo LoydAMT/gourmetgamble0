@@ -1,62 +1,95 @@
 /* Community.css */
 
+/* General styles for the community page */
 .community-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   font-family: Arial, sans-serif;
 }
 
-.search-bar {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.new-post-container {
+/* Styles for the post input section */
+.post-input-container {
   display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-  align-items: flex-start;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
 .new-post-input {
-  width: 100%;
+  flex-grow: 1;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  border-radius: 20px;
+}
+
+.add-image-button {
+  background-color: transparent;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+.file-input {
+  display: none;
 }
 
 .new-post-button {
   padding: 10px 20px;
   background-color: #ffa500;
   border: none;
-  border-radius: 4px;
+  border-radius: 20px;
   color: #fff;
   cursor: pointer;
 }
 
+/* Styles for the filter buttons */
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.filter-button.active {
+  background-color: #ffa500;
+  color: white;
+}
+
+/* Main content area styles */
+.main-content {
+  display: flex;
+  justify-content: space-between;
+}
+
 .posts-container {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+/* Styles for individual post cards */
 .post-card {
   padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
 .post-header {
   display: flex;
   align-items: center;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
@@ -74,6 +107,7 @@
   max-width: 100%;
   height: auto;
   margin-top: 10px;
+  border-radius: 10px;
 }
 
 .likes-comments-container {
@@ -115,15 +149,107 @@
 .comment {
   display: flex;
   align-items: center;
+  gap: 10px;
   margin-left: 20px;
   font-size: 14px;
   margin-top: 5px;
 }
 
 .profile-picture {
-  max-width: 30px;
-  max-height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+}
+
+/* Sidebar styles */
+.sidebar {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+}
+
+.search-bar {
+  width: 90%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+
+.sidebar-section {
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.who-to-follow-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.who-to-follow-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.who-to-follow-profile-picture {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.who-to-follow-info {
+  flex-grow: 1;
+}
+
+.follow-button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.follow-button:hover {
+  background-color: #0056b3;
+}
+
+.error-bar {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.options-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.options-menu {
+  display: none;
+}
+
+.post-options:hover .options-menu,
+.comment-options:hover .options-menu {
+  display: block;
 }

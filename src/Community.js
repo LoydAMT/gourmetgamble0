@@ -1,17 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
 import { db, auth, getUserProfile, uploadPostPhoto } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import './Community.css';
 
-const defaultProfilePicture = 'https://www.kindpng.com/picc/m/451-4517876_default-profile-hd-png-download.png';
+import defaultProfilePicture from './user.png';
 
+const shuffleArray = (array) => {
+  let currentIndex = array.length, randomIndex;
+
+  
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+};
 function Community() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
   const [newPostPhoto, setNewPostPhoto] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [whoToFollow, setWhoToFollow] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
@@ -35,6 +53,8 @@ function Community() {
             profilePicture: defaultProfilePicture,
           });
         }
+        fetchWhoToFollow(user.uid);
+        fetchFollowing(user.uid);
       } else {
         setCurrentUser(null);
       }
@@ -45,6 +65,65 @@ function Community() {
       authUnsubscribe();
     };
   }, []);
+
+  const fetchWhoToFollow = async (currentUserId) => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'users'));
+      const usersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const filteredUsers = usersData.filter(user => user.uid !== currentUserId);
+      setWhoToFollow(shuffleArray(filteredUsers).slice(0, 5));
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setError('Error fetching users. Please try again later.');
+    }
+  };
+
+  const fetchFollowing = async (currentUserId) => {
+    try {
+      const userQuery = query(collection(db, 'users'), where('uid', '==', currentUserId));
+      const querySnapshot = await getDocs(userQuery);
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
+        setFollowing(userData.following || []);
+      }
+    } catch (error) {
+      console.error('Error fetching following:', error);
+      setError('Error fetching following. Please try again later.');
+    }
+  };
+
+  const handleFollow = async (followedUserId) => {
+    if (!currentUser) {
+      setError('You need to be logged in to follow users.');
+      return;
+    }
+
+    try {
+      const userQuery = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+      const userSnapshot = await getDocs(userQuery);
+      if (!userSnapshot.empty) {
+        const userDoc = userSnapshot.docs[0];
+        const userData = userDoc.data();
+        let updatedFollowing;
+        if (following.includes(followedUserId)) {
+          updatedFollowing = following.filter(id => id !== followedUserId);
+        } else {
+          updatedFollowing = [...following, followedUserId];
+        }
+
+        await updateDoc(doc(db, 'users', userDoc.id), { following: updatedFollowing });
+        setFollowing(updatedFollowing);
+
+        console.log('Follow action successful:', followedUserId);
+      } else {
+        setError('User profile not found.');
+      }
+    } catch (error) {
+      console.error('Error following user:', error);
+      setError('Error following user. Please try again later.');
+    }
+  };
 
   const sortPosts = (posts) => {
     const twoDaysAgo = new Date();
@@ -84,6 +163,7 @@ function Community() {
         userProfilePicture: currentUser.profilePicture,
         createdAt: new Date().toISOString(),
         photoURL,
+        userId: currentUser.uid,
       };
 
       await addDoc(collection(db, 'posts'), newPostData);
@@ -102,6 +182,7 @@ function Community() {
           userName: currentUser.name,
           userProfilePicture: currentUser.profilePicture,
           createdAt: new Date().toISOString(),
+          userId: currentUser.uid,
         };
         await updateDoc(postRef, { comments: [...postData.comments, newComment] });
       } else {
@@ -118,10 +199,8 @@ function Community() {
         const postData = postDoc.data();
         const likes = postData.likes || [];
         if (likes.includes(currentUser.uid)) {
-          // Remove like
           await updateDoc(postRef, { likes: likes.filter(uid => uid !== currentUser.uid) });
         } else {
-          // Add like
           await updateDoc(postRef, { likes: [...likes, currentUser.uid] });
         }
       }
@@ -132,62 +211,166 @@ function Community() {
     setSearchQuery(e.target.value);
   };
 
-  const filteredPosts = posts.filter(post => 
-    (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const handleAddImageClick = () => {
+    document.getElementById('post-photo-input').click();
+  };
+
+  const handleEditPost = async (postId, newContent) => {
+    if (newContent) {
+      const postRef = doc(db, 'posts', postId);
+      await updateDoc(postRef, { content: newContent });
+    }
+  };
+
+  const handleDeletePost = async (postId) => {
+    const postRef = doc(db, 'posts', postId);
+    await deleteDoc(postRef);
+  };
+
+  const handleEditComment = async (postId, commentIndex, newContent) => {
+    if (newContent) {
+      const postRef = doc(db, 'posts', postId);
+      const postDoc = await getDoc(postRef);
+      if (postDoc.exists()) {
+        const postData = postDoc.data();
+        const comments = [...postData.comments];
+        comments[commentIndex].content = newContent;
+        await updateDoc(postRef, { comments });
+      }
+    }
+  };
+
+  const handleDeleteComment = async (postId, commentIndex) => {
+    const postRef = doc(db, 'posts', postId);
+    const postDoc = await getDoc(postRef);
+    if (postDoc.exists()) {
+      const postData = postDoc.data();
+      const comments = [...postData.comments];
+      comments.splice(commentIndex, 1);
+      await updateDoc(postRef, { comments });
+    }
+  };
+
+  const getFilteredPosts = () => {
+    const filteredPosts = posts.filter(post =>
+      (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    switch (filter) {
+      case 'myPosts':
+        return filteredPosts.filter(post => post.userId === currentUser?.uid);
+      case 'interactions':
+        return filteredPosts.filter(post => post.likes?.includes(currentUser?.uid) || post.comments?.some(comment => comment.userId === currentUser?.uid));
+      default:
+        return filteredPosts;
+    }
+  };
 
   return (
     <div className="community-container">
-      <h1>Community</h1>
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={handleSearchChange}
-        placeholder="Search for posts..."
-        className="search-bar"
-      />
-      {currentUser && (
-        <div className="new-post-container">
-          <img src={currentUser.profilePicture} alt="Profile" className="profile-picture" />
-          <input
-            type="text"
-            value={newPost}
-            onChange={(e) => setNewPost(e.target.value)}
-            placeholder="Write a new post..."
-            className="new-post-input"
-          />
-          <input type="file" accept="image/*" onChange={handlePostPhotoChange} />
-          <button onClick={handleAddPost} className="new-post-button">Add Post</button>
-        </div>
-      )}
-      <div className="posts-container">
-        {filteredPosts.map(post => (
-          <div key={post.id} className="post-card">
-            <div className="post-header">
-              <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
-              <div>
-                <p className="post-user-name"><strong>{post.userName}</strong></p>
-                {post.createdAt && <p className="post-timestamp">{new Date(post.createdAt).toLocaleString()}</p>}
+      {error && <div className="error-bar">{error}</div>}
+      <div className="post-input-container">
+        <img src={currentUser?.profilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+        <input
+          type="text"
+          value={newPost}
+          onChange={(e) => setNewPost(e.target.value)}
+          placeholder="What's on your mind?"
+          className="new-post-input"
+        />
+        <button onClick={handleAddImageClick} className="add-image-button">
+          <span role="img" aria-label="Add Image">📷</span>
+        </button>
+        <input id="post-photo-input" type="file" accept="image/*" onChange={handlePostPhotoChange} className="file-input" />
+        <button onClick={handleAddPost} className="new-post-button">Post</button>
+      </div>
+
+      <div className="filter-buttons">
+        <button className={`filter-button ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All</button>
+        <button className={`filter-button ${filter === 'myPosts' ? 'active' : ''}`} onClick={() => setFilter('myPosts')}>My Posts</button>
+        <button className={`filter-button ${filter === 'interactions' ? 'active' : ''}`} onClick={() => setFilter('interactions')}>Interactions</button>
+      </div>
+
+      <div className="main-content">
+        <div className="posts-container">
+          {getFilteredPosts().map(post => (
+            <div key={post.id} className="post-card">
+              <div className="post-header">
+                <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+                <div>
+                  <p className="post-user-name"><strong>{post.userName}</strong></p>
+                  {post.createdAt && <p className="post-timestamp">{new Date(post.createdAt).toLocaleString()}</p>}
+                </div>
+                {post.userId === currentUser?.uid && (
+                  <div className="post-options">
+                    <button className="options-button">⋮</button>
+                    <div className="options-menu">
+                      <button onClick={() => handleEditPost(post.id, prompt('Edit post:', post.content))}>Edit</button>
+                      <button onClick={() => handleDeletePost(post.id)}>Delete</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <p>{post.content}</p>
+              {post.photoURL && <img src={post.photoURL} alt="Post" className="post-photo" />}
+              <div className="likes-comments-container">
+                <button onClick={() => handleLike(post.id)} className="like-button">
+                  {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
+                </button>
+                <span>{post.likes ? post.likes.length : 0} Likes</span>
+                {post.comments.map((comment, index) => (
+                  <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
+                    <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+                    <p><strong>{comment.userName}</strong>: {comment.content}</p>
+                    {comment.userId === currentUser?.uid && (
+                      <div className="comment-options">
+                        <button className="options-button">⋮</button>
+                        <div className="options-menu">
+                          <button onClick={() => handleEditComment(post.id, index, prompt('Edit comment:', comment.content))}>Edit</button>
+                          <button onClick={() => handleDeleteComment(post.id, index)}>Delete</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <AddComment postId={post.id} onAddComment={handleAddComment} />
               </div>
             </div>
-            <p>{post.content}</p>
-            {post.photoURL && <img src={post.photoURL} alt="Post" className="post-photo" />}
-            <div className="likes-comments-container">
-              <button onClick={() => handleLike(post.id)} className="like-button">
-                {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
-              </button>
-              <span>{post.likes ? post.likes.length : 0} Likes</span>
-              {post.comments.map((comment, index) => (
-                <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
-                  <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
-                  <p><strong>{comment.userName}</strong>: {comment.content}</p>
-                </div>
-              ))}
-              <AddComment postId={post.id} onAddComment={handleAddComment} />
-            </div>
+          ))}
+        </div>
+
+        <div className="sidebar">
+          <div className="search-bar-container">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search"
+              className="search-bar"
+            />
           </div>
-        ))}
+          <div className="sidebar-section">
+            <h3>Trends for you</h3>
+            {/* Add your trends content here */}
+          </div>
+          <div className="sidebar-section">
+            <h3>Who to follow</h3>
+            <ul className="who-to-follow-list">
+              {whoToFollow.map(user => (
+                <li key={user.uid} className="who-to-follow-item">
+                  <img src={user.profilePicture || defaultProfilePicture} alt="Profile" className="who-to-follow-profile-picture" />
+                  <div className="who-to-follow-info">
+                    <p><strong>{user.name}</strong></p>
+                  </div>
+                  <button className="follow-button" onClick={() => handleFollow(user.uid)}>
+                    {following.includes(user.uid) ? 'Unfollow' : 'Follow'}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

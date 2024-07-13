@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from './firebaseConfig';
+import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
+import { db, auth, onAuthStateChanged, getUserProfile } from './firebaseConfig';
 import ReactPlayer from 'react-player';
 import './DishDetails.css';
 import RecipeModal from './RecipeModal';
@@ -33,6 +33,11 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
   const [mainDisplay, setMainDisplay] = useState('photo');
   const [isPlaying, setIsPlaying] = useState(false);
   const [showRecipeModal, setShowRecipeModal] = useState(false);
+  const [error, setError] = useState('');
+  const [review, setReview] = useState(0);
+  const [hasReviewed, setHasReviewed] = useState(false);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalRatings, setTotalRatings] = useState(0);
   const dishDetailsRef = useRef(null);
 
   useEffect(() => {
@@ -42,22 +47,53 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
     }
 
     const fetchSimilarDishes = async () => {
-      const querySnapshot = await getDocs(collection(db, 'recipes'));
-      const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      try {
+        const querySnapshot = await getDocs(collection(db, 'recipes'));
+        const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      // Filter recipes with 5 or more shared ingredients
-      const similar = recipesData.filter(r => {
-        const sharedIngredients = r.ingredients.filter(ingredient => recipe.ingredients.includes(ingredient));
-        return sharedIngredients.length >= 5;
-      });
+        const similar = recipesData.filter(r => {
+          const sharedIngredients = r.ingredients.filter(ingredient => recipe.ingredients.includes(ingredient));
+          return sharedIngredients.length >= 5;
+        });
 
-      // Exclude recipes with the same name as the current recipe
-      const filteredSimilar = similar.filter(r => r.nameOfDish !== recipe.nameOfDish);
-      setSimilarDishes(filteredSimilar);
+        const filteredSimilar = similar.filter(r => r.nameOfDish !== recipe.nameOfDish);
+        setSimilarDishes(filteredSimilar);
+      } catch (error) {
+        console.error('Error fetching similar dishes:', error);
+        setError('Error fetching similar dishes. Please try again later.');
+      }
+    };
+
+    const fetchAverageRating = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        let totalRatings = 0;
+        let totalScore = 0;
+        querySnapshot.forEach((doc) => {
+          const user = doc.data();
+          if (user.reviews) {
+            user.reviews.forEach((review) => {
+              if (review.recipeId === recipe.id) {
+                totalRatings++;
+                totalScore += review.rating;
+              }
+            });
+          }
+        });
+
+        if (totalRatings > 0) {
+          setAverageRating(totalScore / totalRatings);
+          setTotalRatings(totalRatings);
+        }
+      } catch (error) {
+        console.error('Error fetching average rating:', error);
+        setError('Error fetching average rating. Please try again later.');
+      }
     };
 
     if (recipe) {
       fetchSimilarDishes();
+      fetchAverageRating();
     }
 
     return () => {
@@ -76,7 +112,7 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
 
     setTimeout(() => {
       onSimilarDishClick(id);
-    }, 200); // Adjust the timeout to match the CSS animation duration
+    }, 200);
   };
 
   const handleDisplayChange = (displayType) => {
@@ -84,11 +120,86 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
     setIsPlaying(displayType === 'video');
   };
 
+  const handleAddToFavorites = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        setError('You need to be logged in to add to favorites.');
+        return;
+      }
+
+      const userProfileQuery = query(collection(db, 'users'), where('uid', '==', user.uid));
+      const querySnapshot = await getDocs(userProfileQuery);
+
+      if (querySnapshot.empty) {
+        setError('User profile not found.');
+        return;
+      }
+
+      const userProfileDoc = querySnapshot.docs[0];
+      const userProfile = userProfileDoc.data();
+      const userRef = doc(db, 'users', userProfileDoc.id);
+
+      const existingFavorites = userProfile.favorites || [];
+      if (!existingFavorites.includes(recipe.id)) {
+        await updateDoc(userRef, {
+          favorites: [...existingFavorites, recipe.id]
+        });
+      } else {
+        setError('This recipe is already in your favorites.');
+      }
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      setError('Error adding to favorites. Please try again later.');
+    }
+  };
+
+  const handleAddReview = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        setError('You need to be logged in to give a review.');
+        return;
+      }
+
+      const userProfileQuery = query(collection(db, 'users'), where('uid', '==', user.uid));
+      const querySnapshot = await getDocs(userProfileQuery);
+
+      if (querySnapshot.empty) {
+        setError('User profile not found.');
+        return;
+      }
+
+      const userProfileDoc = querySnapshot.docs[0];
+      const userProfile = userProfileDoc.data();
+      const userRef = doc(db, 'users', userProfileDoc.id);
+
+      const existingReviews = userProfile.reviews || [];
+      const reviewIndex = existingReviews.findIndex(review => review.recipeId === recipe.id);
+
+      if (reviewIndex !== -1) {
+        existingReviews[reviewIndex].rating = review;
+      } else {
+        existingReviews.push({ recipeId: recipe.id, rating: review });
+      }
+
+      await updateDoc(userRef, {
+        reviews: existingReviews
+      });
+
+      setHasReviewed(true);
+    } catch (error) {
+      console.error('Error adding review:', error);
+      setError('Error adding review. Please try again later.');
+    }
+  };
+
   const videoID = recipe.video ? extractYouTubeID(recipe.video) : null;
   const videoThumbnailURL = videoID ? `https://img.youtube.com/vi/${videoID}/0.jpg` : "https://via.placeholder.com/150";
 
   return (
     <main className="dish-details fade-in" ref={dishDetailsRef}>
+      {error && <div className="error-bar">{error}</div>}
       <RecipeModal showModal={showRecipeModal} setShowModal={setShowRecipeModal} recipe={recipe} />
       <section className="content-wrapper">
         <div className="dish-image-container">
@@ -119,13 +230,26 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
           <p className="dish-author">Author:<br /> {recipe.nameOfUser}</p>
           <div className="action-buttons">
             <button className="recipe-button" onClick={() => setShowRecipeModal(true)}>OPEN RECIPE</button>
-            <div className="social-buttons">
-              <SocialButton src="https://cdn.builder.io/api/v1/image/assets/TEMP/7a9066052bd6b7055bb6a1d42d410f27c58bf20b47d0c4ca3691f14d8f400d90?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Social media icon 1" />
-              <SocialButton src="https://cdn.builder.io/api/v1/image/assets/TEMP/06ab42ee6002883ffd32c9c2e019c6e852d9bac72702bfb5a99342e9cc36ff2c?apiKey=58b165f68bc74f159c175e4d9cf0f581&" alt="Social media icon 2" />
+            <button className="favorite-button" onClick={handleAddToFavorites}>ADD TO FAVORITES</button>
+            <div className="review-section">
+              <div className="review-buttons">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <span
+                    key={star}
+                    className={`star ${review >= star ? 'filled' : ''}`}
+                    onClick={() => setReview(star)}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <button className="save-review-button" onClick={handleAddReview}>SAVE REVIEW</button>
             </div>
+           
           </div>
           <h2 className="description-title">DESCRIPTION</h2>
           <p className="dish-description">{recipe.description}</p>
+          <h2 className="average-rating">Average Rating: {averageRating.toFixed(1)} ({totalRatings} ratings)</h2>
         </div>
       </section>
       <section className="similar-dishes">

@@ -7,12 +7,14 @@ import AuthModal from './AuthModal';
 import AboutUsModal from './AboutUsModal';
 import Community from './Community';
 import Profile from './Profile';
+import StalkProfile from './StalkProfile';
 import ContactUsModal from './ContactUsModal';
 import AddRecipeModal from './AddRecipeModal';
 import { collection, getDocs } from 'firebase/firestore';
-import { db, auth } from './firebaseConfig';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { db, auth, getUserProfile } from './firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
 import './App.css';
+import defaultProfilePicture from './user.png';
 
 function App() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -22,6 +24,7 @@ function App() {
   const [recipes, setRecipes] = useState([]);
   const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(defaultProfilePicture);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -32,11 +35,14 @@ function App() {
 
     fetchRecipes();
 
-    const authUnsubscribe = onAuthStateChanged(auth, (user) => {
+    const authUnsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        const userProfile = await getUserProfile(user.uid);
         setCurrentUser(user);
+        setProfilePicture(userProfile?.profilePicture || defaultProfilePicture);
       } else {
         setCurrentUser(null);
+        setProfilePicture(defaultProfilePicture);
       }
     });
 
@@ -47,10 +53,6 @@ function App() {
 
   const handleAddRecipe = (newRecipe) => {
     setRecipes([...recipes, newRecipe]);
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
   };
 
   return (
@@ -69,7 +71,7 @@ function App() {
         showAddRecipeModal={showAddRecipeModal}
         setShowAddRecipeModal={setShowAddRecipeModal}
         currentUser={currentUser}
-        handleLogout={handleLogout}
+        profilePicture={profilePicture}
       />
     </Router>
   );
@@ -81,36 +83,38 @@ function AppContent({
   showAboutUsModal, setShowAboutUsModal,
   showContactUsModal, setShowContactUsModal,
   recipes, handleAddRecipe, showAddRecipeModal, setShowAddRecipeModal,
-  currentUser, handleLogout
+  currentUser, profilePicture
 }) {
   const navigate = useNavigate();
 
   return (
     <div>
-      <nav>
-        <button className="nav-item" onClick={() => navigate('/')}>
-          Home
-        </button>
-        <button className="nav-item" onClick={() => navigate('/recipes')}>
-          Recipes
-        </button>
-        <button className="nav-item" onClick={() => navigate('/community')}>
-          Community
-        </button>
-        {currentUser ? (
-          <>
-            <button className="nav-item" onClick={() => navigate('/profile')}>
-              Profile
-            </button>
-            <button className="nav-item" onClick={handleLogout}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <button className="sign-in-button" onClick={() => setShowAuthModal(true)}>
-            Sign in/Sign Up
+      <nav className="nav-bar">
+        <div className="nav-items-center">
+          <button className="nav-item" onClick={() => navigate('/')}>
+            Home
           </button>
-        )}
+          <button className="nav-item" onClick={() => navigate('/recipes')}>
+            Recipes
+          </button>
+          <button className="nav-item" onClick={() => navigate('/community')}>
+            Community
+          </button>
+        </div>
+        <div className="nav-item-right">
+          {currentUser ? (
+            <img
+              src={profilePicture}
+              alt="Profile"
+              className="profile-picture-nav"
+              onClick={() => navigate('/profile')}
+            />
+          ) : (
+            <button className="sign-in-button" onClick={() => setShowAuthModal(true)}>
+              Sign in/Sign Up
+            </button>
+          )}
+        </div>
       </nav>
 
       <Routes>
@@ -118,6 +122,7 @@ function AppContent({
         <Route path="/recipes" element={<Recipes recipes={recipes} />} />
         <Route path="/community" element={<Community />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:userId" element={<StalkProfile />} />
       </Routes>
 
       <AddRecipeModal

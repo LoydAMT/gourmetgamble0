@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // Your web app's Firebase configuration
@@ -13,6 +13,7 @@ const firebaseConfig = {
     appId: "1:573275647223:web:117be7110a1ffe3e4d37f2",
     measurementId: "G-Y43QVYFP9J"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -49,4 +50,4 @@ const uploadPostPhoto = async (file) => {
   return getDownloadURL(fileRef);
 };
 
-export { db, auth, registerUser, loginUser, signInWithGoogle, getUserProfile, uploadProfilePicture, uploadPostPhoto };
+export { db, auth, registerUser, loginUser, signInWithGoogle, getUserProfile, uploadProfilePicture, uploadPostPhoto, onAuthStateChanged };

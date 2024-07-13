@@ -1,8 +1,10 @@
+// AuthModal.js
 import React, { useState } from 'react';
 import { registerUser, loginUser, signInWithGoogle, db, getUserProfile } from './firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import './AuthModal.css';
-import googleLogo from './google.png'; // Adjust the path as necessary
+import googleLogo from './google.png';
+import ResetPasswordModal from './ResetPasswordModal'; // Import the reset password modal
 
 const AuthModal = ({ showModal, setShowModal }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -12,6 +14,7 @@ const AuthModal = ({ showModal, setShowModal }) => {
   const [culinaryExperience, setCulinaryExperience] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [resetPasswordShow, setResetPasswordShow] = useState(false); // State for reset password modal
 
   const handleSignUp = async () => {
     try {
@@ -79,74 +82,88 @@ const AuthModal = ({ showModal, setShowModal }) => {
     }
   };
 
+  const handlePasswordResetShow = () => {
+    setResetPasswordShow(true);
+  };
+
   if (!showModal) return null;
 
   return (
-    <div className="modal-background">
-      <div className="modal-container">
-        <h2 className="LSHeader">{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
-        <p className="LSSubText">{isSignUp ? 'Enter your email to sign up for this app' : 'Login using email or other'}</p>
-        {isSignUp && (
-          <>
-            <input
-              className="input"
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            <select
-              className="select"
-              value={culinaryExperience}
-              onChange={(e) => setCulinaryExperience(e.target.value)}
-              required
-            >
-              <option value="">Do you have culinary experience?</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </>
-        )}
-        <input
-          className="input"
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          className="input"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <div className="button-container">
-          {isSignUp ? (
+    <>
+      <div className="modal-background">
+        <div className="modal-container">
+          <h2 className="LSHeader">{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
+          <p className="LSSubText">{isSignUp ? 'Enter your email to sign up for this app' : 'Login using email or other'}</p>
+          {isSignUp && (
             <>
-              <button className="Sbutton" type="button" onClick={handleSignUp}>Create account</button>
-              <button className="Sbutton" type="button" onClick={() => setIsSignUp(false)}>Back to Sign In</button>
-            </>
-          ) : (
-            <>
-              <button className="Sbutton" type="button" onClick={handleSignIn}>Login</button>
-              <button className="Sbutton" type="button" onClick={() => setIsSignUp(true)}>Create Account</button>
+              <input
+                className="input"
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+              <select
+                className="select"
+                value={culinaryExperience}
+                onChange={(e) => setCulinaryExperience(e.target.value)}
+                required
+              >
+                <option value="">Do you have culinary experience?</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
             </>
           )}
+          <input
+            className="input"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            className="input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <div className="button-container">
+            {isSignUp ? (
+              <>
+                <button className="Sbutton" type="button" onClick={handleSignUp}>Create account</button>
+                <button className="Sbutton" type="button" onClick={() => setIsSignUp(false)}>Back to Sign In</button>
+              </>
+            ) : (
+              <>
+                <button className="Sbutton" type="button" onClick={handleSignIn}>Login</button>
+                <button className="Sbutton" type="button" onClick={() => setIsSignUp(true)}>Create Account</button>
+              </>
+            )}
+          </div>
+          <p className="GoogleLoginText">or login with</p>
+          <button className="google-button" type="button" onClick={handleGoogleSignIn}>
+            <img src={googleLogo} alt="Google Logo" className="google-logo" />
+            Google
+          </button>
+          {!isSignUp && (
+            <p className="mt-3">
+              <a href="#" onClick={handlePasswordResetShow}>Forgot Password?</a>
+            </p>
+          )}
+          <button className="Sbutton" onClick={() => setShowModal(false)}>Cancel</button>
+          {successMessage && <div className="success-message">{successMessage}</div>}
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
         </div>
-        <p className="GoogleLoginText">or login with</p>
-        <button className="google-button" type="button" onClick={handleGoogleSignIn}>
-          <img src={googleLogo} alt="Google Logo" className="google-logo" />
-          Google
-        </button>
-        <button className="Sbutton" onClick={() => setShowModal(false)}>Cancel</button>
-        {successMessage && <div className="success-message">{successMessage}</div>}
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
       </div>
-    </div>
+
+      {/* Reset Password Modal */}
+      <ResetPasswordModal show={resetPasswordShow} handleClose={() => setResetPasswordShow(false)} />
+    </>
   );
 };
 

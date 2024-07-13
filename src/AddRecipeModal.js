@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { db } from './firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
+import { db, auth } from './firebaseConfig';
 import './AddRecipeModal.css';
 
 const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
@@ -9,7 +10,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   const [nameOfUser, setNameOfUser] = useState('');
   const [photo, setPhoto] = useState('');
   const [video, setVideo] = useState('');
-  const [recipe, setRecipe] = useState(''); // Added the recipe state back
+  const [recipe, setRecipe] = useState('');
   const [description, setDescription] = useState('');
   const [recipeSteps, setRecipeSteps] = useState([{ value: '' }]);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +21,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   const [newIngredientName, setNewIngredientName] = useState('');
   const [newIngredientImageURL, setNewIngredientImageURL] = useState('');
   const [showNewIngredientForm, setShowNewIngredientForm] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const countries = [
     'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia',
@@ -45,7 +47,6 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
     'United Kingdom', 'United States of America', 'Uruguay', 'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam',
     'Yemen', 'Zambia', 'Zimbabwe'
   ];
-
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
@@ -62,6 +63,16 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
     };
 
     fetchIngredients();
+
+    const authUnsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+      }
+    });
+
+    return () => {
+      authUnsubscribe();
+    };
   }, []);
 
   const filteredIngredients = availableIngredients.filter((ingredient) =>
@@ -130,6 +141,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
         nameOfDish,
         origin,
         nameOfUser,
+        userId: currentUser?.uid || '',
         photo,
         video,
         recipe,

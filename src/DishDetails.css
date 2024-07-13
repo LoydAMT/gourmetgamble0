@@ -19,6 +19,15 @@
   animation: fadeOut 1s forwards;
 }
 
+.error-bar {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
 .dish-details {
   display: flex;
   flex-direction: column;
@@ -47,17 +56,17 @@
   width: 57%;
   margin-left: 5%;
   position: relative;
-  height: 500px; /* You might want to set a specific height if necessary */
+  height: 500px;
 }
 
 .main-image-container {
-  width: 100%; /* Full width of the parent */
-  height: 100%; /* Adjust the height as needed, or keep it responsive */
-  padding: 0; /* No padding for precise fitting */
+  width: 100%;
+  height: 100%;
+  padding: 0;
   display: flex;
-  justify-content: center; /* Center content horizontally */
-  align-items: center; /* Center content vertically */
-  position: relative; /* Adjust positioning if necessary */
+  justify-content: center;
+  align-items: center;
+  position: relative;
   top: 0;
   left: 0;
 }
@@ -66,19 +75,19 @@
   border: solid 1px #000;
   border-radius: 20px;
   position: absolute;
-  width: 100%; /* Full width of the parent container */
-  height: 100%; /* Full height of the parent container */
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden; /* Ensures no overflow of the inner content */
+  overflow: hidden;
 }
 
 .main-dish-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures the image covers the area, may crop */
-  object-position: center; /* Centers the image within the element */
+  object-fit: cover;
+  object-position: center;
 }
 
 .thumbnail-container {
@@ -86,9 +95,9 @@
   gap: 10px;
   justify-content: center;
   position: relative;
-  width: 100%; /* Ensures it occupies the full width of its parent container */
-  margin-top: 20px; /* Increase if more space is needed between the main image and thumbnails */
-  flex-wrap: wrap; /* Wraps thumbnails to the next line if they don't fit */
+  width: 100%;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .thumbnail {
@@ -172,7 +181,9 @@
   }
 }
 
-.recipe-button {
+.recipe-button,
+.review-button,
+.favorite-button {
   border-radius: 10px;
   background-color: #d9d9d9;
   color: #000;
@@ -184,7 +195,9 @@
 }
 
 @media (max-width: 991px) {
-  .recipe-button {
+  .recipe-button,
+  .review-button,
+  .favorite-button {
     padding-right: 20px;
   }
 }
@@ -347,4 +360,42 @@
 
 .recipe-steps p {
   margin-top: 10px;
+}
+/* Add the following styles to DishDetails.css */
+
+.star {
+  font-size: 24px;
+  cursor: pointer;
+  color: #ccc; /* Default star color */
+}
+
+.star.filled {
+  color: #ffd700; /* Gold color for filled stars */
+}
+
+.review-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.review-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.save-review-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #32cd32;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.average-rating {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #000;
 }

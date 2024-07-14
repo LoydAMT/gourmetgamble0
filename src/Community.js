@@ -351,7 +351,7 @@ function Community() {
                   </div>
                 )}
               </div>
-              <p>{post.content}</p>
+              <p className="postCaption">{post.content}</p>
               {post.photoURL && <img src={post.photoURL} alt="Post" className="post-photo" />}
               <div className="likes-comments-container">
                 <div className="like-comment-buttons">

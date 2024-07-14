@@ -9,7 +9,6 @@ import defaultProfilePicture from './user.png';
 const shuffleArray = (array) => {
   let currentIndex = array.length, randomIndex;
 
-  
   while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
@@ -20,6 +19,7 @@ const shuffleArray = (array) => {
 
   return array;
 };
+
 function Community() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
@@ -30,6 +30,7 @@ function Community() {
   const [whoToFollow, setWhoToFollow] = useState([]);
   const [following, setFollowing] = useState([]);
   const [error, setError] = useState('');
+  const [commentVisibility, setCommentVisibility] = useState({});
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
@@ -251,6 +252,13 @@ function Community() {
     }
   };
 
+  const toggleComment = (postId) => {
+    setCommentVisibility(prevState => ({
+      ...prevState,
+      [postId]: !prevState[postId],
+    }));
+  };
+
   const getFilteredPosts = () => {
     const filteredPosts = posts.filter(post =>
       (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -315,14 +323,17 @@ function Community() {
               <p>{post.content}</p>
               {post.photoURL && <img src={post.photoURL} alt="Post" className="post-photo" />}
               <div className="likes-comments-container">
-                <button onClick={() => handleLike(post.id)} className="like-button">
-                  {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
-                </button>
-                <span>{post.likes ? post.likes.length : 0} Likes</span>
+                <div className="like-comment-buttons">
+                  <button onClick={() => handleLike(post.id)} className="like-button">
+                    {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
+                  </button>
+                  <button onClick={() => toggleComment(post.id)} className="comment-toggle-button">Comment</button>
+                </div>
+                <span className="like-count">{post.likes ? post.likes.length : 0} Likes</span>
                 {post.comments.map((comment, index) => (
                   <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
                     <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
-                    <p><strong>{comment.userName}</strong>: {comment.content}</p>
+                    <p className="commentContent"><strong>{comment.userName}</strong>: {comment.content}</p>
                     {comment.userId === currentUser?.uid && (
                       <div className="comment-options">
                         <button className="options-button">⋮</button>
@@ -334,7 +345,9 @@ function Community() {
                     )}
                   </div>
                 ))}
-                <AddComment postId={post.id} onAddComment={handleAddComment} />
+                {commentVisibility[post.id] && (
+                  <AddComment postId={post.id} onAddComment={handleAddComment} />
+                )}
               </div>
             </div>
           ))}
@@ -393,7 +406,7 @@ function AddComment({ postId, onAddComment }) {
         placeholder="Write a comment..."
         className="comment-input"
       />
-      <button onClick={handleAddComment} className="comment-button">Add Comment</button>
+      <button onClick={handleAddComment} className="post-comment-button">Post Comment</button>
     </div>
   );
 }

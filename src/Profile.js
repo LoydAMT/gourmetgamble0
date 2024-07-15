@@ -180,7 +180,7 @@ function Profile() {
   };
 
   return (
-    <div className="profile-container">
+    <div className="profile-container" >
       {error && <div className="error-bar">{error}</div>}
       {profileUser ? (
         <>
@@ -212,7 +212,7 @@ function Profile() {
           </div>
 
           <h2>Saved Recipes</h2>
-          <div className="recipes-container">
+          <div className="recipes-container-profile">
             {favorites.map(recipe => (
               <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
@@ -222,7 +222,7 @@ function Profile() {
           </div>
 
           <h2>My Recipes</h2>
-          <div className="recipes-container">
+          <div className="recipes-container-profile">
             {recipes.map(recipe => (
               <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
@@ -235,12 +235,12 @@ function Profile() {
             <>
               <h2>Following ({following.length})</h2>
               {following.length > 0 ? (
-                <div className="recipes-container">
+                <div className="recipes-container-profile">
                   {following.map(user => (
                     <div key={user.uid} className="recipe-card">
                       <Link to={`/profile/${user.uid}`}>
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
-                        <p>{user.name}</p>
+                        <p className="Username">{user.name}</p>
                       </Link>
                       {!userId && (
                         <button className="follow-button" onClick={() => handleFollow(user.uid)}>
@@ -260,7 +260,7 @@ function Profile() {
             <>
               <h2>Followers ({followers.length})</h2>
               {followers.length > 0 ? (
-                <div className="recipes-container">
+                <div className="recipes-container-profile">
                   {followers.map(user => (
                     <div key={user.uid} className="recipe-card">
                       <Link to={`/profile/${user.uid}`}>

@@ -2,10 +2,10 @@
 
 .profile-container {
   max-width: 800px;
+  background: linear-gradient(to right, #F6D8B0 0%, #F9EC8D 58%, #FCFF6D 100%);
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
-  background: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -16,12 +16,26 @@
   margin-bottom: 20px;
 }
 
+.nickname{
+  color: #000000;
+  font-size: 25px;
+}
+
+.name{
+  padding-top: 2px;
+  padding-bottom: 3px;
+  color: #000000;
+  font-size: 20px;
+  font-weight: bolder;
+}
+
 .profile-picture {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
+  margin-left: 10px;
+  margin-right: 40px;
   object-fit: cover;
-  margin-right: 20px;
   border: 2px solid #ffa500;
 }
 
@@ -41,7 +55,6 @@
 
 .profile-stats span {
   cursor: pointer;
-  text-decoration: underline;
 }
 
 .profile-actions {
@@ -64,11 +77,26 @@
 .logout-button {
   background-color: #ff6347;
 }
+.edit-profile-button{
+  background-color: #32cd32;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
 
 .upload-recipe-button-container {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   margin-bottom: 20px;
+}
+
+.Username{
+  text-decoration: none;
+  color: black;
 }
 
 .upload-recipe-button {
@@ -86,11 +114,18 @@
   background-color: #28a428;
 }
 
-.recipes-container {
+.recipes-container-profile {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  
+ 
 }
+
+.profile-container {
+  background-color: #ccc;
+}
+
 
 .recipe-card {
   width: 200px;

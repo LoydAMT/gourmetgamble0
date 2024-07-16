@@ -2,7 +2,7 @@
 
 .profile-container {
   max-width: 800px;
-  min-height: 100px;
+  height: 100vh;
   background: linear-gradient(to right, #F6D8B0 0%, #F9EC8D 58%, #FCFF6D 100%);
   margin: 0 auto;
   padding: 20px;

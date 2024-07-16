@@ -182,9 +182,11 @@
 .commentContent{
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   background-color: #F9EC8D;
-  padding: 25px;
+  padding: 10px;
   border-radius: 10px;
   max-width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 .comment-input-container {
   margin-top: 10px;
@@ -216,12 +218,22 @@
   gap: 10px;
   margin-left: 20px;
   font-size: 14px;
-  margin-top: 5px;
+  margin-top: 0px;
 }
 
-.profile-picture {
-  width: 40px;
-  height: 40px;
+.post-profile-picture {
+  width: 8%;
+  height: 8%;
+  border: 2px solid #ffa500;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.comment-profile-picture{
+  width: 4%;
+  height: 4%;
+  border: 2px solid #ffa500;
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
@@ -278,6 +290,7 @@
 
 .who-to-follow-profile-picture {
   width: 40px;
+  border: 2px solid #ffa500;
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
@@ -314,6 +327,7 @@
 }
 
 .trending-profile-picture {
+  border: 2px solid #ffa500;
   width: 60px;
   height: 60px;
   border-radius: 50%;

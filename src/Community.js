@@ -336,7 +336,7 @@ function Community() {
           {getFilteredPosts().map(post => (
             <div key={post.id} id={post.id} ref={(el) => (postCardRefs.current[post.id] = el)} className="post-card">
               <div className="post-header">
-                <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+                <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="post-profile-picture" />
                 <div>
                   <p className="post-user-name"><strong>{post.userName}</strong></p>
                   {post.createdAt && <p className="post-timestamp">{new Date(post.createdAt).toLocaleString()}</p>}
@@ -364,7 +364,7 @@ function Community() {
                 <div className="comments-container">
                   {post.comments.map((comment, index) => (
                     <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
-                      <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+                      <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="comment-profile-picture" />
                       <p className="commentContent"><strong>{comment.userName}</strong>: {comment.content}</p>
                       {comment.userId === currentUser?.uid && (
                         <div className="comment-options">

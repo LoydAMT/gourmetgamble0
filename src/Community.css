@@ -235,8 +235,8 @@
 }
 
 .post-profile-picture {
-  width: 8%;
-  height: 8%;
+  width: 80px;
+  height: 80px;
   border: 2px solid #ffa500;
   border-radius: 50%;
   object-fit: cover;
@@ -244,8 +244,8 @@
 }
 
 .comment-profile-picture{
-  width: 4%;
-  height: 4%;
+  width: 50px;
+  height: 50px;
   border: 2px solid #ffa500;
   border-radius: 50%;
   object-fit: cover;

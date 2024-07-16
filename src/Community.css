@@ -221,6 +221,19 @@
   margin-top: 0px;
 }
 
+.show-more-less-button {
+  background: none;
+  border: none;
+  color: #143501;
+  cursor: pointer;
+  padding: 5px 0;
+  font-size: 14px;
+  text-align: left;
+}
+.show-more-less-button:hover {
+  text-decoration: underline;
+}
+
 .post-profile-picture {
   width: 8%;
   height: 8%;

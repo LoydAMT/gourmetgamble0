@@ -54,6 +54,8 @@ function Community() {
   const [error, setError] = useState('');
   const [commentVisibility, setCommentVisibility] = useState({});
   const [mostLikedPosts, setMostLikedPosts] = useState([]);
+  const [visibleComments, setVisibleComments] = useState({});
+  const [commentInputVisibility, setCommentInputVisibility] = useState({});
   const postCardRefs = useRef({});
 
   useEffect(() => {
@@ -266,21 +268,24 @@ function Community() {
     }
   };
 
-  const toggleComment = (postId) => {
-    setCommentVisibility(prevState => {
-      const newState = {
-        ...prevState,
-        [postId]: !prevState[postId],
-      };
+  const toggleMoreLessComment = (postId) => {
+    setVisibleComments(prevState => ({
+      ...prevState,
+      [postId]: !prevState[postId],
+    }));
+  };
 
-      if (newState[postId] && postCardRefs.current[postId]) {
-        setTimeout(() => {
-          postCardRefs.current[postId].scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }, 0);
-      }
+  const toggleCommentInput = (postId) => {
+    setCommentInputVisibility(prevState => ({
+      ...prevState,
+      [postId]: !prevState[postId],
+    }));
 
-      return newState;
-    });
+    if (!commentInputVisibility[postId] && postCardRefs.current[postId]) {
+      setTimeout(() => {
+        postCardRefs.current[postId].scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 0);
+    }
   };
 
   const getFilteredPosts = () => {
@@ -358,11 +363,13 @@ function Community() {
                   <button onClick={() => handleLike(post.id)} className="like-button">
                     {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
                   </button>
-                  <button onClick={() => toggleComment(post.id)} className="comment-toggle-button">Comment</button>
+                  <button onClick={() => toggleCommentInput(post.id)} className="comment-toggle-button">
+                    {commentInputVisibility[post.id] ? 'Hide Comment' : 'Comment'}
+                  </button>
                 </div>
                 <span className="like-count">{post.likes ? post.likes.length : 0} Likes</span>
                 <div className="comments-container">
-                  {post.comments.map((comment, index) => (
+                  {post.comments.slice(0, visibleComments[post.id] ? post.comments.length : 3).map((comment, index) => (
                     <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
                       <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="comment-profile-picture" />
                       <p className="commentContent"><strong>{comment.userName}</strong>: {comment.content}</p>
@@ -377,8 +384,13 @@ function Community() {
                       )}
                     </div>
                   ))}
+                  {post.comments.length > 3 && (
+                    <button onClick={() => toggleMoreLessComment(post.id)} className="show-more-less-button">
+                      {visibleComments[post.id] ? 'Show Less' : 'Show More'}
+                    </button>
+                  )}
                 </div>
-                {commentVisibility[post.id] && (
+                {commentInputVisibility[post.id] && (
                   <AddComment
                     postId={post.id}
                     onAddComment={handleAddComment}

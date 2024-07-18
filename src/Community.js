@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
 import { db, auth, getUserProfile, uploadPostPhoto } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
+import { formatDistanceToNow } from 'date-fns';
 import './Community.css';
 
 import defaultProfilePicture from './user.png';
@@ -352,7 +353,11 @@ function Community() {
                 <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="post-profile-picture" />
                 <div>
                   <p className="post-user-name"><strong>{post.userName}</strong></p>
-                  {post.createdAt && <p className="post-timestamp">{new Date(post.createdAt).toLocaleString()}</p>}
+                  {post.createdAt && (
+                    <p className="post-timestamp" title={new Date(post.createdAt).toLocaleString()}>
+                      {formatDistanceToNow(new Date(post.createdAt))} ago
+                    </p>
+                  )}
                 </div>
                 {post.userId === currentUser?.uid && (
                   <div className="post-options">
@@ -381,6 +386,7 @@ function Community() {
                     <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
                       <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="comment-profile-picture" />
                       <p className="commentContent"><strong>{comment.userName}</strong>: {comment.content}</p>
+                      <p className="comment-timestamp">{formatDistanceToNow(new Date(comment.createdAt))} ago</p>
                       {comment.userId === currentUser?.uid && (
                         <div className="comment-options">
                           <button className="options-button">⋮</button>

@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Modal from 'react-modal';
 import { auth, db, getUserProfile, uploadProfilePicture } from './firebaseConfig';
 import { collection, getDocs, query, where, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import AddRecipeModal from './AddRecipeModal';
-import DishDetails from './DishDetails';
 import './Profile.css';
 
 function Profile() {
   const { userId } = useParams();
-  const navigate = useNavigate();
   const [profileUser, setProfileUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [profilePicture, setProfilePicture] = useState('');
@@ -24,7 +21,6 @@ function Profile() {
   const [showFollowers, setShowFollowers] = useState(false);
   const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -63,7 +59,11 @@ function Profile() {
           if (userProfile.following && userProfile.following.length > 0) {
             const followingQuery = query(collection(db, 'users'), where('uid', 'in', userProfile.following));
             const followingSnapshot = await getDocs(followingQuery);
-            const followingUsers = followingSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+            const followingUsers = followingSnapshot.docs.map(doc => ({
+              uid: doc.id,
+              ...doc.data(),
+              isFollowing: true,
+            }));
             setFollowing(followingUsers);
           } else {
             setFollowing([]);
@@ -72,7 +72,11 @@ function Profile() {
           // Fetch followers
           const followersQuery = query(collection(db, 'users'), where('following', 'array-contains', uid));
           const followersSnapshot = await getDocs(followersQuery);
-          const userFollowers = followersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+          const userFollowers = followersSnapshot.docs.map(doc => ({
+            uid: doc.id,
+            ...doc.data(),
+            isFollowing: userProfile.following.includes(doc.id),
+          }));
           setFollowers(userFollowers);
         } else {
           setError('User profile not found.');
@@ -153,21 +157,12 @@ function Profile() {
     await signOut(auth);
   };
 
-  const openModal = (recipe) => {
+  const handleRecipeClick = (recipe) => {
     setSelectedRecipe(recipe);
-    setIsModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const handleCloseModal = () => {
     setSelectedRecipe(null);
-  };
-
-  const handleSimilarDishClick = (id) => {
-    const selected = recipes.find(recipe => recipe.id === id);
-    if (selected) {
-      setSelectedRecipe(selected);
-    }
   };
 
   const handleFollow = async (followedUserId) => {
@@ -183,7 +178,7 @@ function Profile() {
         const userDoc = userSnapshot.docs[0];
         const userData = userDoc.data();
         let updatedFollowing;
-        if (following.some(followingUser => followingUser.uid === followedUserId)) {
+        if (userData.following.includes(followedUserId)) {
           updatedFollowing = userData.following.filter(id => id !== followedUserId);
         } else {
           updatedFollowing = [...userData.following, followedUserId];
@@ -192,22 +187,24 @@ function Profile() {
         await updateDoc(doc(db, 'users', userDoc.id), { following: updatedFollowing });
 
         // Update the local following state
-        const updatedFollowingUsers = following.map(user => {
-          if (user.uid === followedUserId) {
-            return { ...user, isFollowing: !user.isFollowing };
-          }
-          return user;
-        });
-        setFollowing(updatedFollowingUsers);
+        setFollowing(prevFollowing =>
+          prevFollowing.map(user => {
+            if (user.uid === followedUserId) {
+              return { ...user, isFollowing: !user.isFollowing };
+            }
+            return user;
+          })
+        );
 
         // Update the local followers state
-        const updatedFollowers = followers.map(user => {
-          if (user.uid === followedUserId) {
-            return { ...user, isFollowing: !user.isFollowing };
-          }
-          return user;
-        });
-        setFollowers(updatedFollowers);
+        setFollowers(prevFollowers =>
+          prevFollowers.map(user => {
+            if (user.uid === followedUserId) {
+              return { ...user, isFollowing: !user.isFollowing };
+            }
+            return user;
+          })
+        );
 
         console.log('Follow action successful:', followedUserId);
       } else {
@@ -234,7 +231,6 @@ function Profile() {
               <div className="nickname">{profileUser.nickname || 'Nickname'}</div>
               <div className="name">{profileUser.name}</div>
               <div className="profile-stats">
-                <span>{recipes.length} Uploads</span>
                 <span onClick={() => setShowFollowers(!showFollowers)}>{followers.length} Followers</span>
                 <span onClick={() => setShowFollowing(!showFollowing)}>{following.length} Following</span>
               </div>
@@ -254,7 +250,7 @@ function Profile() {
           <h2>Saved Recipes</h2>
           <div className="recipes-container-profile">
             {favorites.map(recipe => (
-              <div key={recipe.id} className="recipe-card" onClick={() => openModal(recipe)}>
+              <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
                 <p>{recipe.nameOfDish}</p>
               </div>
@@ -264,7 +260,7 @@ function Profile() {
           <h2>My Recipes</h2>
           <div className="recipes-container-profile">
             {recipes.map(recipe => (
-              <div key={recipe.id} className="recipe-card" onClick={() => openModal(recipe)}>
+              <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
                 <p>{recipe.nameOfDish}</p>
               </div>
@@ -321,30 +317,23 @@ function Profile() {
             </>
           )}
 
-          <Modal
-            isOpen={isModalOpen}
-            onRequestClose={closeModal}
-            contentLabel="Recipe Details"
-            style={{
-              overlay: {
-                backgroundColor: 'rgba(0, 0, 0, 0.75)',
-              },
-              content: {
-                top: '50%',
-                left: '50%',
-                right: 'auto',
-                bottom: 'auto',
-                marginRight: '-50%',
-                transform: 'translate(-50%, -50%)',
-                maxWidth: '90%',
-                maxHeight: '90%',
-                padding: '0px',
-                borderRadius: '20px',
-              },
-            }}
-          >
-            {selectedRecipe && <DishDetails recipe={selectedRecipe} onSimilarDishClick={handleSimilarDishClick} />}
-          </Modal>
+          {selectedRecipe && (
+            <div className="modalBackground">
+              <div className="modalContainer">
+                <h2>{selectedRecipe.nameOfDish}</h2>
+                <p><strong>Description:</strong> {selectedRecipe.description}</p>
+                <p><strong>Origin:</strong> {selectedRecipe.origin}</p>
+                <p><strong>Ingredients:</strong> {selectedRecipe.ingredients.join(', ')}</p>
+                <p><strong>Steps:</strong></p>
+                <ul>
+                  {selectedRecipe.steps.map((step, index) => (
+                    <li key={index}>{step}</li>
+                  ))}
+                </ul>
+                <button onClick={handleCloseModal} className="button closeModalButton">Close</button>
+              </div>
+            </div>
+          )}
 
           <AddRecipeModal showModal={showAddRecipeModal} setShowModal={setShowAddRecipeModal} />
           <EditProfileModal
@@ -385,7 +374,7 @@ function EditProfileModal({
           <img
             src={newProfilePicture || profilePicture || 'default-profile.png'}
             alt="Profile"
-            className="profile-picture-edit"
+            className="profile-picture"
           />
           <label htmlFor="file-upload" className="custom-file-upload">
             Choose File

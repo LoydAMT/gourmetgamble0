@@ -89,7 +89,7 @@ function StalkProfile() {
       {profileUser ? (
         <>
           <h1>{profileUser.name}'s Profile</h1>
-          <div className="profile-info">
+          <div className="profile-header">
             <img
               src={profileUser.profilePicture || 'default-profile.png'}
               alt="Profile"
@@ -97,17 +97,17 @@ function StalkProfile() {
             />
           </div>
           {error && <p className="error-message">{error}</p>}
-          <div>
-            <button onClick={() => setShowFollowing(!showFollowing)} className="show-button">
+          <div className="profile-actions">
+            <button onClick={() => setShowFollowing(!showFollowing)} className="follow-button">
               {showFollowing ? 'Hide Following' : 'Show Following'}
             </button>
-            <button onClick={() => setShowFollowers(!showFollowers)} className="show-button">
+            <button onClick={() => setShowFollowers(!showFollowers)} className="follow-button">
               {showFollowers ? 'Hide Followers' : 'Show Followers'}
             </button>
           </div>
 
           <h2>{profileUser.name}'s Recipes</h2>
-          <div className="recipes-container">
+          <div className="recipes-container-profile">
             {recipes.map(recipe => (
               <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
@@ -117,7 +117,7 @@ function StalkProfile() {
           </div>
 
           <h2>{profileUser.name}'s Favorites</h2>
-          <div className="recipes-container">
+          <div className="recipes-container-profile">
             {favorites.map(recipe => (
               <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
@@ -130,12 +130,12 @@ function StalkProfile() {
             <>
               <h2>Following ({following.length})</h2>
               {following.length > 0 ? (
-                <div className="recipes-container">
+                <div className="recipes-container-profile">
                   {following.map(user => (
                     <div key={user.uid} className="recipe-card">
                       <Link to={`/profile/${user.uid}`}>
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
-                        <p>{user.name}</p>
+                        <p className="Username">{user.name}</p>
                       </Link>
                     </div>
                   ))}
@@ -150,7 +150,7 @@ function StalkProfile() {
             <>
               <h2>Followers ({followers.length})</h2>
               {followers.length > 0 ? (
-                <div className="recipes-container">
+                <div className="recipes-container-profile">
                   {followers.map(user => (
                     <div key={user.uid} className="recipe-card">
                       <Link to={`/profile/${user.uid}`}>

@@ -28,18 +28,26 @@ const getTopPostsWithMostLikes = (posts, count = 5) => {
 };
 
 const sortPosts = (posts) => {
-  const twoDaysAgo = new Date();
-  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+  // Sort all posts by recency
+  const sortedByRecency = posts
+    .filter(post => post.createdAt) // Filter out posts without createdAt timestamp
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  const recentPosts = posts.filter(post => post.createdAt && new Date(post.createdAt) > twoDaysAgo);
-  const olderPostsWithLikes = posts.filter(post => post.createdAt && new Date(post.createdAt) <= twoDaysAgo && post.likes && post.likes.length > 0);
-  const olderPostsWithoutLikes = posts.filter(post => post.createdAt && new Date(post.createdAt) <= twoDaysAgo && (!post.likes || post.likes.length === 0));
-  const postsWithoutTimestamps = posts.filter(post => !post.createdAt);
+  // Separate the top 3 most recent posts
+  const top3RecentPosts = sortedByRecency.slice(0, 3);
+  const remainingPosts = sortedByRecency.slice(3);
 
-  recentPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  olderPostsWithLikes.sort((a, b) => b.likes.length - a.likes.length);
+  // Sort remaining posts by likes
+  const sortedByLikes = remainingPosts.sort((a, b) => {
+    return (b.likes ? b.likes.length : 0) - (a.likes ? a.likes.length : 0);
+  });
 
-  return [...recentPosts, ...olderPostsWithLikes, ...olderPostsWithoutLikes, ...postsWithoutTimestamps];
+  // Combine top 3 most recent posts with the rest sorted by likes
+  return [...top3RecentPosts, ...sortedByLikes];
+};
+
+const sortComments = (comments) => {
+  return comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 };
 
 function Community() {
@@ -369,7 +377,7 @@ function Community() {
                 </div>
                 <span className="like-count">{post.likes ? post.likes.length : 0} Likes</span>
                 <div className="comments-container">
-                  {post.comments.slice(0, visibleComments[post.id] ? post.comments.length : 3).map((comment, index) => (
+                  {sortComments(post.comments).slice(0, visibleComments[post.id] ? post.comments.length : 3).map((comment, index) => (
                     <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
                       <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="comment-profile-picture" />
                       <p className="commentContent"><strong>{comment.userName}</strong>: {comment.content}</p>

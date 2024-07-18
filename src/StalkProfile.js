@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { db, getUserProfile } from './firebaseConfig';
-import { collection, getDocs, query, where, getDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, query, where, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { useParams, Link } from 'react-router-dom';
+import { onAuthStateChanged, getAuth } from 'firebase/auth';
 import './Profile.css';
 
 function StalkProfile() {
   const { userId } = useParams();
   const [profileUser, setProfileUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [recipes, setRecipes] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [following, setFollowing] = useState([]);
@@ -14,6 +16,7 @@ function StalkProfile() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [showFollowing, setShowFollowing] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -50,7 +53,11 @@ function StalkProfile() {
           if (userProfile.following && userProfile.following.length > 0) {
             const followingQuery = query(collection(db, 'users'), where('uid', 'in', userProfile.following));
             const followingSnapshot = await getDocs(followingQuery);
-            const followingUsers = followingSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+            const followingUsers = followingSnapshot.docs.map(doc => ({
+              uid: doc.id,
+              ...doc.data(),
+              isFollowing: true,
+            }));
             setFollowing(followingUsers);
           } else {
             setFollowing([]);
@@ -59,8 +66,17 @@ function StalkProfile() {
           // Fetch followers
           const followersQuery = query(collection(db, 'users'), where('following', 'array-contains', uid));
           const followersSnapshot = await getDocs(followersQuery);
-          const userFollowers = followersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+          const userFollowers = followersSnapshot.docs.map(doc => ({
+            uid: doc.id,
+            ...doc.data(),
+            isFollowing: userProfile.following.includes(doc.id),
+          }));
           setFollowers(userFollowers);
+
+          // Check if current user is following this profile
+          if (currentUser && userProfile.followers && userProfile.followers.includes(currentUser.uid)) {
+            setIsFollowing(true);
+          }
         } else {
           setError('User profile not found.');
         }
@@ -73,7 +89,72 @@ function StalkProfile() {
     if (userId) {
       fetchProfileData(userId);
     }
+
+    // Fetch current user data
+    const auth = getAuth();
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setCurrentUser(user);
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (userData.following && userData.following.includes(userId)) {
+            setIsFollowing(true);
+          }
+        }
+      }
+    });
   }, [userId]);
+
+  const handleFollow = async (followedUserId) => {
+    if (!currentUser) {
+      setError('You need to be logged in to follow users.');
+      return;
+    }
+
+    try {
+      const userQuery = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+      const userSnapshot = await getDocs(userQuery);
+      if (!userSnapshot.empty) {
+        const userDoc = userSnapshot.docs[0];
+        const userData = userDoc.data();
+        if (userData.following.includes(followedUserId)) {
+          setError('You are already following this user.');
+        } else {
+          const updatedFollowing = [...userData.following, followedUserId];
+          await updateDoc(doc(db, 'users', userDoc.id), { following: updatedFollowing });
+
+          // Update the local following state
+          setFollowing(prevFollowing =>
+            prevFollowing.map(user => {
+              if (user.uid === followedUserId) {
+                return { ...user, isFollowing: true };
+              }
+              return user;
+            })
+          );
+
+          // Update the local followers state
+          setFollowers(prevFollowers =>
+            prevFollowers.map(user => {
+              if (user.uid === followedUserId) {
+                return { ...user, isFollowing: true };
+              }
+              return user;
+            })
+          );
+
+          setIsFollowing(true);
+          setError('');
+        }
+      } else {
+        setError('User profile not found.');
+      }
+    } catch (error) {
+      console.error('Error following user:', error);
+      setError('Error following user. Please try again later.');
+    }
+  };
 
   const handleRecipeClick = (recipe) => {
     setSelectedRecipe(recipe);
@@ -95,6 +176,11 @@ function StalkProfile() {
               alt="Profile"
               className="profile-picture"
             />
+            {currentUser && currentUser.uid !== userId && (
+              <button onClick={() => handleFollow(userId)} className="follow-button">
+                {isFollowing ? 'Unfollow' : 'Follow'}
+              </button>
+            )}
           </div>
           {error && <p className="error-message">{error}</p>}
           <div className="profile-actions">
@@ -137,6 +223,11 @@ function StalkProfile() {
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
                         <p className="Username">{user.name}</p>
                       </Link>
+                      {currentUser && (
+                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
+                          {user.isFollowing ? 'Unfollow' : 'Follow'}
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -157,6 +248,11 @@ function StalkProfile() {
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
                         <p>{user.name}</p>
                       </Link>
+                      {currentUser && (
+                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
+                          {user.isFollowing ? 'Unfollow' : 'Follow'}
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>

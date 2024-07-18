@@ -64,17 +64,10 @@ function StalkProfile() {
           }
 
           // Fetch followers
-          const followersQuery = query(collection(db, 'users'), where('following', 'array-contains', uid));
-          const followersSnapshot = await getDocs(followersQuery);
-          const userFollowers = followersSnapshot.docs.map(doc => ({
-            uid: doc.id,
-            ...doc.data(),
-            isFollowing: userProfile.following.includes(doc.id),
-          }));
-          setFollowers(userFollowers);
+          fetchFollowers(uid);
 
           // Check if current user is following this profile
-          if (currentUser && userProfile.followers && userProfile.followers.includes(currentUser.uid)) {
+          if (currentUser && userProfile.following && userProfile.following.includes(currentUser.uid)) {
             setIsFollowing(true);
           }
         } else {
@@ -83,6 +76,22 @@ function StalkProfile() {
       } catch (error) {
         console.error('Error fetching user data:', error);
         setError('Error fetching user data. Please try again later.');
+      }
+    };
+
+    const fetchFollowers = async (uid) => {
+      try {
+        const followersQuery = query(collection(db, 'users'), where('following', 'array-contains', uid));
+        const followersSnapshot = await getDocs(followersQuery);
+        const userFollowers = followersSnapshot.docs.map(doc => ({
+          uid: doc.id,
+          ...doc.data(),
+          isFollowing: following.some(followingUser => followingUser.uid === doc.id),
+        }));
+        setFollowers(userFollowers);
+      } catch (error) {
+        console.error('Error fetching followers:', error);
+        setError('Error fetching followers. Please try again later.');
       }
     };
 
@@ -104,7 +113,7 @@ function StalkProfile() {
         }
       }
     });
-  }, [userId]);
+  }, [userId, following]);
 
   const handleFollow = async (followedUserId) => {
     if (!currentUser) {
@@ -113,46 +122,43 @@ function StalkProfile() {
     }
 
     try {
-      const userQuery = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
-      const userSnapshot = await getDocs(userQuery);
-      if (!userSnapshot.empty) {
-        const userDoc = userSnapshot.docs[0];
-        const userData = userDoc.data();
-        if (userData.following.includes(followedUserId)) {
-          setError('You are already following this user.');
-        } else {
-          const updatedFollowing = [...userData.following, followedUserId];
-          await updateDoc(doc(db, 'users', userDoc.id), { following: updatedFollowing });
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userDoc = await getDoc(userRef);
 
-          // Update the local following state
-          setFollowing(prevFollowing =>
-            prevFollowing.map(user => {
-              if (user.uid === followedUserId) {
-                return { ...user, isFollowing: true };
-              }
-              return user;
-            })
-          );
-
-          // Update the local followers state
-          setFollowers(prevFollowers =>
-            prevFollowers.map(user => {
-              if (user.uid === followedUserId) {
-                return { ...user, isFollowing: true };
-              }
-              return user;
-            })
-          );
-
-          setIsFollowing(true);
-          setError('');
-        }
-      } else {
-        setError('User profile not found.');
+      if (!userDoc.exists()) {
+        console.error(`Current user document not found at path: users/${currentUser.uid}`);
+        throw new Error('Current user profile not found.');
       }
+
+      const userData = userDoc.data();
+      const following = userData.following || [];
+
+      let updatedFollowing;
+
+      if (following.includes(followedUserId)) {
+        updatedFollowing = following.filter(id => id !== followedUserId);
+        setIsFollowing(false);
+      } else {
+        updatedFollowing = [...following, followedUserId];
+        setIsFollowing(true);
+      }
+
+      await updateDoc(userRef, { following: updatedFollowing });
+
+      // Update the local following state
+      setFollowing(updatedFollowing);
+
+      // Update the followers state
+      setFollowers(prevState => 
+        prevState.map(user => 
+          user.uid === followedUserId ? { ...user, isFollowing: !user.isFollowing } : user
+        )
+      );
+
+      setError('');
     } catch (error) {
       console.error('Error following user:', error);
-      setError('Error following user. Please try again later.');
+      setError(`Error following user: ${error.message}`);
     }
   };
 
@@ -223,11 +229,7 @@ function StalkProfile() {
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
                         <p className="Username">{user.name}</p>
                       </Link>
-                      {currentUser && (
-                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
-                          {user.isFollowing ? 'Unfollow' : 'Follow'}
-                        </button>
-                      )}
+                     
                     </div>
                   ))}
                 </div>
@@ -248,11 +250,7 @@ function StalkProfile() {
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
                         <p>{user.name}</p>
                       </Link>
-                      {currentUser && (
-                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
-                          {user.isFollowing ? 'Unfollow' : 'Follow'}
-                        </button>
-                      )}
+                      
                     </div>
                   ))}
                 </div>

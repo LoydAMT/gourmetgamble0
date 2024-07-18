@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import Modal from 'react-modal';
 import { auth, db, getUserProfile, uploadProfilePicture } from './firebaseConfig';
 import { collection, getDocs, query, where, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import AddRecipeModal from './AddRecipeModal';
+import DishDetails from './DishDetails';
 import './Profile.css';
 
 function Profile() {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const [profileUser, setProfileUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [profilePicture, setProfilePicture] = useState('');
@@ -21,6 +24,7 @@ function Profile() {
   const [showFollowers, setShowFollowers] = useState(false);
   const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -59,31 +63,40 @@ function Profile() {
           if (userProfile.following && userProfile.following.length > 0) {
             const followingQuery = query(collection(db, 'users'), where('uid', 'in', userProfile.following));
             const followingSnapshot = await getDocs(followingQuery);
-            const followingUsers = followingSnapshot.docs.map(doc => ({
-              uid: doc.id,
-              ...doc.data(),
-              isFollowing: true,
-            }));
+            const followingUsers = followingSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
             setFollowing(followingUsers);
           } else {
             setFollowing([]);
           }
 
           // Fetch followers
-          const followersQuery = query(collection(db, 'users'), where('following', 'array-contains', uid));
-          const followersSnapshot = await getDocs(followersQuery);
-          const userFollowers = followersSnapshot.docs.map(doc => ({
-            uid: doc.id,
-            ...doc.data(),
-            isFollowing: userProfile.following.includes(doc.id),
-          }));
-          setFollowers(userFollowers);
+          fetchFollowers(uid);
+
         } else {
           setError('User profile not found.');
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
         setError('Error fetching user data. Please try again later.');
+      }
+    };
+
+    const fetchFollowers = async (uid) => {
+      try {
+        const followersQuery = query(collection(db, 'users'), where('following', 'array-contains', uid));
+        const followersSnapshot = await getDocs(followersQuery);
+        const userFollowers = followersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+
+        // Check if the current user is following each of these followers
+        const updatedFollowers = userFollowers.map(follower => ({
+          ...follower,
+          isFollowing: following.some(followingUser => followingUser.uid === follower.uid)
+        }));
+
+        setFollowers(updatedFollowers);
+      } catch (error) {
+        console.error('Error fetching followers:', error);
+        setError('Error fetching followers. Please try again later.');
       }
     };
 
@@ -99,7 +112,7 @@ function Profile() {
         }
       });
     }
-  }, [userId]);
+  }, [userId, following]);
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -157,12 +170,21 @@ function Profile() {
     await signOut(auth);
   };
 
-  const handleRecipeClick = (recipe) => {
+  const openModal = (recipe) => {
     setSelectedRecipe(recipe);
+    setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const closeModal = () => {
+    setIsModalOpen(false);
     setSelectedRecipe(null);
+  };
+
+  const handleSimilarDishClick = (id) => {
+    const selected = recipes.find(recipe => recipe.id === id);
+    if (selected) {
+      setSelectedRecipe(selected);
+    }
   };
 
   const handleFollow = async (followedUserId) => {
@@ -178,32 +200,21 @@ function Profile() {
         const userDoc = userSnapshot.docs[0];
         const userData = userDoc.data();
         let updatedFollowing;
-        if (userData.following.includes(followedUserId)) {
+
+        if (following.some(followingUser => followingUser.uid === followedUserId)) {
           updatedFollowing = userData.following.filter(id => id !== followedUserId);
         } else {
           updatedFollowing = [...userData.following, followedUserId];
         }
 
         await updateDoc(doc(db, 'users', userDoc.id), { following: updatedFollowing });
+        setFollowing(updatedFollowing); // Update the following state
 
-        // Update the local following state
-        setFollowing(prevFollowing =>
-          prevFollowing.map(user => {
-            if (user.uid === followedUserId) {
-              return { ...user, isFollowing: !user.isFollowing };
-            }
-            return user;
-          })
-        );
-
-        // Update the local followers state
-        setFollowers(prevFollowers =>
-          prevFollowers.map(user => {
-            if (user.uid === followedUserId) {
-              return { ...user, isFollowing: !user.isFollowing };
-            }
-            return user;
-          })
+        // Update the followers state
+        setFollowers(prevState => 
+          prevState.map(user => 
+            user.uid === followedUserId ? { ...user, isFollowing: !user.isFollowing } : user
+          )
         );
 
         console.log('Follow action successful:', followedUserId);
@@ -231,6 +242,7 @@ function Profile() {
               <div className="nickname">{profileUser.nickname || 'Nickname'}</div>
               <div className="name">{profileUser.name}</div>
               <div className="profile-stats">
+                <span>{recipes.length} Uploads</span>
                 <span onClick={() => setShowFollowers(!showFollowers)}>{followers.length} Followers</span>
                 <span onClick={() => setShowFollowing(!showFollowing)}>{following.length} Following</span>
               </div>
@@ -250,7 +262,7 @@ function Profile() {
           <h2>Saved Recipes</h2>
           <div className="recipes-container-profile">
             {favorites.map(recipe => (
-              <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
+              <div key={recipe.id} className="recipe-card" onClick={() => openModal(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
                 <p>{recipe.nameOfDish}</p>
               </div>
@@ -260,7 +272,7 @@ function Profile() {
           <h2>My Recipes</h2>
           <div className="recipes-container-profile">
             {recipes.map(recipe => (
-              <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
+              <div key={recipe.id} className="recipe-card" onClick={() => openModal(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
                 <p>{recipe.nameOfDish}</p>
               </div>
@@ -278,11 +290,9 @@ function Profile() {
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
                         <p className="Username">{user.name}</p>
                       </Link>
-                      {!userId && (
-                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
-                          {user.isFollowing ? 'Unfollow' : 'Follow'}
-                        </button>
-                      )}
+                      <button className="follow-button" onClick={() => handleFollow(user.uid)}>
+                        Unfollow
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -303,11 +313,9 @@ function Profile() {
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
                         <p>{user.name}</p>
                       </Link>
-                      {!userId && (
-                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
-                          {user.isFollowing ? 'Unfollow' : 'Follow'}
-                        </button>
-                      )}
+                      <button className="follow-button" onClick={() => handleFollow(user.uid)}>
+                        {user.isFollowing ? 'Unfollow' : 'Follow'}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -317,23 +325,30 @@ function Profile() {
             </>
           )}
 
-          {selectedRecipe && (
-            <div className="modalBackground">
-              <div className="modalContainer">
-                <h2>{selectedRecipe.nameOfDish}</h2>
-                <p><strong>Description:</strong> {selectedRecipe.description}</p>
-                <p><strong>Origin:</strong> {selectedRecipe.origin}</p>
-                <p><strong>Ingredients:</strong> {selectedRecipe.ingredients.join(', ')}</p>
-                <p><strong>Steps:</strong></p>
-                <ul>
-                  {selectedRecipe.steps.map((step, index) => (
-                    <li key={index}>{step}</li>
-                  ))}
-                </ul>
-                <button onClick={handleCloseModal} className="button closeModalButton">Close</button>
-              </div>
-            </div>
-          )}
+          <Modal
+            isOpen={isModalOpen}
+            onRequestClose={closeModal}
+            contentLabel="Recipe Details"
+            style={{
+              overlay: {
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+              },
+              content: {
+                top: '50%',
+                left: '50%',
+                right: 'auto',
+                bottom: 'auto',
+                marginRight: '-50%',
+                transform: 'translate(-50%, -50%)',
+                maxWidth: '90%',
+                maxHeight: '90%',
+                padding: '0px',
+                borderRadius: '20px',
+              },
+            }}
+          >
+            {selectedRecipe && <DishDetails recipe={selectedRecipe} onSimilarDishClick={handleSimilarDishClick} />}
+          </Modal>
 
           <AddRecipeModal showModal={showAddRecipeModal} setShowModal={setShowAddRecipeModal} />
           <EditProfileModal
@@ -374,7 +389,7 @@ function EditProfileModal({
           <img
             src={newProfilePicture || profilePicture || 'default-profile.png'}
             alt="Profile"
-            className="profile-picture"
+            className="profile-picture-edit"
           />
           <label htmlFor="file-upload" className="custom-file-upload">
             Choose File

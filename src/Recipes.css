@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: white;
+  background: linear-gradient(to right, #FFA62F 0%, #34A853 100%);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.1);
@@ -17,14 +17,16 @@
   max-width: 650px;
   height: auto;
   margin: 20px auto;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, background 0.3s ease;
 }
 
 .recipe-of-the-day:hover {
   transform: scale(1.03);
   box-shadow: 10px 16px 16px rgba(0, 0, 0, 0.2);
-  background-color: rgba(255, 165, 0, 0.9);
+  background: rgba(255, 165, 0, 0.9); /* Sets the background to the specified color on hover */
 }
+
+
 
 .recipe-image {
   margin-right: 10px; 
@@ -95,18 +97,18 @@
 }
 
 .recipe-card {
-  background-color: #fff;
+  background: linear-gradient(to right, #FFC96F 0%, #ACD793 100%);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   opacity: 0.9;
-  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.5s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.5s ease, background 0.3s ease;
 }
 
 .recipe-card:hover {
   transform: scale(1.05);
   opacity: 1;
-  background-color: rgba(255, 165, 0, 0.9);
+  background: rgba(255, 165, 0, 0.9); /* Sets the background to the specified orange color on hover */
 }
 
 .recipe-card-image {

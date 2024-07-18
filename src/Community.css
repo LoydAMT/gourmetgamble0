@@ -106,12 +106,14 @@
 
 .post-user-name {
   margin: 0;
+  cursor: pointer;
 }
 
 .post-timestamp {
   font-size: 12px;
   color: #777;
   margin-top: 2px;
+  cursor: pointer;
 }
 
 
@@ -241,6 +243,7 @@
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+  cursor: pointer;
 }
 
 .comment-profile-picture{
@@ -250,6 +253,7 @@
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+  cursor: pointer;
 }
 
 /* Sidebar styles */

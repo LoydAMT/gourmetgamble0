@@ -3,6 +3,7 @@ import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, deleteDoc, getD
 import { db, auth, getUserProfile, uploadPostPhoto } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { formatDistanceToNow } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import './Community.css';
 
 import defaultProfilePicture from './user.png';
@@ -66,6 +67,7 @@ function Community() {
   const [visibleComments, setVisibleComments] = useState({});
   const [commentInputVisibility, setCommentInputVisibility] = useState({});
   const postCardRefs = useRef({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
@@ -320,6 +322,10 @@ function Community() {
     }
   };
 
+  const handleUserClick = (uid) => {
+    navigate(`/profile/${uid}`);
+  };
+
   return (
     <div className="community-container">
       {error && <div className="error-bar">{error}</div>}
@@ -350,11 +356,11 @@ function Community() {
           {getFilteredPosts().map(post => (
             <div key={post.id} id={post.id} ref={(el) => (postCardRefs.current[post.id] = el)} className="post-card">
               <div className="post-header">
-                <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="post-profile-picture" />
+                <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="post-profile-picture"  onClick={() => handleUserClick(post.userId)}/>
                 <div>
-                  <p className="post-user-name"><strong>{post.userName}</strong></p>
+                  <p className="post-user-name" onClick={() => handleUserClick(post.userId)}><strong>{post.userName}</strong></p>
                   {post.createdAt && (
-                    <p className="post-timestamp" title={new Date(post.createdAt).toLocaleString()}>
+                    <p className="post-timestamp" title={new Date(post.createdAt).toLocaleString()}  onClick={() => handleUserClick(post.userId)}>
                       {formatDistanceToNow(new Date(post.createdAt))} ago
                     </p>
                   )}
@@ -384,7 +390,12 @@ function Community() {
                 <div className="comments-container">
                   {sortComments(post.comments).slice(0, visibleComments[post.id] ? post.comments.length : 3).map((comment, index) => (
                     <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
-                      <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="comment-profile-picture" />
+                      <img
+                        src={comment.userProfilePicture || defaultProfilePicture}
+                        alt="Profile"
+                        className="comment-profile-picture"
+                        onClick={() => handleUserClick(comment.userId)}
+                      />
                       <p className="commentContent"><strong>{comment.userName}</strong>: {comment.content}</p>
                       <p className="comment-timestamp">{formatDistanceToNow(new Date(comment.createdAt))} ago</p>
                       {comment.userId === currentUser?.uid && (

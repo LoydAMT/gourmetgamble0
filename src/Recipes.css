@@ -23,7 +23,7 @@
 .recipe-of-the-day:hover {
   transform: scale(1.03);
   box-shadow: 10px 16px 16px rgba(0, 0, 0, 0.2);
-  background: rgba(255, 165, 0, 0.9); /* Sets the background to the specified color on hover */
+  background: rgba(255, 165, 0, 0.9); 
 }
 
 
@@ -40,7 +40,7 @@
 .recipe-content {
   width: 45%;
   background-color: transparent;
-  padding: 10px; /* Adjust this value to your preference */
+  padding: 10px; 
   color: black;
   text-align: justify;
   border-radius: 0 10px 10px 0;
@@ -73,11 +73,14 @@
   font-size: 18px;
   border-radius: 30px;
   border: none;
-  background-color: rgba(127, 250, 116, 0.87);
+  background: linear-gradient(to right, #7FFA74 0%, #B9F8B4 78%); 
   margin-bottom: 20px;
+  transition: transform 0.3s ease, background-color 0.3s ease, background 0.3s ease; 
 }
 
-
+.search-input:hover {
+  transform: scale(1.05); 
+}
 
 .origin-container {
   display: flex;
@@ -108,7 +111,7 @@
 .recipe-card:hover {
   transform: scale(1.05);
   opacity: 1;
-  background: rgba(255, 165, 0, 0.9); /* Sets the background to the specified orange color on hover */
+  background: rgba(255, 165, 0, 0.9); 
 }
 
 .recipe-card-image {

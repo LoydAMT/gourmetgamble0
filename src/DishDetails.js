@@ -4,6 +4,7 @@ import { db, auth, onAuthStateChanged, getUserProfile } from './firebaseConfig';
 import ReactPlayer from 'react-player';
 import './DishDetails.css';
 import RecipeModal from './RecipeModal';
+import { useNavigate } from 'react-router-dom';
 
 const SimilarDishCard = ({ imageSrc, title, onClick }) => (
   <div className="similar-dish-card" onClick={onClick}>
@@ -39,6 +40,11 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
   const [averageRating, setAverageRating] = useState(0);
   const [totalRatings, setTotalRatings] = useState(0);
   const dishDetailsRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleUserClick = (uid) => {
+    navigate(`/profile/${uid}`);
+  };
 
   useEffect(() => {
     if (dishDetailsRef.current) {
@@ -227,7 +233,7 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
         <div className="dish-info">
           <button className="close-button" onClick={() => window.location.reload()}>×</button>
           <h1 className="dish-name">{recipe.nameOfDish}</h1>
-          <p className="dish-author">Author:<br /> {recipe.nameOfUser}</p>
+          <p className="dish-author" onClick={() => handleUserClick(recipe.userId)} >Author:<br /> {recipe.nameOfUser}</p>
           <div className="action-buttons">
             <button className="recipe-button" onClick={() => setShowRecipeModal(true)}>OPEN RECIPE</button>
             <button className="favorite-button" onClick={handleAddToFavorites}>ADD TO FAVORITES</button>

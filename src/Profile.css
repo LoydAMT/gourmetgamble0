@@ -288,3 +288,68 @@
 .follow-button:hover {
   background-color: #0056b3;
 }
+
+/* Media queries for mobile devices */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 10px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-picture {
+    margin: 0 0 10px 0;
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-details {
+    align-items: center;
+  }
+
+  .nickname {
+    font-size: 20px;
+  }
+
+  .name {
+    font-size: 18px;
+  }
+
+  .profile-stats {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .recipes-container-profile {
+    gap: 10px;
+  }
+
+  .recipe-card {
+    width: 150px;
+    padding: 5px;
+  }
+
+  .recipe-photo {
+    height: 100px;
+  }
+
+  .follow-button {
+    font-size: 14px;
+    padding: 5px 10px;
+  }
+
+  .edit-profile-button,
+  .upload-recipe-button {
+    font-size: 14px;
+    padding: 5px 10px;
+  }
+}

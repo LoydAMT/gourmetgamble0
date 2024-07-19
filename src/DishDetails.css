@@ -31,32 +31,47 @@
 .dish-details {
   display: flex;
   flex-direction: column;
-  padding: 70px;
+  padding: 20px;
   background: linear-gradient(270deg, #f6d8b0 0%, #f9ec8d 58%, #fcff6d 100%);
   border-radius: 20px;
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
 }
 
-@media (max-width: 991px) {
+@media (min-width: 768px) {
   .dish-details {
-    padding: 20px;
+    padding: 70px;
   }
 }
 
 .content-wrapper {
   display: flex;
-  width: 1000px;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .content-wrapper {
+    flex-direction: row;
+    width: 100%;
+  }
 }
 
 .dish-image-container {
   display: flex;
   flex-direction: column;
   line-height: normal;
-  width: 57%;
-  margin-left: 5%;
+  width: 100%;
+  margin: 0 auto;
   position: relative;
-  height: 500px;
+  height: auto;
+}
+
+@media (min-width: 768px) {
+  .dish-image-container {
+    width: 57%;
+    margin-left: 5%;
+    height: 500px;
+  }
 }
 
 .main-image-container {
@@ -74,18 +89,26 @@
 .main-image-wrapper {
   border: solid 1px #000;
   border-radius: 20px;
-  position: absolute;
+  position: relative;
   width: 100%;
-  height: 100%;
+  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
 }
 
+@media (min-width: 768px) {
+  .main-image-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .main-dish-image {
   width: 100%;
-  height: 100%;
+  height: auto;
   object-fit: cover;
   object-position: center;
 }
@@ -119,15 +142,14 @@
   display: flex;
   flex-direction: column;
   line-height: normal;
-  width: 43%;
-  margin-left: 30px;
+  width: 100%;
+  margin: 0 auto;
 }
 
-@media (max-width: 991px) {
+@media (min-width: 768px) {
   .dish-info {
-    width: 100%;
-    margin-top: 20px;
-    margin-left: 0;
+    width: 43%;
+    margin-left: 30px;
   }
 }
 
@@ -139,17 +161,19 @@
   border: 1px solid #000;
   background-color: #d9d9d9;
   align-self: flex-end;
-  width: 56px;
+  width: 40px;
   color: #000;
   white-space: nowrap;
-  height: 56px;
+  height: 40px;
   padding: 0 12px;
-  font: 500 48px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 500 24px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
 }
 
-@media (max-width: 991px) {
+@media (min-width: 768px) {
   .close-button {
-    font-size: 40px;
+    width: 56px;
+    height: 56px;
+    font-size: 48px;
     white-space: initial;
   }
 }
@@ -168,11 +192,11 @@
   max-width: 100%;
   margin-top: 0px;
   font: 700 24px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
-  cursor: pointer;
 }
 
 .action-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
 }
@@ -217,7 +241,7 @@
   font: 700 24px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
 }
 
-@media (max-width: 991px) {
+@media (min-width: 768px) {
   .description-title {
     max-width: 100%;
     margin-top: 40px;
@@ -232,7 +256,7 @@
   font: 500 15px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
 }
 
-@media (max-width: 991px) {
+@media (min-width: 768px) {
   .dish-description {
     margin-left: 20px;
   }
@@ -242,31 +266,25 @@
   color: #000;
   text-align: center;
   align-self: start;
-  margin: 150px 0 0 30px;
+  margin: 40px 0 0 10px;
   font: 700 24px/150% Inter, -apple-system, Roboto, Helvetica, sans-serif;
-}
-
-@media (max-width: 991px) {
-  .similar-dishes-title {
-    margin: 40px 0 0 10px;
-  }
 }
 
 .similar-dishes-grid {
   align-self: center;
   margin-top: 31px;
   width: 100%;
-  max-width: 1045px;
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-@media (max-width: 991px) {
+@media (min-width: 768px) {
   .similar-dishes-grid {
-    max-width: 100%;
-    flex-direction: column;
+    max-width: 1045px;
+    flex-direction: row;
     align-items: stretch;
-    gap: 0;
+    gap: 20px;
   }
 }
 
@@ -283,15 +301,9 @@
   padding: 16px 13px;
 }
 
-@media (max-width: 991px) {
-  .similar-dish-card {
-    margin-top: 40px;
-  }
-}
-
 .image-wrapper {
   width: 100%;
-  max-width: 300px;
+  max-width: 100%;
   border-radius: 20px;
   border: 1px solid #000;
   display: flex;
@@ -393,100 +405,4 @@
   margin-top: 20px;
   font-size: 18px;
   color: #000;
-}
-
-/* Responsive styles */
-@media (max-width: 600px) {
-  .dish-details {
-    padding: 20px;
-  }
-
-  .content-wrapper {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .dish-image-container {
-    width: 100%;
-    height: auto;
-    margin-left: 0;
-  }
-
-  .main-image-container {
-    height: 300px;
-  }
-
-  .thumbnail {
-    width: 60px;
-    height: 60px;
-  }
-
-  .dish-info {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 20px;
-  }
-
-  .dish-name {
-    font-size: 24px;
-  }
-
-  .dish-author {
-    font-size: 18px;
-  }
-
-  .recipe-button, .favorite-button {
-    font-size: 16px;
-    padding: 8px 12px;
-  }
-
-  .social-icon {
-    width: 36px;
-  }
-
-  .description-title {
-    font-size: 20px;
-  }
-
-  .dish-description {
-    font-size: 14px;
-    margin: 0 20px;
-  }
-
-  .similar-dishes-title {
-    font-size: 20px;
-    margin-left: 10px;
-  }
-
-  .similar-dishes-grid {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .similar-dish-card {
-    padding: 10px;
-    font-size: 20px;
-  }
-
-  .image-wrapper {
-    max-width: 100%;
-    padding: 40px 10px;
-  }
-
-  .full-recipe {
-    padding: 10px;
-  }
-
-  .recipe-title {
-    font-size: 24px;
-    
-  }
-
-  .recipe-author {
-    font-size: 16px;
-  }
-
-  .recipe-steps {
-    font-size: 14px;
-  }
 }

@@ -289,67 +289,34 @@
   background-color: #0056b3;
 }
 
-/* Media queries for mobile devices */
-@media (max-width: 768px) {
-  .profile-container {
-    padding: 10px;
-  }
-
-  .profile-header {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .profile-picture {
-    margin: 0 0 10px 0;
-    width: 100px;
-    height: 100px;
-  }
-
-  .profile-details {
-    align-items: center;
-  }
-
-  .nickname {
-    font-size: 20px;
-  }
-
-  .name {
-    font-size: 18px;
-  }
-
+/* Responsive styles */
+@media (max-width: 600px) {
+  .profile-actions,
   .profile-stats {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .profile-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .recipes-container-profile {
-    gap: 10px;
-  }
-
-  .recipe-card {
-    width: 150px;
-    padding: 5px;
-  }
-
-  .recipe-photo {
-    height: 100px;
-  }
-
-  .follow-button {
-    font-size: 14px;
-    padding: 5px 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
   }
 
   .edit-profile-button,
+  .logout-button,
   .upload-recipe-button {
     font-size: 14px;
-    padding: 5px 10px;
+    padding: 8px 10px;
+    flex: 1 1 30%;
+    margin: 5px 0;
+  }
+
+  .profile-stats span {
+    font-size: 14px;
+  }
+
+  .recipe-card {
+    width: 45%;
+  }
+
+  .profile-container {
+    padding: 10px;
   }
 }

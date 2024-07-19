@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import Modal from 'react-modal';
 import { db, getUserProfile } from './firebaseConfig';
 import { collection, getDocs, query, where, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { useParams, Link } from 'react-router-dom';
 import { onAuthStateChanged, getAuth } from 'firebase/auth';
+import DishDetails from './DishDetails';
 import './Profile.css';
 
 function StalkProfile() {
@@ -16,6 +18,7 @@ function StalkProfile() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [showFollowing, setShowFollowing] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [error, setError] = useState('');
 
@@ -153,10 +156,12 @@ function StalkProfile() {
 
   const handleRecipeClick = (recipe) => {
     setSelectedRecipe(recipe);
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setSelectedRecipe(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -257,23 +262,30 @@ function StalkProfile() {
             </>
           )}
 
-          {selectedRecipe && (
-            <div className="modalBackground">
-              <div className="modalContainer">
-                <h2>{selectedRecipe.nameOfDish}</h2>
-                <p><strong>Description:</strong> {selectedRecipe.description}</p>
-                <p><strong>Origin:</strong> {selectedRecipe.origin}</p>
-                <p><strong>Ingredients:</strong> {selectedRecipe.ingredients.join(', ')}</p>
-                <p><strong>Steps:</strong></p>
-                <ul>
-                  {selectedRecipe.steps.map((step, index) => (
-                    <li key={index}>{step}</li>
-                  ))}
-                </ul>
-                <button onClick={handleCloseModal} className="button closeModalButton">Close</button>
-              </div>
-            </div>
-          )}
+          <Modal
+            isOpen={isModalOpen}
+            onRequestClose={handleCloseModal}
+            contentLabel="Recipe Details"
+            style={{
+              overlay: {
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+              },
+              content: {
+                top: '50%',
+                left: '50%',
+                right: 'auto',
+                bottom: 'auto',
+                marginRight: '-50%',
+                transform: 'translate(-50%, -50%)',
+                maxWidth: '90%',
+                maxHeight: '90%',
+                padding: '0px',
+                borderRadius: '20px',
+              },
+            }}
+          >
+            {selectedRecipe && <DishDetails recipe={selectedRecipe} />}
+          </Modal>
         </>
       ) : (
         <p>Loading user profile...</p>
@@ -283,4 +295,3 @@ function StalkProfile() {
 }
 
 export default StalkProfile;
- 

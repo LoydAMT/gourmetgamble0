@@ -233,7 +233,7 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
         <div className="dish-info">
           <button className="close-button" onClick={() => window.location.reload()}>×</button>
           <h1 className="dish-name">{recipe.nameOfDish}</h1>
-          <p className="dish-author" onClick={() => handleUserClick(recipe.userId)}>Author:<br /> {recipe.nameOfUser}</p>
+          <p className="dish-author" onClick={() => handleUserClick(recipe.userId)} >Author:<br /> {recipe.nameOfUser}</p>
           <div className="action-buttons">
             <button className="recipe-button" onClick={() => setShowRecipeModal(true)}>OPEN RECIPE</button>
             <button className="favorite-button" onClick={handleAddToFavorites}>ADD TO FAVORITES</button>
@@ -251,6 +251,7 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
               </div>
               <button className="save-review-button" onClick={handleAddReview}>SAVE REVIEW</button>
             </div>
+           
           </div>
           <h2 className="description-title">DESCRIPTION</h2>
           <p className="dish-description">{recipe.description}</p>

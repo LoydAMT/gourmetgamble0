@@ -55,11 +55,11 @@
 }
 
 .left-scroll-button {
-  left: 10px; /* Adjusted for smaller button */
+  left: 0px; /* Adjusted for smaller button */
 }
 
 .right-scroll-button {
-  right: 10px; /* Adjusted for smaller button */
+  right: -20px; /* Adjusted for smaller button */
 }
 
 /* Other existing styles */

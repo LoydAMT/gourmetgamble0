@@ -126,6 +126,7 @@
     width: 100%; /* Ensure it takes full width */
     margin-left: 0; /* Remove the auto margin */
     margin-top: 0; /* Remove margin-top */
+    padding-bottom: 50px;
   }
 
   .nav-item, .sign-in-button {

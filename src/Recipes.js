@@ -125,7 +125,13 @@ function Recipes() {
           },
         }}
       >
-        {selectedRecipe && <DishDetails recipe={selectedRecipe} onSimilarDishClick={handleSimilarDishClick} />}
+        {selectedRecipe && (
+          <DishDetails
+            recipe={selectedRecipe}
+            closeModal={closeModal}
+            onSimilarDishClick={handleSimilarDishClick}
+          />
+        )}
       </Modal>
     </div>
   );

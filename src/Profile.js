@@ -347,7 +347,13 @@ function Profile() {
               },
             }}
           >
-            {selectedRecipe && <DishDetails recipe={selectedRecipe} onSimilarDishClick={handleSimilarDishClick} />}
+            {selectedRecipe && (
+              <DishDetails
+                recipe={selectedRecipe}
+                closeModal={closeModal}
+                onSimilarDishClick={handleSimilarDishClick}
+              />
+            )}
           </Modal>
 
           <AddRecipeModal showModal={showAddRecipeModal} setShowModal={setShowAddRecipeModal} />

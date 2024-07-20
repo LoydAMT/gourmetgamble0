@@ -223,11 +223,7 @@ function StalkProfile() {
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
                         <p className="Username">{user.name}</p>
                       </Link>
-                      {currentUser && (
-                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
-                          {following.some(followingUser => followingUser.uid === user.uid) ? 'Unfollow' : 'Follow'}
-                        </button>
-                      )}
+                     
                     </div>
                   ))}
                 </div>
@@ -248,11 +244,7 @@ function StalkProfile() {
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
                         <p>{user.name}</p>
                       </Link>
-                      {currentUser && (
-                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
-                          {following.some(followingUser => followingUser.uid === user.uid) ? 'Unfollow' : 'Follow'}
-                        </button>
-                      )}
+                      
                     </div>
                   ))}
                 </div>
@@ -284,7 +276,12 @@ function StalkProfile() {
               },
             }}
           >
-            {selectedRecipe && <DishDetails recipe={selectedRecipe} />}
+            {selectedRecipe && (
+              <DishDetails
+                recipe={selectedRecipe}
+                closeModal={handleCloseModal}
+              />
+            )}
           </Modal>
         </>
       ) : (

@@ -330,7 +330,7 @@ function Community() {
     <div className="community-container">
       {error && <div className="error-bar">{error}</div>}
       <div className="post-input-container">
-        <img src={currentUser?.profilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+        <img src={currentUser?.profilePicture || defaultProfilePicture} alt="Profile" className="community-profile-picture" />
         <input
           type="text"
           value={newPost}

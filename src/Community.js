@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
 import { db, auth, getUserProfile, uploadPostPhoto } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -30,21 +30,17 @@ const getTopPostsWithMostLikes = (posts, count = 5) => {
 };
 
 const sortPosts = (posts) => {
-  // Sort all posts by recency
   const sortedByRecency = posts
-    .filter(post => post.createdAt) // Filter out posts without createdAt timestamp
+    .filter(post => post.createdAt)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  // Separate the top 3 most recent posts
   const top3RecentPosts = sortedByRecency.slice(0, 3);
   const remainingPosts = sortedByRecency.slice(3);
 
-  // Sort remaining posts by likes
   const sortedByLikes = remainingPosts.sort((a, b) => {
     return (b.likes ? b.likes.length : 0) - (a.likes ? a.likes.length : 0);
   });
 
-  // Combine top 3 most recent posts with the rest sorted by likes
   return [...top3RecentPosts, ...sortedByLikes];
 };
 
@@ -71,10 +67,11 @@ function Community() {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
-      const postsData = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return { id: doc.id, likes: [], ...data }; // Ensure likes is an array
-      });
+      const postsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        likes: [],
+        ...doc.data(),
+      }));
       const sortedPosts = sortPosts(postsData);
       setPosts(sortedPosts);
       setMostLikedPosts(getTopPostsWithMostLikes(sortedPosts, 5));
@@ -109,7 +106,7 @@ function Community() {
     };
   }, []);
 
-  const fetchWhoToFollow = async (currentUserId) => {
+  const fetchWhoToFollow = useCallback(async (currentUserId) => {
     try {
       const querySnapshot = await getDocs(collection(db, 'users'));
       const usersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -119,9 +116,9 @@ function Community() {
       console.error('Error fetching users:', error);
       setError('Error fetching users. Please try again later.');
     }
-  };
+  }, []);
 
-  const fetchFollowing = async (currentUserId) => {
+  const fetchFollowing = useCallback(async (currentUserId) => {
     try {
       const userQuery = query(collection(db, 'users'), where('uid', '==', currentUserId));
       const querySnapshot = await getDocs(userQuery);
@@ -134,7 +131,7 @@ function Community() {
       console.error('Error fetching following:', error);
       setError('Error fetching following. Please try again later.');
     }
-  };
+  }, []);
 
   const handleFollow = async (followedUserId) => {
     if (!currentUser) {
@@ -299,7 +296,7 @@ function Community() {
     }
   };
 
-  const getFilteredPosts = () => {
+  const getFilteredPosts = useMemo(() => {
     const filteredPosts = posts.filter(post =>
       (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -313,7 +310,7 @@ function Community() {
       default:
         return filteredPosts;
     }
-  };
+  }, [posts, searchQuery, filter, currentUser]);
 
   const scrollToPost = (postId) => {
     const postElement = document.getElementById(postId);
@@ -353,7 +350,7 @@ function Community() {
 
       <div className="main-content">
         <div className="posts-container">
-          {getFilteredPosts().map(post => (
+          {getFilteredPosts.map(post => (
             <div key={post.id} id={post.id} ref={(el) => (postCardRefs.current[post.id] = el)} className="post-card">
               <div className="post-header">
                 <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="post-profile-picture"  onClick={() => handleUserClick(post.userId)}/>

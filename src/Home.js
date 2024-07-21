@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import AddRecipeModal from './AddRecipeModal';
@@ -28,32 +28,30 @@ function Home() {
   const [showChatBot, setShowChatBot] = useState(false);
   const [showSplash, setShowSplash] = useState(() => sessionStorage.getItem("splashComplete") !== "true");
 
-  useEffect(() => {
-    const fetchIngredients = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'ingredients'));
-        const ingredientsList = querySnapshot.docs.map((doc) => doc.data());
-        setIngredients(ingredientsList);
-      } catch (error) {
-        console.error("Error fetching ingredients:", error);
-      }
-    };
-
-    const fetchRecipes = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'recipes'));
-        const recipesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setRecipes(recipesData);
-      } catch (error) {
-        console.error("Error fetching recipes:", error);
-      }
-    };
-
-    fetchIngredients();
-    fetchRecipes();
+  const fetchIngredients = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'ingredients'));
+      const ingredientsList = querySnapshot.docs.map((doc) => doc.data());
+      setIngredients(ingredientsList);
+    } catch (error) {
+      console.error("Error fetching ingredients:", error);
+    }
   }, []);
 
- 
+  const fetchRecipes = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'recipes'));
+      const recipesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setRecipes(recipesData);
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchIngredients();
+    fetchRecipes();
+  }, [fetchIngredients, fetchRecipes]);
 
   const scroll = (direction) => {
     if (direction === 'left') {
@@ -90,7 +88,8 @@ function Home() {
       recipe.ingredients.includes(ingredient)
     )
   );
- const handleSplashComplete = () => {
+
+  const handleSplashComplete = () => {
     setShowSplash(false);
     sessionStorage.setItem("splashComplete", "true");
   };

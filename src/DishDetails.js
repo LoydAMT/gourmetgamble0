@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
-import { db, auth, onAuthStateChanged, getUserProfile } from './firebaseConfig';
+import { db, auth, getUserProfile } from './firebaseConfig';
 import ReactPlayer from 'react-player';
 import './DishDetails.css';
 import RecipeModal from './RecipeModal';
@@ -46,56 +46,58 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
     navigate(`/profile/${uid}`);
   };
 
+  // Memoized fetchSimilarDishes function to prevent unnecessary re-renders
+  const fetchSimilarDishes = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'recipes'));
+      const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const similar = recipesData.filter(r => {
+        const sharedIngredients = r.ingredients.filter(ingredient => recipe.ingredients.includes(ingredient));
+        return sharedIngredients.length >= 5;
+      });
+
+      const filteredSimilar = similar.filter(r => r.nameOfDish !== recipe.nameOfDish);
+      setSimilarDishes(filteredSimilar);
+    } catch (error) {
+      console.error('Error fetching similar dishes:', error);
+      setError('Error fetching similar dishes. Please try again later.');
+    }
+  }, [recipe]);
+
+  // Memoized fetchAverageRating function to prevent unnecessary re-renders
+  const fetchAverageRating = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'users'));
+      let totalRatings = 0;
+      let totalScore = 0;
+      querySnapshot.forEach((doc) => {
+        const user = doc.data();
+        if (user.reviews) {
+          user.reviews.forEach((review) => {
+            if (review.recipeId === recipe.id) {
+              totalRatings++;
+              totalScore += review.rating;
+            }
+          });
+        }
+      });
+
+      if (totalRatings > 0) {
+        setAverageRating(totalScore / totalRatings);
+        setTotalRatings(totalRatings);
+      }
+    } catch (error) {
+      console.error('Error fetching average rating:', error);
+      setError('Error fetching average rating. Please try again later.');
+    }
+  }, [recipe]);
+
   useEffect(() => {
     if (dishDetailsRef.current) {
       dishDetailsRef.current.classList.add('fade-in');
       dishDetailsRef.current.classList.remove('fade-out');
     }
-
-    const fetchSimilarDishes = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'recipes'));
-        const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        const similar = recipesData.filter(r => {
-          const sharedIngredients = r.ingredients.filter(ingredient => recipe.ingredients.includes(ingredient));
-          return sharedIngredients.length >= 5;
-        });
-
-        const filteredSimilar = similar.filter(r => r.nameOfDish !== recipe.nameOfDish);
-        setSimilarDishes(filteredSimilar);
-      } catch (error) {
-        console.error('Error fetching similar dishes:', error);
-        setError('Error fetching similar dishes. Please try again later.');
-      }
-    };
-
-    const fetchAverageRating = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'users'));
-        let totalRatings = 0;
-        let totalScore = 0;
-        querySnapshot.forEach((doc) => {
-          const user = doc.data();
-          if (user.reviews) {
-            user.reviews.forEach((review) => {
-              if (review.recipeId === recipe.id) {
-                totalRatings++;
-                totalScore += review.rating;
-              }
-            });
-          }
-        });
-
-        if (totalRatings > 0) {
-          setAverageRating(totalScore / totalRatings);
-          setTotalRatings(totalRatings);
-        }
-      } catch (error) {
-        console.error('Error fetching average rating:', error);
-        setError('Error fetching average rating. Please try again later.');
-      }
-    };
 
     if (recipe) {
       fetchSimilarDishes();
@@ -108,7 +110,7 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
         dishDetailsRef.current.classList.add('fade-out');
       }
     };
-  }, [recipe]);
+  }, [recipe, fetchSimilarDishes, fetchAverageRating]);
 
   const handleSimilarDishClick = (id) => {
     if (dishDetailsRef.current) {

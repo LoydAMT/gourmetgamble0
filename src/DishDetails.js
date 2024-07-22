@@ -241,15 +241,16 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
             <button className="favorite-button" onClick={handleAddToFavorites}>ADD TO FAVORITES</button>
             <div className="review-section">
               <div className="review-buttons">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <span
-                    key={star}
-                    className={`star ${review >= star ? 'filled' : ''}`}
-                    onClick={() => setReview(star)}
-                  >
-                    ★
-                  </span>
-                ))}
+                <input type="radio" id="star5" name="rating" value="5" onClick={() => setReview(5)} />
+                <label htmlFor="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4" onClick={() => setReview(4)} />
+                <label htmlFor="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3" onClick={() => setReview(3)} />
+                <label htmlFor="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2" onClick={() => setReview(2)} />
+                <label htmlFor="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1" onClick={() => setReview(1)} />
+                <label htmlFor="star1">★</label>
               </div>
               <button className="save-review-button" onClick={handleAddReview}>SAVE REVIEW</button>
             </div>

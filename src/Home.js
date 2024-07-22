@@ -29,6 +29,7 @@ function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showChatBot, setShowChatBot] = useState(false);
   const [showSplash, setShowSplash] = useState(() => sessionStorage.getItem("splashComplete") !== "true");
+  const [isMobile, setIsMobile] = useState(false);
 
   const fetchIngredients = useCallback(async () => {
     try {
@@ -53,6 +54,21 @@ function Home() {
   useEffect(() => {
     fetchIngredients();
     fetchRecipes();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    // Set initial value
+    handleResize();
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, [fetchIngredients, fetchRecipes]);
 
   const scroll = (direction, ref, items) => {
@@ -202,8 +218,8 @@ function Home() {
               {'<'}
             </button>
             <div className="recipe-list" ref={recipeListRef}>
-              {recipes.map((recipe) => (
-                <div key={recipe.id} className="recipe-card">
+              {(isMobile ? [...recipes, ...recipes] : recipes).map((recipe, index) => (
+                <div key={index} className="recipe-card">
                   <h2>{recipe.nameOfDish}</h2>
                   <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} className="recipe-photo" />
                   <IngredientList ingredients={recipe.ingredients} />
@@ -219,7 +235,7 @@ function Home() {
           </div>
           <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />
           <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} />
-          <AuthModal showModal={showAuthModal} setShowModal={setShowAuthModal} />
+          <AuthModal showModal={showAuthModal} setShowAuthModal={setShowAuthModal} />
           <AboutUsModal showModal={showAboutUsModal} setShowAboutUsModal={setShowAboutUsModal} />
           <ContactUsModal showModal={showContactUsModal} setShowModal={setShowContactUsModal} />
           {/* ChatBot Floating Button */}

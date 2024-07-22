@@ -16,6 +16,8 @@ import 'animate.css/animate.min.css'; // Import Animate.css
 
 function Home() {
   const ingredientCardsRef = useRef(null);
+  const filteredRecipesRef = useRef(null);
+  const recipeListRef = useRef(null);
   const [ingredients, setIngredients] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -53,11 +55,19 @@ function Home() {
     fetchRecipes();
   }, [fetchIngredients, fetchRecipes]);
 
-  const scroll = (direction) => {
+  const scroll = (direction, ref, items) => {
     if (direction === 'left') {
-      ingredientCardsRef.current.scrollBy({ left: -150, behavior: 'smooth' });
+      if (ref.current.scrollLeft === 0) {
+        ref.current.scrollLeft = ref.current.scrollWidth;
+      } else {
+        ref.current.scrollBy({ left: -150, behavior: 'smooth' });
+      }
     } else {
-      ingredientCardsRef.current.scrollBy({ left: 150, behavior: 'smooth' });
+      if (ref.current.scrollLeft + ref.current.clientWidth >= ref.current.scrollWidth) {
+        ref.current.scrollLeft = 0;
+      } else {
+        ref.current.scrollBy({ left: 150, behavior: 'smooth' });
+      }
     }
   };
 
@@ -118,7 +128,7 @@ function Home() {
               <div className="ingredient-cards-container">
                 <button
                   className="scroll-button left-scroll-button"
-                  onClick={() => scroll('left')}
+                  onClick={() => scroll('left', ingredientCardsRef)}
                 >
                   {'<'}
                 </button>
@@ -140,20 +150,36 @@ function Home() {
                 </div>
                 <button
                   className="scroll-button right-scroll-button"
-                  onClick={() => scroll('right')}
+                  onClick={() => scroll('right', ingredientCardsRef)}
                 >
                   {'>'}
                 </button>
               </div>
-              <div className="filtered-recipes">
-                {filteredRecipes.slice(0, 3).map((recipe) => (
-                  <div key={recipe.id} className="filtered-recipe-card">
-                    <h2>{recipe.nameOfDish}</h2>
-                    <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} className="filtered-recipe-photo" />
-                    <IngredientList ingredients={recipe.ingredients} />
+              {selectedIngredients.length > 0 && (
+                <div className="filtered-recipes-container">
+                  <button
+                    className="scroll-button left-scroll-button"
+                    onClick={() => scroll('left', filteredRecipesRef)}
+                  >
+                    {'<'}
+                  </button>
+                  <div className="filtered-recipes" ref={filteredRecipesRef}>
+                    {filteredRecipes.map((recipe) => (
+                      <div key={recipe.id} className="filtered-recipe-card">
+                        <h2>{recipe.nameOfDish}</h2>
+                        <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} className="filtered-recipe-photo" />
+                        <IngredientList ingredients={recipe.ingredients} />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                  <button
+                    className="scroll-button right-scroll-button"
+                    onClick={() => scroll('right', filteredRecipesRef)}
+                  >
+                    {'>'}
+                  </button>
+                </div>
+              )}
             </div>
             <div className="right-column">
               <div className="main-image">
@@ -168,19 +194,33 @@ function Home() {
               </div>
             </div>
           </main>
-          <div className="recipe-list">
-            {recipes.map((recipe) => (
-              <div key={recipe.id} className="recipe-card">
-                <h2>{recipe.nameOfDish}</h2>
-                <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} className="recipe-photo" />
-                <IngredientList ingredients={recipe.ingredients} />
-              </div>
-            ))}
+          <div className="recipe-list-container">
+            <button
+              className="scroll-button left-scroll-button"
+              onClick={() => scroll('left', recipeListRef)}
+            >
+              {'<'}
+            </button>
+            <div className="recipe-list" ref={recipeListRef}>
+              {recipes.map((recipe) => (
+                <div key={recipe.id} className="recipe-card">
+                  <h2>{recipe.nameOfDish}</h2>
+                  <img src={recipe.photo || `https://via.placeholder.com/250?text=${recipe.nameOfDish}`} alt={recipe.nameOfDish} className="recipe-photo" />
+                  <IngredientList ingredients={recipe.ingredients} />
+                </div>
+              ))}
+            </div>
+            <button
+              className="scroll-button right-scroll-button"
+              onClick={() => scroll('right', recipeListRef)}
+            >
+              {'>'}
+            </button>
           </div>
           <AddRecipeModal showModal={showModal} setShowModal={setShowModal} onAddRecipe={handleAddRecipe} />
           <PrivacyPolicyModal showModal={showPrivacyModal} setShowModal={setShowPrivacyModal} />
           <AuthModal showModal={showAuthModal} setShowModal={setShowAuthModal} />
-          <AboutUsModal showModal={showAboutUsModal} setShowModal={setShowAboutUsModal} />
+          <AboutUsModal showModal={showAboutUsModal} setShowAboutUsModal={setShowAboutUsModal} />
           <ContactUsModal showModal={showContactUsModal} setShowModal={setShowContactUsModal} />
           {/* ChatBot Floating Button */}
           <button className="chatbot-button" onClick={() => setShowChatBot(!showChatBot)}>💬</button>

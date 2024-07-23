@@ -9,7 +9,7 @@ const PrivacyPolicyModal = ({ showModal, setShowModal }) => {
     return (
         <>
             {showModal && (
-                <div className="modal" onClick={closeModal}>
+                <div className="modal privacy-policy-modal" data-cy="privacy-policy-modal" onClick={closeModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <span className="close" onClick={closeModal}>&times;</span>
                         <h2>Privacy Policy</h2>

@@ -9,7 +9,7 @@ const ContactUsModal = ({ showModal, setShowModal }) => {
     return (
         <>
             {showModal && (
-                <div className="modal" onClick={closeModal}>
+                <div className="modal contact-us-modal" data-cy="contact-us-modal" onClick={closeModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <span className="close" onClick={closeModal}>&times;</span>
                         <h2>Contact Us</h2>

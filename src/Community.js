@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import './Community.css';
 
 import defaultProfilePicture from './user.png';
+import likeIcon from './Icons/like.png'; // Import the like icon
+import likedIcon from './Icons/liked.png'; // Import the liked icon
 
 const shuffleArray = (array) => {
   let currentIndex = array.length, randomIndex;
@@ -301,7 +303,7 @@ function Community() {
       (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
     );
-
+  
     switch (filter) {
       case 'myPosts':
         return filteredPosts.filter(post => post.userId === currentUser?.uid);
@@ -341,13 +343,13 @@ function Community() {
         <input id="post-photo-input" type="file" accept="image/*" onChange={handlePostPhotoChange} className="file-input" />
         <button onClick={handleAddPost} className="new-post-button">Post</button>
       </div>
-
+  
       <div className="filter-buttons">
         <button className={`filter-button ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All Posts</button>
         <button className={`filter-button ${filter === 'myPosts' ? 'active' : ''}`} onClick={() => setFilter('myPosts')}>My Posts</button>
         <button className={`filter-button ${filter === 'interactions' ? 'active' : ''}`} onClick={() => setFilter('interactions')}>Interactions</button>
       </div>
-
+  
       <div className="main-content">
         <div className="posts-container">
           {getFilteredPosts.map(post => (
@@ -377,7 +379,11 @@ function Community() {
               <div className="likes-comments-container">
                 <div className="like-comment-buttons">
                   <button onClick={() => handleLike(post.id)} className="like-button">
-                    {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
+                    <img
+                      src={post.likes && post.likes.includes(currentUser?.uid) ? likedIcon: likeIcon}
+                      alt={post.likes && post.likes.includes(currentUser?.uid) ? 'Liked' : 'Like'}
+                      className="like-icon"
+                    />
                   </button>
                   <button onClick={() => toggleCommentInput(post.id)} className="comment-toggle-button">
                     {commentInputVisibility[post.id] ? 'Hide Comment' : 'Comment'}
@@ -422,7 +428,7 @@ function Community() {
             </div>
           ))}
         </div>
-
+  
         <div className="sidebar">
           <div className="search-bar-container">
             <input
@@ -466,16 +472,16 @@ function Community() {
       </div>
     </div>
   );
-}
-
-const AddComment = ({ postId, onAddComment }) => {
+  }
+  
+  const AddComment = ({ postId, onAddComment }) => {
   const [comment, setComment] = useState('');
-
+  
   const handleAddComment = () => {
     onAddComment(postId, comment);
     setComment('');
   };
-
+  
   return (
     <div className="add-comment-container">
       <input
@@ -488,6 +494,6 @@ const AddComment = ({ postId, onAddComment }) => {
       <button onClick={handleAddComment} className="post-comment-button">Post Comment</button>
     </div>
   );
-};
-
-export default Community;
+  };
+  
+  export default Community;

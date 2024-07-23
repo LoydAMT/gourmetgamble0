@@ -408,7 +408,7 @@ function EditProfileModal({
             placeholder="Set Nickname"
             defaultValue={profileUser.nickname}
             onBlur={handleNicknameChange}
-          />
+          />n
           <div className="button-container">
             <button onClick={handleSaveProfilePicture} className="button save-button">Save</button>
             <button onClick={() => setShowModal(false)} className="button closeModalButton">Close</button>

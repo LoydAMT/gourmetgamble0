@@ -110,9 +110,12 @@ function AppContent({
               onClick={() => navigate('/profile')}
             />
           ) : (
-            <button className="sign-in-button" onClick={() => setShowAuthModal(true)}>
-              Sign in/Sign Up
+            <button className="sign-in-button" data-cy="auth-modal-open" onClick={() => setShowAuthModal(true)}>
+            Sign in/Sign Up
             </button>
+
+          
+
           )}
         </div>
       </nav>

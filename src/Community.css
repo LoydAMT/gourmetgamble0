@@ -131,6 +131,11 @@
   border-radius: 10px;
 }
 
+.like-icon {
+  width: 15px; /* Adjust size as needed */
+  height: 15px; /* Adjust size as needed */
+}
+
 .likes-comments-container {
   margin-top: 10px;
 }

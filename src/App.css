@@ -49,11 +49,11 @@
 }
 
 .nav-items-center {
+  padding-left: 180px;
   display: flex;
   justify-content: center;
   flex-grow: 1;
-  gap: 50px;
-  padding-left: 10%;
+  gap: 30px;
 }
 
 .nav-item:hover {
@@ -75,7 +75,6 @@
 .nav-item-right {
   display: flex;
   align-items: center;
-  margin-left: auto; /* Pushes the profile picture/sign-in button to the right */
 }
 
 .profile-picture-nav {
@@ -107,26 +106,21 @@
 
 @media (max-width: 768px) {
   .nav-bar {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap; /* Ensure items stay in one line */
+    justify-content: space-between;
   }
 
   .nav-items-center {
-    order: 1; /* Ensure this comes first in the order */
+    flex-grow: 1;
     justify-content: center;
-    width: 100%; /* Ensure it takes full width */
-    padding-left: 0;
     gap: 10px;
+    padding-left: 0;
   }
 
   .nav-item-right {
-    order: 2; /* Ensure this comes second in the order */
-    display: flex;
-    justify-content: center; /* Center items in this section */
-    width: 100%; /* Ensure it takes full width */
-    margin-left: 0; /* Remove the auto margin */
-    margin-top: 0; /* Remove margin-top */
-    padding-bottom: 50px;
+    margin-left: 0;
+    padding-bottom: 0;
   }
 
   .nav-item, .sign-in-button {
@@ -136,6 +130,23 @@
   .profile-picture-nav {
     width: 45px;
     height: 45px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-item, .sign-in-button {
+    font-size: 12px; /* Reduce font size further */
+    padding: 3px; /* Adjust padding */
+  }
+
+  .profile-picture-nav {
+    width: 35px; /* Reduce profile picture size */
+    height: 35px; /* Reduce profile picture size */
+  }
+
+  .nav-items-center {
+    gap: 3px; /* Reduce gap between nav items */
+    padding-left: 0; /* Remove padding */
   }
 }
 

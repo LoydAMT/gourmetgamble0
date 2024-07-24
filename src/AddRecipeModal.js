@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from './firebaseConfig';
@@ -23,6 +23,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   const [newIngredientImageURL, setNewIngredientImageURL] = useState('');
   const [showNewIngredientForm, setShowNewIngredientForm] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const newIngredientFormRef = useRef(null); // Reference to the new ingredient form
 
   const countries = [
     'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia',
@@ -78,6 +79,12 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (showNewIngredientForm) {
+      newIngredientFormRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [showNewIngredientForm]);
+  
   const filteredIngredients = useMemo(() => {
     return availableIngredients.filter((ingredient) =>
       ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -187,7 +194,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
         <h2>Add Recipe</h2>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-          <input className="input" type="text" placeholder="Name of dish" value={nameOfDish} onChange={(e) => setNameOfDish(e.target.value)} required />
+          <input className="Rinput" type="text" placeholder="Name of dish" value={nameOfDish} onChange={(e) => setNameOfDish(e.target.value)} required />
           <textarea className="inputRecipe" placeholder="Dish Description" value={description} onChange={(e) => setDescription(e.target.value)} />
           <select className="Countryinput" value={origin} onChange={(e) => setOrigin(e.target.value)} required>
             <option className="origin" value="" disabled>Select country of origin</option>
@@ -197,9 +204,9 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
               </option>
             ))}
           </select>
-          <input className="input" type="text" placeholder="Your name" value={nameOfUser} onChange={(e) => setNameOfUser(e.target.value)} required />
-          <input className="input" type="url" placeholder="Photo URL" value={photo} onChange={(e) => setPhoto(e.target.value)} />
-          <input className="input" type="url" placeholder="Video Tutorial URL" value={video} onChange={(e) => setVideo(e.target.value)} />
+          <input className="Rinput" type="text" placeholder="Your name" value={nameOfUser} onChange={(e) => setNameOfUser(e.target.value)} required />
+          <input className="Rinput" type="url" placeholder="Photo URL" value={photo} onChange={(e) => setPhoto(e.target.value)} />
+          <input className="Rinput" type="url" placeholder="Video Tutorial URL" value={video} onChange={(e) => setVideo(e.target.value)} />
           <textarea className="inputRecipe" placeholder="Ingredients Measurements" value={recipe} onChange={(e) => setRecipe(e.target.value)} />
           {recipeSteps.map((step, index) => (
             <textarea
@@ -222,20 +229,21 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
               </div>
             ))}
             {showNewIngredientForm && (
-              <div className="ingredientItem">
-                <input className="NewIngredient" type="text" placeholder="New Ingredient Name" value={newIngredientName} onChange={(e) => setNewIngredientName(e.target.value)} />
-                <input className="NewIngredient" type="url" placeholder="Image URL" value={newIngredientImageURL} onChange={(e) => setNewIngredientImageURL(e.target.value)} />
-                <button type="button" onClick={addNewIngredient}>
-                  Add
-                </button>
-              </div>
-            )}
+  <div ref={newIngredientFormRef} className="ingredientItem">
+    <input className="NewIngredient" type="text" placeholder="New Ingredient Name" value={newIngredientName} onChange={(e) => setNewIngredientName(e.target.value)} />
+    <input className="NewIngredient" type="url" placeholder="Image URL" value={newIngredientImageURL} onChange={(e) => setNewIngredientImageURL(e.target.value)} />
+    <button type="button" onClick={addNewIngredient}>
+      Add
+    </button>
+  </div>
+)}
+
           </div>
           <button type="button" className="button addButton" onClick={() => setShowNewIngredientForm(true)}>
             Add New Ingredient
           </button>
           <div className="buttonContainer">
-            <button className="button addRecipeButton" type="submit" disabled={isLoading}>
+            <button className="button addRecipeButton" type="submit" disabled={isLoading} >
               {isLoading ? 'Adding...' : 'Add Recipe'}
             </button>
             <button className="button cancelButton" type="button" onClick={() => setShowModal(false)}>

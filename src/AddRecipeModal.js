@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from './firebaseConfig';
 import './AddRecipeModal.css';
+import { debounce } from 'lodash';
 
 const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   const [nameOfDish, setNameOfDish] = useState('');
@@ -47,6 +48,8 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
     'United Kingdom', 'United States of America', 'Uruguay', 'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam',
     'Yemen', 'Zambia', 'Zimbabwe'
   ];
+
+
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
@@ -75,9 +78,11 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
     };
   }, []);
 
-  const filteredIngredients = availableIngredients.filter((ingredient) =>
-    ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredIngredients = useMemo(() => {
+    return availableIngredients.filter((ingredient) =>
+      ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [availableIngredients, searchQuery]);
 
   const handleIngredientChange = (ingredientName) => {
     setSelectedIngredients((prevSelected) =>
@@ -131,6 +136,11 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
   const addStep = () => {
     setRecipeSteps([...recipeSteps, { value: '' }]);
   };
+
+  const debouncedSearch = useMemo(
+    () => debounce((value) => setSearchQuery(value), 300),
+    []
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -203,7 +213,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
           <button type="button" className="button addButton" onClick={addStep}>
             Add Step
           </button>
-          <input className="searchInput" type="text" placeholder="Search Ingredients" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <input className="searchInput" type="text" placeholder="Search Ingredients" onChange={(e) => debouncedSearch(e.target.value)} />
           <div className="ingredientList">
             {filteredIngredients.map((ingredient) => (
               <div key={ingredient.id} className="ingredientItem">

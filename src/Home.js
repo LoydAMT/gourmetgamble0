@@ -122,9 +122,11 @@ function Home() {
 
   return (
     <div className="container">
-      {showSplash ? (
-        <SplashScreen onComplete={handleSplashComplete} />
-      ) : (
+      { 
+      //showSplash ? (
+       // <SplashScreen onComplete={handleSplashComplete} />
+      //) : 
+      (
         <div className={`animate__animated animate__fadeIn`}>
           <main className="main-content">
             <div className="left-column">

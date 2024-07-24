@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
-import { db, auth, onAuthStateChanged, getUserProfile } from './firebaseConfig';
+import { db, auth, getUserProfile } from './firebaseConfig';
 import ReactPlayer from 'react-player';
 import './DishDetails.css';
 import RecipeModal from './RecipeModal';
+import { useNavigate } from 'react-router-dom';
 
 const SimilarDishCard = ({ imageSrc, title, onClick }) => (
   <div className="similar-dish-card" onClick={onClick}>
@@ -39,57 +40,64 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
   const [averageRating, setAverageRating] = useState(0);
   const [totalRatings, setTotalRatings] = useState(0);
   const dishDetailsRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleUserClick = (uid) => {
+    navigate(`/profile/${uid}`);
+  };
+
+  // Memoized fetchSimilarDishes function to prevent unnecessary re-renders
+  const fetchSimilarDishes = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'recipes'));
+      const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const similar = recipesData.filter(r => {
+        const sharedIngredients = r.ingredients.filter(ingredient => recipe.ingredients.includes(ingredient));
+        return sharedIngredients.length >= 5;
+      });
+
+      const filteredSimilar = similar.filter(r => r.nameOfDish !== recipe.nameOfDish);
+      setSimilarDishes(filteredSimilar);
+    } catch (error) {
+      console.error('Error fetching similar dishes:', error);
+      setError('Error fetching similar dishes. Please try again later.');
+    }
+  }, [recipe]);
+
+  // Memoized fetchAverageRating function to prevent unnecessary re-renders
+  const fetchAverageRating = useCallback(async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'users'));
+      let totalRatings = 0;
+      let totalScore = 0;
+      querySnapshot.forEach((doc) => {
+        const user = doc.data();
+        if (user.reviews) {
+          user.reviews.forEach((review) => {
+            if (review.recipeId === recipe.id) {
+              totalRatings++;
+              totalScore += review.rating;
+            }
+          });
+        }
+      });
+
+      if (totalRatings > 0) {
+        setAverageRating(totalScore / totalRatings);
+        setTotalRatings(totalRatings);
+      }
+    } catch (error) {
+      console.error('Error fetching average rating:', error);
+      setError('Error fetching average rating. Please try again later.');
+    }
+  }, [recipe]);
 
   useEffect(() => {
     if (dishDetailsRef.current) {
       dishDetailsRef.current.classList.add('fade-in');
       dishDetailsRef.current.classList.remove('fade-out');
     }
-
-    const fetchSimilarDishes = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'recipes'));
-        const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        const similar = recipesData.filter(r => {
-          const sharedIngredients = r.ingredients.filter(ingredient => recipe.ingredients.includes(ingredient));
-          return sharedIngredients.length >= 5;
-        });
-
-        const filteredSimilar = similar.filter(r => r.nameOfDish !== recipe.nameOfDish);
-        setSimilarDishes(filteredSimilar);
-      } catch (error) {
-        console.error('Error fetching similar dishes:', error);
-        setError('Error fetching similar dishes. Please try again later.');
-      }
-    };
-
-    const fetchAverageRating = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'users'));
-        let totalRatings = 0;
-        let totalScore = 0;
-        querySnapshot.forEach((doc) => {
-          const user = doc.data();
-          if (user.reviews) {
-            user.reviews.forEach((review) => {
-              if (review.recipeId === recipe.id) {
-                totalRatings++;
-                totalScore += review.rating;
-              }
-            });
-          }
-        });
-
-        if (totalRatings > 0) {
-          setAverageRating(totalScore / totalRatings);
-          setTotalRatings(totalRatings);
-        }
-      } catch (error) {
-        console.error('Error fetching average rating:', error);
-        setError('Error fetching average rating. Please try again later.');
-      }
-    };
 
     if (recipe) {
       fetchSimilarDishes();
@@ -102,7 +110,7 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
         dishDetailsRef.current.classList.add('fade-out');
       }
     };
-  }, [recipe]);
+  }, [recipe, fetchSimilarDishes, fetchAverageRating]);
 
   const handleSimilarDishClick = (id) => {
     if (dishDetailsRef.current) {
@@ -225,27 +233,27 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
           </div>
         </div>
         <div className="dish-info">
-          <button className="close-button" onClick={() => window.location.reload()}>×</button>
+          <button className="close-button" onClick={closeModal}>×</button>
           <h1 className="dish-name">{recipe.nameOfDish}</h1>
-          <p className="dish-author">Author:<br /> {recipe.nameOfUser}</p>
+          <p className="dish-author" onClick={() => handleUserClick(recipe.userId)}>Author:<br /> {recipe.nameOfUser}</p>
           <div className="action-buttons">
             <button className="recipe-button" onClick={() => setShowRecipeModal(true)}>OPEN RECIPE</button>
             <button className="favorite-button" onClick={handleAddToFavorites}>ADD TO FAVORITES</button>
             <div className="review-section">
               <div className="review-buttons">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <span
-                    key={star}
-                    className={`star ${review >= star ? 'filled' : ''}`}
-                    onClick={() => setReview(star)}
-                  >
-                    ★
-                  </span>
-                ))}
+                <input type="radio" id="star5" name="rating" value="5" onClick={() => setReview(5)} />
+                <label htmlFor="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4" onClick={() => setReview(4)} />
+                <label htmlFor="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3" onClick={() => setReview(3)} />
+                <label htmlFor="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2" onClick={() => setReview(2)} />
+                <label htmlFor="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1" onClick={() => setReview(1)} />
+                <label htmlFor="star1">★</label>
               </div>
               <button className="save-review-button" onClick={handleAddReview}>SAVE REVIEW</button>
             </div>
-           
           </div>
           <h2 className="description-title">DESCRIPTION</h2>
           <p className="dish-description">{recipe.description}</p>
@@ -256,10 +264,10 @@ const DishDetails = ({ closeModal, recipe, onSimilarDishClick }) => {
         <h2 className="similar-dishes-title">SIMILAR DISHES</h2>
         <div className="similar-dishes-grid">
           {similarDishes.map((dish, index) => (
-            <SimilarDishCard 
-              key={index} 
-              imageSrc={dish.photo || 'https://via.placeholder.com/150'} 
-              title={dish.nameOfDish} 
+            <SimilarDishCard
+              key={index}
+              imageSrc={dish.photo || 'https://via.placeholder.com/150'}
+              title={dish.nameOfDish}
               onClick={() => handleSimilarDishClick(dish.id)}
             />
           ))}

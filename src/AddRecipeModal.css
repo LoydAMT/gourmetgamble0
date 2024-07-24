@@ -11,6 +11,7 @@
 }
 
 .modalContainer {
+    background: linear-gradient(to right, #FFC96F 0%, #ACD793 100%);
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;

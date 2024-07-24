@@ -110,9 +110,12 @@ function AppContent({
               onClick={() => navigate('/profile')}
             />
           ) : (
-            <button className="sign-in-button" onClick={() => setShowAuthModal(true)}>
-              Sign in/Sign Up
+            <button className="sign-in-button" data-cy="auth-modal-open" onClick={() => setShowAuthModal(true)}>
+            Sign in/Sign Up
             </button>
+
+          
+
           )}
         </div>
       </nav>
@@ -142,9 +145,6 @@ function AppContent({
         </button>
         <button className="footer-item" onClick={() => setShowContactUsModal(true)}>
           Contact Us
-        </button>
-        <button className="footer-item" onClick={() => setShowPrivacyModal(true)}>
-          Feedback
         </button>
         <button className="footer-item" onClick={() => setShowPrivacyModal(true)}>
           Privacy Policy

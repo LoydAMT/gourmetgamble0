@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import Modal from 'react-modal';
 import { auth, db, getUserProfile, uploadProfilePicture } from './firebaseConfig';
 import { collection, getDocs, query, where, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import AddRecipeModal from './AddRecipeModal';
+import DishDetails from './DishDetails';
 import './Profile.css';
 
 function Profile() {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const [profileUser, setProfileUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [profilePicture, setProfilePicture] = useState('');
@@ -21,6 +24,7 @@ function Profile() {
   const [showFollowers, setShowFollowers] = useState(false);
   const [showAddRecipeModal, setShowAddRecipeModal] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -66,16 +70,33 @@ function Profile() {
           }
 
           // Fetch followers
-          const followersQuery = query(collection(db, 'users'), where('following', 'array-contains', uid));
-          const followersSnapshot = await getDocs(followersQuery);
-          const userFollowers = followersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
-          setFollowers(userFollowers);
+          fetchFollowers(uid);
+
         } else {
           setError('User profile not found.');
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
         setError('Error fetching user data. Please try again later.');
+      }
+    };
+
+    const fetchFollowers = async (uid) => {
+      try {
+        const followersQuery = query(collection(db, 'users'), where('following', 'array-contains', uid));
+        const followersSnapshot = await getDocs(followersQuery);
+        const userFollowers = followersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+
+        // Check if the current user is following each of these followers
+        const updatedFollowers = userFollowers.map(follower => ({
+          ...follower,
+          isFollowing: following.some(followingUser => followingUser.uid === follower.uid)
+        }));
+
+        setFollowers(updatedFollowers);
+      } catch (error) {
+        console.error('Error fetching followers:', error);
+        setError('Error fetching followers. Please try again later.');
       }
     };
 
@@ -91,7 +112,7 @@ function Profile() {
         }
       });
     }
-  }, [userId]);
+  }, [userId, following]);
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -149,29 +170,56 @@ function Profile() {
     await signOut(auth);
   };
 
-  const handleRecipeClick = (recipe) => {
+  const openModal = (recipe) => {
     setSelectedRecipe(recipe);
+    setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const closeModal = () => {
+    setIsModalOpen(false);
     setSelectedRecipe(null);
   };
 
+  const handleSimilarDishClick = (id) => {
+    const selected = recipes.find(recipe => recipe.id === id);
+    if (selected) {
+      setSelectedRecipe(selected);
+    }
+  };
+
   const handleFollow = async (followedUserId) => {
+    if (!currentUser) {
+      setError('You need to be logged in to follow users.');
+      return;
+    }
+
     try {
-      const userRef = doc(db, 'users', currentUser.uid);
-      const userDoc = await getDoc(userRef);
-      if (userDoc.exists()) {
+      const userQuery = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+      const userSnapshot = await getDocs(userQuery);
+      if (!userSnapshot.empty) {
+        const userDoc = userSnapshot.docs[0];
         const userData = userDoc.data();
         let updatedFollowing;
+
         if (following.some(followingUser => followingUser.uid === followedUserId)) {
           updatedFollowing = userData.following.filter(id => id !== followedUserId);
         } else {
           updatedFollowing = [...userData.following, followedUserId];
         }
 
-        await updateDoc(userRef, { following: updatedFollowing });
-        setFollowing(updatedFollowing);
+        await updateDoc(doc(db, 'users', userDoc.id), { following: updatedFollowing });
+        setFollowing(updatedFollowing); // Update the following state
+
+        // Update the followers state
+        setFollowers(prevState => 
+          prevState.map(user => 
+            user.uid === followedUserId ? { ...user, isFollowing: !user.isFollowing } : user
+          )
+        );
+
+        console.log('Follow action successful:', followedUserId);
+      } else {
+        setError('User profile not found.');
       }
     } catch (error) {
       console.error('Error following user:', error);
@@ -212,9 +260,9 @@ function Profile() {
           </div>
 
           <h2>Saved Recipes</h2>
-          <div className="recipes-container">
+          <div className="recipes-container-profile">
             {favorites.map(recipe => (
-              <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
+              <div key={recipe.id} className="recipe-card" onClick={() => openModal(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
                 <p>{recipe.nameOfDish}</p>
               </div>
@@ -222,9 +270,9 @@ function Profile() {
           </div>
 
           <h2>My Recipes</h2>
-          <div className="recipes-container">
+          <div className="recipes-container-profile">
             {recipes.map(recipe => (
-              <div key={recipe.id} className="recipe-card" onClick={() => handleRecipeClick(recipe)}>
+              <div key={recipe.id} className="recipe-card" onClick={() => openModal(recipe)}>
                 <img src={recipe.photo} alt={recipe.nameOfDish} className="recipe-photo" />
                 <p>{recipe.nameOfDish}</p>
               </div>
@@ -235,18 +283,16 @@ function Profile() {
             <>
               <h2>Following ({following.length})</h2>
               {following.length > 0 ? (
-                <div className="recipes-container">
+                <div className="recipes-container-profile">
                   {following.map(user => (
                     <div key={user.uid} className="recipe-card">
                       <Link to={`/profile/${user.uid}`}>
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
-                        <p>{user.name}</p>
+                        <p className="Username">{user.name}</p>
                       </Link>
-                      {!userId && (
-                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
-                          {following.some(followingUser => followingUser.uid === user.uid) ? 'Unfollow' : 'Follow'}
-                        </button>
-                      )}
+                      <button className="follow-button" onClick={() => handleFollow(user.uid)}>
+                        Unfollow
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -260,18 +306,16 @@ function Profile() {
             <>
               <h2>Followers ({followers.length})</h2>
               {followers.length > 0 ? (
-                <div className="recipes-container">
+                <div className="recipes-container-profile">
                   {followers.map(user => (
                     <div key={user.uid} className="recipe-card">
                       <Link to={`/profile/${user.uid}`}>
                         <img src={user.profilePicture || 'default-profile.png'} alt="Profile" className="profile-picture" />
                         <p>{user.name}</p>
                       </Link>
-                      {!userId && (
-                        <button className="follow-button" onClick={() => handleFollow(user.uid)}>
-                          {following.some(followingUser => followingUser.uid === user.uid) ? 'Unfollow' : 'Follow'}
-                        </button>
-                      )}
+                      <button className="follow-button" onClick={() => handleFollow(user.uid)}>
+                        {user.isFollowing ? 'Unfollow' : 'Follow'}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -281,23 +325,36 @@ function Profile() {
             </>
           )}
 
-          {selectedRecipe && (
-            <div className="modalBackground">
-              <div className="modalContainer">
-                <h2>{selectedRecipe.nameOfDish}</h2>
-                <p><strong>Description:</strong> {selectedRecipe.description}</p>
-                <p><strong>Origin:</strong> {selectedRecipe.origin}</p>
-                <p><strong>Ingredients:</strong> {selectedRecipe.ingredients.join(', ')}</p>
-                <p><strong>Steps:</strong></p>
-                <ul>
-                  {selectedRecipe.steps.map((step, index) => (
-                    <li key={index}>{step}</li>
-                  ))}
-                </ul>
-                <button onClick={handleCloseModal} className="button closeModalButton">Close</button>
-              </div>
-            </div>
-          )}
+          <Modal
+            isOpen={isModalOpen}
+            onRequestClose={closeModal}
+            contentLabel="Recipe Details"
+            style={{
+              overlay: {
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+              },
+              content: {
+                top: '50%',
+                left: '50%',
+                right: 'auto',
+                bottom: 'auto',
+                marginRight: '-50%',
+                transform: 'translate(-50%, -50%)',
+                maxWidth: '90%',
+                maxHeight: '90%',
+                padding: '0px',
+                borderRadius: '20px',
+              },
+            }}
+          >
+            {selectedRecipe && (
+              <DishDetails
+                recipe={selectedRecipe}
+                closeModal={closeModal}
+                onSimilarDishClick={handleSimilarDishClick}
+              />
+            )}
+          </Modal>
 
           <AddRecipeModal showModal={showAddRecipeModal} setShowModal={setShowAddRecipeModal} />
           <EditProfileModal
@@ -338,17 +395,24 @@ function EditProfileModal({
           <img
             src={newProfilePicture || profilePicture || 'default-profile.png'}
             alt="Profile"
-            className="profile-picture"
+            className="profile-picture-edit"
           />
-          <input type="file" accept="image/*" onChange={handleProfilePictureChange} />
+          <label htmlFor="file-upload" className="custom-file-upload">
+            Choose File
+          </label>
+          <input id="file-upload" type="file" accept="image/*" onChange={handleProfilePictureChange} />
+          <label htmlFor="nickname">Nickname</label>
           <input
             type="text"
+            id="nickname"
             placeholder="Set Nickname"
             defaultValue={profileUser.nickname}
             onBlur={handleNicknameChange}
           />
-          <button onClick={handleSaveProfilePicture} className="save-button">Save</button>
-          <button onClick={() => setShowModal(false)} className="closeModalButton">Close</button>
+          <div className="button-container">
+            <button onClick={handleSaveProfilePicture} className="button save-button">Save</button>
+            <button onClick={() => setShowModal(false)} className="button closeModalButton">Close</button>
+          </div>
         </div>
       </div>
     </div>

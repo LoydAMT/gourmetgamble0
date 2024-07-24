@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { collection, addDoc, updateDoc, doc, onSnapshot, getDoc, deleteDoc, getDocs, query, where } from 'firebase/firestore';
 import { db, auth, getUserProfile, uploadPostPhoto } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
+import { formatDistanceToNow } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import './Community.css';
 
 import defaultProfilePicture from './user.png';
+import likeIcon from './Icons/like.png'; // Import the like icon
+import likedIcon from './Icons/liked.png'; // Import the liked icon
 
 const shuffleArray = (array) => {
   let currentIndex = array.length, randomIndex;
 
-  
   while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
@@ -20,6 +24,33 @@ const shuffleArray = (array) => {
 
   return array;
 };
+
+const getTopPostsWithMostLikes = (posts, count = 5) => {
+  return posts
+    .filter(post => post.likes && post.likes.length > 0)
+    .sort((a, b) => b.likes.length - a.likes.length)
+    .slice(0, count);
+};
+
+const sortPosts = (posts) => {
+  const sortedByRecency = posts
+    .filter(post => post.createdAt)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  const top3RecentPosts = sortedByRecency.slice(0, 3);
+  const remainingPosts = sortedByRecency.slice(3);
+
+  const sortedByLikes = remainingPosts.sort((a, b) => {
+    return (b.likes ? b.likes.length : 0) - (a.likes ? a.likes.length : 0);
+  });
+
+  return [...top3RecentPosts, ...sortedByLikes];
+};
+
+const sortComments = (comments) => {
+  return comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+};
+
 function Community() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
@@ -30,11 +61,23 @@ function Community() {
   const [whoToFollow, setWhoToFollow] = useState([]);
   const [following, setFollowing] = useState([]);
   const [error, setError] = useState('');
+  const [commentVisibility, setCommentVisibility] = useState({});
+  const [mostLikedPosts, setMostLikedPosts] = useState([]);
+  const [visibleComments, setVisibleComments] = useState({});
+  const [commentInputVisibility, setCommentInputVisibility] = useState({});
+  const postCardRefs = useRef({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
-      const postsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setPosts(sortPosts(postsData));
+      const postsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        likes: [],
+        ...doc.data(),
+      }));
+      const sortedPosts = sortPosts(postsData);
+      setPosts(sortedPosts);
+      setMostLikedPosts(getTopPostsWithMostLikes(sortedPosts, 5));
     });
 
     const authUnsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -66,7 +109,7 @@ function Community() {
     };
   }, []);
 
-  const fetchWhoToFollow = async (currentUserId) => {
+  const fetchWhoToFollow = useCallback(async (currentUserId) => {
     try {
       const querySnapshot = await getDocs(collection(db, 'users'));
       const usersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -76,9 +119,9 @@ function Community() {
       console.error('Error fetching users:', error);
       setError('Error fetching users. Please try again later.');
     }
-  };
+  }, []);
 
-  const fetchFollowing = async (currentUserId) => {
+  const fetchFollowing = useCallback(async (currentUserId) => {
     try {
       const userQuery = query(collection(db, 'users'), where('uid', '==', currentUserId));
       const querySnapshot = await getDocs(userQuery);
@@ -91,7 +134,7 @@ function Community() {
       console.error('Error fetching following:', error);
       setError('Error fetching following. Please try again later.');
     }
-  };
+  }, []);
 
   const handleFollow = async (followedUserId) => {
     if (!currentUser) {
@@ -123,21 +166,6 @@ function Community() {
       console.error('Error following user:', error);
       setError('Error following user. Please try again later.');
     }
-  };
-
-  const sortPosts = (posts) => {
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-
-    const recentPosts = posts.filter(post => post.createdAt && new Date(post.createdAt) > twoDaysAgo);
-    const olderPostsWithLikes = posts.filter(post => post.createdAt && new Date(post.createdAt) <= twoDaysAgo && post.likes && post.likes.length > 0);
-    const olderPostsWithoutLikes = posts.filter(post => post.createdAt && new Date(post.createdAt) <= twoDaysAgo && (!post.likes || post.likes.length === 0));
-    const postsWithoutTimestamps = posts.filter(post => !post.createdAt);
-
-    recentPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    olderPostsWithLikes.sort((a, b) => b.likes.length - a.likes.length);
-
-    return [...recentPosts, ...olderPostsWithLikes, ...olderPostsWithoutLikes, ...postsWithoutTimestamps];
   };
 
   const handlePostPhotoChange = (e) => {
@@ -178,6 +206,7 @@ function Community() {
       if (postDoc.exists()) {
         const postData = postDoc.data();
         const newComment = {
+          id: uuidv4(),
           content: comment,
           userName: currentUser.name,
           userProfilePicture: currentUser.profilePicture,
@@ -190,6 +219,7 @@ function Community() {
       }
     }
   };
+  
 
   const handleLike = async (postId) => {
     if (currentUser) {
@@ -227,36 +257,58 @@ function Community() {
     await deleteDoc(postRef);
   };
 
-  const handleEditComment = async (postId, commentIndex, newContent) => {
+  const handleEditComment = async (postId, commentId, newContent) => {
     if (newContent) {
       const postRef = doc(db, 'posts', postId);
       const postDoc = await getDoc(postRef);
       if (postDoc.exists()) {
         const postData = postDoc.data();
-        const comments = [...postData.comments];
-        comments[commentIndex].content = newContent;
-        await updateDoc(postRef, { comments });
+        const updatedComments = postData.comments.map(comment =>
+          comment.id === commentId ? { ...comment, content: newContent } : comment
+        );
+        await updateDoc(postRef, { comments: updatedComments });
       }
     }
   };
+  
 
-  const handleDeleteComment = async (postId, commentIndex) => {
+  const handleDeleteComment = async (postId, commentId) => {
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     if (postDoc.exists()) {
       const postData = postDoc.data();
-      const comments = [...postData.comments];
-      comments.splice(commentIndex, 1);
-      await updateDoc(postRef, { comments });
+      const updatedComments = postData.comments.filter(comment => comment.id !== commentId);
+      await updateDoc(postRef, { comments: updatedComments });
+    }
+  };
+  
+
+  const toggleMoreLessComment = (postId) => {
+    setVisibleComments(prevState => ({
+      ...prevState,
+      [postId]: !prevState[postId],
+    }));
+  };
+
+  const toggleCommentInput = (postId) => {
+    setCommentInputVisibility(prevState => ({
+      ...prevState,
+      [postId]: !prevState[postId],
+    }));
+
+    if (!commentInputVisibility[postId] && postCardRefs.current[postId]) {
+      setTimeout(() => {
+        postCardRefs.current[postId].scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 0);
     }
   };
 
-  const getFilteredPosts = () => {
+  const getFilteredPosts = useMemo(() => {
     const filteredPosts = posts.filter(post =>
       (post.userName && post.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
     );
-
+  
     switch (filter) {
       case 'myPosts':
         return filteredPosts.filter(post => post.userId === currentUser?.uid);
@@ -265,13 +317,24 @@ function Community() {
       default:
         return filteredPosts;
     }
+  }, [posts, searchQuery, filter, currentUser]);
+
+  const scrollToPost = (postId) => {
+    const postElement = document.getElementById(postId);
+    if (postElement) {
+      postElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleUserClick = (uid) => {
+    navigate(`/profile/${uid}`);
   };
 
   return (
     <div className="community-container">
       {error && <div className="error-bar">{error}</div>}
       <div className="post-input-container">
-        <img src={currentUser?.profilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+        <img src={currentUser?.profilePicture || defaultProfilePicture} alt="Profile" className="community-profile-picture" />
         <input
           type="text"
           value={newPost}
@@ -285,22 +348,26 @@ function Community() {
         <input id="post-photo-input" type="file" accept="image/*" onChange={handlePostPhotoChange} className="file-input" />
         <button onClick={handleAddPost} className="new-post-button">Post</button>
       </div>
-
+  
       <div className="filter-buttons">
-        <button className={`filter-button ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All</button>
+        <button className={`filter-button ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All Posts</button>
         <button className={`filter-button ${filter === 'myPosts' ? 'active' : ''}`} onClick={() => setFilter('myPosts')}>My Posts</button>
         <button className={`filter-button ${filter === 'interactions' ? 'active' : ''}`} onClick={() => setFilter('interactions')}>Interactions</button>
       </div>
-
+  
       <div className="main-content">
         <div className="posts-container">
-          {getFilteredPosts().map(post => (
-            <div key={post.id} className="post-card">
+          {getFilteredPosts.map(post => (
+            <div key={post.id} id={post.id} ref={(el) => (postCardRefs.current[post.id] = el)} className="post-card">
               <div className="post-header">
-                <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
+                <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="post-profile-picture"  onClick={() => handleUserClick(post.userId)}/>
                 <div>
-                  <p className="post-user-name"><strong>{post.userName}</strong></p>
-                  {post.createdAt && <p className="post-timestamp">{new Date(post.createdAt).toLocaleString()}</p>}
+                  <p className="post-user-name" onClick={() => handleUserClick(post.userId)}><strong>{post.userName}</strong></p>
+                  {post.createdAt && (
+                    <p className="post-timestamp" title={new Date(post.createdAt).toLocaleString()}  onClick={() => handleUserClick(post.userId)}>
+                      {formatDistanceToNow(new Date(post.createdAt))} ago
+                    </p>
+                  )}
                 </div>
                 {post.userId === currentUser?.uid && (
                   <div className="post-options">
@@ -312,34 +379,61 @@ function Community() {
                   </div>
                 )}
               </div>
-              <p>{post.content}</p>
+              <p className="postCaption">{post.content}</p>
               {post.photoURL && <img src={post.photoURL} alt="Post" className="post-photo" />}
               <div className="likes-comments-container">
-                <button onClick={() => handleLike(post.id)} className="like-button">
-                  {post.likes && post.likes.includes(currentUser?.uid) ? 'Unlike' : 'Like'}
-                </button>
-                <span>{post.likes ? post.likes.length : 0} Likes</span>
-                {post.comments.map((comment, index) => (
-                  <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
-                    <img src={comment.userProfilePicture || defaultProfilePicture} alt="Profile" className="profile-picture" />
-                    <p><strong>{comment.userName}</strong>: {comment.content}</p>
-                    {comment.userId === currentUser?.uid && (
-                      <div className="comment-options">
-                        <button className="options-button">⋮</button>
-                        <div className="options-menu">
-                          <button onClick={() => handleEditComment(post.id, index, prompt('Edit comment:', comment.content))}>Edit</button>
-                          <button onClick={() => handleDeleteComment(post.id, index)}>Delete</button>
+                <div className="like-comment-buttons">
+                  <button onClick={() => handleLike(post.id)} className="like-button">
+                    <img
+                      src={post.likes && post.likes.includes(currentUser?.uid) ? likedIcon: likeIcon}
+                      alt={post.likes && post.likes.includes(currentUser?.uid) ? 'Liked' : 'Like'}
+                      className="like-icon"
+                    />
+                  </button>
+                  <button onClick={() => toggleCommentInput(post.id)} className="comment-toggle-button">
+                    {commentInputVisibility[post.id] ? 'Hide Comment' : 'Comment'}
+                  </button>
+                </div>
+                <span className="like-count">{post.likes ? post.likes.length : 0} Likes</span>
+                <div className="comments-container">
+                {sortComments(post.comments).slice(0, visibleComments[post.id] ? post.comments.length : 3).map((comment) => (
+                  <div key={comment.id} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
+                  <img
+                    src={comment.userProfilePicture || defaultProfilePicture}
+                    alt="Profile"
+                    className="comment-profile-picture"
+                    onClick={() => handleUserClick(comment.userId)}
+                  />
+                  <p className="commentContent"><strong>{comment.userName}</strong>: {comment.content}</p>
+                  <p className="comment-timestamp">{formatDistanceToNow(new Date(comment.createdAt))} ago</p>
+                  {comment.userId === currentUser?.uid && (
+                    <div className="comment-options">
+                      <button className="options-button">⋮</button>
+                      <div className="options-menu">
+                        <button onClick={() => handleEditComment(post.id, comment.id, prompt('Edit comment:', comment.content))}>Edit</button>
+                        <button onClick={() => handleDeleteComment(post.id, comment.id)}>Delete</button>
                         </div>
                       </div>
                     )}
                   </div>
                 ))}
-                <AddComment postId={post.id} onAddComment={handleAddComment} />
+                  {post.comments.length > 3 && (
+                    <button onClick={() => toggleMoreLessComment(post.id)} className="show-more-less-button">
+                      {visibleComments[post.id] ? 'Show Less' : 'Show More'}
+                    </button>
+                  )}
+                </div>
+                {commentInputVisibility[post.id] && (
+                  <AddComment
+                    postId={post.id}
+                    onAddComment={handleAddComment}
+                  />
+                )}
               </div>
             </div>
           ))}
         </div>
-
+  
         <div className="sidebar">
           <div className="search-bar-container">
             <input
@@ -352,7 +446,16 @@ function Community() {
           </div>
           <div className="sidebar-section">
             <h3>Trends for you</h3>
-            {/* Add your trends content here */}
+            {mostLikedPosts.length > 0 && mostLikedPosts.map(post => (
+              <div key={post.id} className="trending-post" onClick={() => scrollToPost(post.id)}>
+                <img src={post.userProfilePicture || defaultProfilePicture} alt="Profile" className="trending-profile-picture" />
+                <div>
+                  <p className="trending-user-name"><strong>{post.userName}</strong></p>
+                  <p className="trending-content">{post.content}</p>
+                  <p className="trending-likes">{post.likes.length} Likes</p>
+                </div>
+              </div>
+            ))}
           </div>
           <div className="sidebar-section">
             <h3>Who to follow</h3>
@@ -374,16 +477,16 @@ function Community() {
       </div>
     </div>
   );
-}
-
-function AddComment({ postId, onAddComment }) {
+  }
+  
+  const AddComment = ({ postId, onAddComment }) => {
   const [comment, setComment] = useState('');
-
+  
   const handleAddComment = () => {
     onAddComment(postId, comment);
     setComment('');
   };
-
+  
   return (
     <div className="add-comment-container">
       <input
@@ -393,9 +496,9 @@ function AddComment({ postId, onAddComment }) {
         placeholder="Write a comment..."
         className="comment-input"
       />
-      <button onClick={handleAddComment} className="comment-button">Add Comment</button>
+      <button onClick={handleAddComment} className="post-comment-button">Post Comment</button>
     </div>
   );
-}
-
-export default Community;
+  };
+  
+  export default Community;

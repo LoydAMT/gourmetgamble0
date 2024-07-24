@@ -2,10 +2,11 @@
 
 .profile-container {
   max-width: 800px;
+  height: 100%;
+  background: linear-gradient(to right, #F6D8B0 0%, #F9EC8D 58%, #FCFF6D 100%);
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
-  background: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -16,12 +17,34 @@
   margin-bottom: 20px;
 }
 
+.nickname {
+  color: #000000;
+  font-size: 25px;
+}
+
+.name {
+  padding-top: 2px;
+  padding-bottom: 3px;
+  color: #000000;
+  font-size: 20px;
+  font-weight: bolder;
+}
+
 .profile-picture {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-left: 10px;
+  margin-right: 40px;
+  object-fit: cover;
+  border: 2px solid #ffa500;
+}
+
+.profile-picture-edit {
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 20px;
   border: 2px solid #ffa500;
 }
 
@@ -41,7 +64,6 @@
 
 .profile-stats span {
   cursor: pointer;
-  text-decoration: underline;
 }
 
 .profile-actions {
@@ -50,7 +72,8 @@
   margin-top: 10px;
 }
 
-.save-button, .logout-button {
+.save-button,
+.logout-button {
   background-color: #32cd32;
   border: none;
   border-radius: 25px;
@@ -65,10 +88,26 @@
   background-color: #ff6347;
 }
 
+.edit-profile-button {
+  background-color: #32cd32;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
 .upload-recipe-button-container {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   margin-bottom: 20px;
+}
+
+.Username {
+  text-decoration: none;
+  color: black;
 }
 
 .upload-recipe-button {
@@ -86,10 +125,14 @@
   background-color: #28a428;
 }
 
-.recipes-container {
+.recipes-container-profile {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+}
+
+.profile-container {
+  background-color: #ccc;
 }
 
 .recipe-card {
@@ -135,6 +178,75 @@
   width: 80%;
   max-width: 600px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.modalContainer h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.profile-edit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-edit img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
+.profile-edit label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.profile-edit input[type="file"] {
+  display: none;
+}
+
+.profile-edit .custom-file-upload {
+  display: inline-block;
+  padding: 10px 20px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  margin-bottom: 20px;
+}
+
+.profile-edit input[type="text"] {
+  padding: 10px;
+  margin-bottom: 20px;
+  width: calc(100% - 20px);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.profile-edit .button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.profile-edit .save-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.profile-edit .closeModalButton {
+  background-color: #f44336;
+  color: white;
+}
+
+.profile-edit .save-button:hover,
+.profile-edit .closeModalButton:hover {
+  opacity: 0.9;
 }
 
 .closeModalButton {
@@ -175,4 +287,36 @@
 
 .follow-button:hover {
   background-color: #0056b3;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+  .profile-actions,
+  .profile-stats {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .edit-profile-button,
+  .logout-button,
+  .upload-recipe-button {
+    font-size: 14px;
+    padding: 8px 10px;
+    flex: 1 1 30%;
+    margin: 5px 0;
+  }
+
+  .profile-stats span {
+    font-size: 14px;
+  }
+
+  .recipe-card {
+    width: 45%;
+  }
+
+  .profile-container {
+    padding: 10px;
+  }
 }

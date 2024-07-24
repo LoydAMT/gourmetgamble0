@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Modal from 'react-modal';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
@@ -12,16 +12,21 @@ function Recipes() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchRecipes = async () => {
+  // Memoized fetchRecipes function to prevent unnecessary re-renders
+  const fetchRecipes = useCallback(async () => {
+    try {
       const querySnapshot = await getDocs(collection(db, 'recipes'));
       const recipesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setRecipes(recipesData);
       setRecipeOfTheDay(recipesData[Math.floor(Math.random() * recipesData.length)]);
-    };
-
-    fetchRecipes();
+    } catch (error) {
+      console.error('Error fetching recipes:', error);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchRecipes();
+  }, [fetchRecipes]);
 
   const filteredRecipes = recipes.filter(recipe =>
     recipe.nameOfDish.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -125,7 +130,13 @@ function Recipes() {
           },
         }}
       >
-        {selectedRecipe && <DishDetails recipe={selectedRecipe} onSimilarDishClick={handleSimilarDishClick} />}
+        {selectedRecipe && (
+          <DishDetails
+            recipe={selectedRecipe}
+            closeModal={closeModal}
+            onSimilarDishClick={handleSimilarDishClick}
+          />
+        )}
       </Modal>
     </div>
   );

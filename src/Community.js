@@ -4,6 +4,7 @@ import { db, auth, getUserProfile, uploadPostPhoto } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import './Community.css';
 
 import defaultProfilePicture from './user.png';
@@ -205,6 +206,7 @@ function Community() {
       if (postDoc.exists()) {
         const postData = postDoc.data();
         const newComment = {
+          id: uuidv4(),
           content: comment,
           userName: currentUser.name,
           userProfilePicture: currentUser.profilePicture,
@@ -217,6 +219,7 @@ function Community() {
       }
     }
   };
+  
 
   const handleLike = async (postId) => {
     if (currentUser) {
@@ -254,29 +257,31 @@ function Community() {
     await deleteDoc(postRef);
   };
 
-  const handleEditComment = async (postId, commentIndex, newContent) => {
+  const handleEditComment = async (postId, commentId, newContent) => {
     if (newContent) {
       const postRef = doc(db, 'posts', postId);
       const postDoc = await getDoc(postRef);
       if (postDoc.exists()) {
         const postData = postDoc.data();
-        const comments = [...postData.comments];
-        comments[commentIndex].content = newContent;
-        await updateDoc(postRef, { comments });
+        const updatedComments = postData.comments.map(comment =>
+          comment.id === commentId ? { ...comment, content: newContent } : comment
+        );
+        await updateDoc(postRef, { comments: updatedComments });
       }
     }
   };
+  
 
-  const handleDeleteComment = async (postId, commentIndex) => {
+  const handleDeleteComment = async (postId, commentId) => {
     const postRef = doc(db, 'posts', postId);
     const postDoc = await getDoc(postRef);
     if (postDoc.exists()) {
       const postData = postDoc.data();
-      const comments = [...postData.comments];
-      comments.splice(commentIndex, 1);
-      await updateDoc(postRef, { comments });
+      const updatedComments = postData.comments.filter(comment => comment.id !== commentId);
+      await updateDoc(postRef, { comments: updatedComments });
     }
   };
+  
 
   const toggleMoreLessComment = (postId) => {
     setVisibleComments(prevState => ({
@@ -391,27 +396,27 @@ function Community() {
                 </div>
                 <span className="like-count">{post.likes ? post.likes.length : 0} Likes</span>
                 <div className="comments-container">
-                  {sortComments(post.comments).slice(0, visibleComments[post.id] ? post.comments.length : 3).map((comment, index) => (
-                    <div key={index} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
-                      <img
-                        src={comment.userProfilePicture || defaultProfilePicture}
-                        alt="Profile"
-                        className="comment-profile-picture"
-                        onClick={() => handleUserClick(comment.userId)}
-                      />
-                      <p className="commentContent"><strong>{comment.userName}</strong>: {comment.content}</p>
-                      <p className="comment-timestamp">{formatDistanceToNow(new Date(comment.createdAt))} ago</p>
-                      {comment.userId === currentUser?.uid && (
-                        <div className="comment-options">
-                          <button className="options-button">⋮</button>
-                          <div className="options-menu">
-                            <button onClick={() => handleEditComment(post.id, index, prompt('Edit comment:', comment.content))}>Edit</button>
-                            <button onClick={() => handleDeleteComment(post.id, index)}>Delete</button>
-                          </div>
+                {sortComments(post.comments).slice(0, visibleComments[post.id] ? post.comments.length : 3).map((comment) => (
+                  <div key={comment.id} className="comment" title={new Date(comment.createdAt).toLocaleString()}>
+                  <img
+                    src={comment.userProfilePicture || defaultProfilePicture}
+                    alt="Profile"
+                    className="comment-profile-picture"
+                    onClick={() => handleUserClick(comment.userId)}
+                  />
+                  <p className="commentContent"><strong>{comment.userName}</strong>: {comment.content}</p>
+                  <p className="comment-timestamp">{formatDistanceToNow(new Date(comment.createdAt))} ago</p>
+                  {comment.userId === currentUser?.uid && (
+                    <div className="comment-options">
+                      <button className="options-button">⋮</button>
+                      <div className="options-menu">
+                        <button onClick={() => handleEditComment(post.id, comment.id, prompt('Edit comment:', comment.content))}>Edit</button>
+                        <button onClick={() => handleDeleteComment(post.id, comment.id)}>Delete</button>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
                   {post.comments.length > 3 && (
                     <button onClick={() => toggleMoreLessComment(post.id)} className="show-more-less-button">
                       {visibleComments[post.id] ? 'Show Less' : 'Show More'}

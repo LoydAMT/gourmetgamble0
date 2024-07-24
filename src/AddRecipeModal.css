@@ -72,6 +72,16 @@
     gap: 5px;
 }
 
+.ingredientName{
+    color: white;
+    font-size: 14px;
+}
+
+.ingredientName:hover{
+    color: white;
+    cursor: default;
+}
+
 .buttonContainer {
     display: flex;
     justify-content: space-between;

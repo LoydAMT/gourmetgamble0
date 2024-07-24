@@ -218,7 +218,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
             {filteredIngredients.map((ingredient) => (
               <div key={ingredient.id} className="ingredientItem">
                 <input type="checkbox" checked={selectedIngredients.includes(ingredient.name)} onChange={() => handleIngredientChange(ingredient.name)} />
-                <label>{ingredient.name}</label>
+                <label className="ingredientName">{ingredient.name}</label>
               </div>
             ))}
             {showNewIngredientForm && (

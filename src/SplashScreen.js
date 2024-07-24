@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './SplashScreen.css';
-import 'animate.css/animate.min.css'; // Ensure animate.css is imported
-import logo from './logo.png'; // Adjust the path as necessary
+import 'animate.css/animate.min.css'; 
+import logo from './logo.png'; 
 
 function SplashScreen({ onComplete, isComplete }) {
   const [showText, setShowText] = useState(false);
@@ -15,12 +15,12 @@ function SplashScreen({ onComplete, isComplete }) {
 
     const textTimeout = setTimeout(() => {
       setShowText(true);
-    }, 1500); // Delay for the logo animation
+    }, 1500); 
 
     const exitTimeout = setTimeout(() => {
       setFadeOut(true);
-      setTimeout(onComplete, 1000); // Delay to match fade-out animation
-    }, 3500); // Total animation sequence
+      setTimeout(onComplete, 1000); 
+    }, 3500); 
 
     return () => {
       clearTimeout(textTimeout);

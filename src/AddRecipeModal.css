@@ -29,6 +29,20 @@
     padding: 10px;
     width: 95%;
     font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid white;
+    background: transparent;
+}
+
+.inputRecipe::placeholder,
+.searchInput::placeholder,
+.input::placeholder{
+    color: black;
+}
+
+.inputSteps::placeholder{
+    color: black;
+    font-family: inter, sans-serif, arial;
 }
 
 .inputRecipe {
@@ -38,7 +52,21 @@
     font-size: 16px;
     height: 50px;
     resize: vertical;
-    font-family: sans-serif, inter, arial;
+    border-radius: 4px;
+    background: transparent;
+    border: 1px solid white;
+    font-family: inter, sans-serif, arial;
+}
+
+.Countryinput{
+    color:black;
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 99%;
+    border-radius: 4px;
+    border-color: 1px solid white;
+    background: transparent;
+    font-size: 16px;
 }
 
 .origin{
@@ -51,16 +79,19 @@
     padding: 10px;
     width: 95%;
     font-size: 16px;
+    border-radius: 4px;
     height: 25px;
     resize: vertical;
+    background: transparent;
+    border-color: 1px solid white;
 }
 
 .ingredientList {
     margin-bottom: 20px;
-    width: 95%;
+    width: 96%;
     max-height: 150px;
     overflow-y: auto; /* Allows scrolling within the ingredients list if it's too long */
-    border: 1px solid #ddd;
+    border: 1px solid white;
     border-radius: 4px;
     padding: 10px;
 }
@@ -82,10 +113,15 @@
     cursor: default;
 }
 
+.ingredientCheck:Hover{
+    cursor: pointer;
+}
+
 .buttonContainer {
     display: flex;
     justify-content: space-between;
-    width: 100%;
+    width: 99.2%;
+    padding-left: 2px;
 }
 
 .button {
@@ -98,7 +134,7 @@
 .addButton {
     background-color: #ff9800;
     margin-bottom: 10px;
-    width: 100%;
+    width: 99%;
 }
 
 .addRecipeButton {

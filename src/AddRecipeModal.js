@@ -189,7 +189,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <input className="input" type="text" placeholder="Name of dish" value={nameOfDish} onChange={(e) => setNameOfDish(e.target.value)} required />
           <textarea className="inputRecipe" placeholder="Dish Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-          <select className="input" value={origin} onChange={(e) => setOrigin(e.target.value)} required>
+          <select className="Countryinput" value={origin} onChange={(e) => setOrigin(e.target.value)} required>
             <option className="origin" value="" disabled>Select country of origin</option>
             {countries.map((country) => (
               <option key={country} value={country}>
@@ -217,7 +217,7 @@ const AddRecipeModal = ({ showModal, setShowModal, onAddRecipe }) => {
           <div className="ingredientList">
             {filteredIngredients.map((ingredient) => (
               <div key={ingredient.id} className="ingredientItem">
-                <input type="checkbox" checked={selectedIngredients.includes(ingredient.name)} onChange={() => handleIngredientChange(ingredient.name)} />
+                <input className="ingredientCheck" type="checkbox" checked={selectedIngredients.includes(ingredient.name)} onChange={() => handleIngredientChange(ingredient.name)} />
                 <label className="ingredientName">{ingredient.name}</label>
               </div>
             ))}

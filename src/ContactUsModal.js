@@ -1,5 +1,5 @@
 import React from 'react';
-import './ContactUsModal.css'; // Import the CSS file
+import './ContactUsModal.css'; 
 
 const ContactUsModal = ({ showModal, setShowModal }) => {
     const closeModal = () => {

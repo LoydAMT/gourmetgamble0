@@ -31,7 +31,7 @@ const ResetPasswordModal = ({ show, handleClose }) => {
         <div className="reset-password-modal-body">
           <form>
             <div className="form-group">
-              <label htmlFor="email">Email address</label>
+              <label className="emailAdd" htmlFor="email">Email address</label>
               <input
                 type="email"
                 id="email"
@@ -47,9 +47,6 @@ const ResetPasswordModal = ({ show, handleClose }) => {
             {message && <p className="message success">{message}</p>}
             {error && <p className="message error">{error}</p>}
           </form>
-        </div>
-        <div className="reset-password-modal-footer">
-          <button onClick={handleClose} className="close-button">Close</button>
         </div>
       </div>
     </div>

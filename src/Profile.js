@@ -401,7 +401,7 @@ function EditProfileModal({
             Choose File
           </label>
           <input id="file-upload" type="file" accept="image/*" onChange={handleProfilePictureChange} />
-          <label htmlFor="nickname">Nickname</label>
+          <h2 className="nickname">Nickname</h2>
           <input
             type="text"
             id="nickname"

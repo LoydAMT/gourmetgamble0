@@ -97,7 +97,7 @@ const AuthModal = ({ showModal, setShowModal }) => {
           {isSignUp && (
             <>
               <input
-                className="input"
+                className="Ainput"
                 type="text"
                 placeholder="Name"
                 value={name}
@@ -117,7 +117,7 @@ const AuthModal = ({ showModal, setShowModal }) => {
             </>
           )}
           <input
-            className="input"
+            className="Ainput"
             type="email"
             placeholder="Email"
             value={email}
@@ -125,7 +125,7 @@ const AuthModal = ({ showModal, setShowModal }) => {
             required
           />
           <input
-            className="input"
+            className="Ainput"
             type="password"
             placeholder="Password"
             value={password}

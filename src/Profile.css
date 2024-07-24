@@ -218,6 +218,23 @@
   margin-bottom: 20px;
 }
 
+.custom-file-upload{
+  color: black;
+}
+
+.custom-file-upload:hover{
+  color: black;
+  background: #ddd;
+}
+
+.nickname{
+  margin: 0px;
+}
+
+.nickname:hover{
+  color: black;
+}
+
 .profile-edit input[type="text"] {
   padding: 10px;
   margin-bottom: 20px;
